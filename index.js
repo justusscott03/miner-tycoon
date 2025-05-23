@@ -703,6 +703,56 @@ function cursor (cursor) {
 }
 
 
+// Number abbreviation for money counting, credit to Electric Dolphin ⚡️🐬 (@Dolphin0002)
+const numberLetters = ["K", "B", "M", "T", "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak"];
+function tenthRoot (num) {
+    const numStr = num.toString();
+    if (numStr[1] === ".") {
+        return numStr.substring(numStr.indexOf("e") + 2);
+    } 
+    else if (numStr[1] === "e") {
+        return numStr.substring(3);
+    } 
+    else {
+        return numStr.length - 1;
+    }
+}
+function abbreviateNum (num, forceZeroes) {
+    if (num < 1000) {
+        return num.toString();
+    }
+    let numStr = num.toString();
+    let numStrArr = numStr.split("");
+    let numPow = numStr.length - 1;
+    if (numStrArr[1] === ".") {
+        numPow = numStr.substring(numStrArr.indexOf("e") + 2);
+        numStrArr.splice(1, 1);
+    }
+    if (numStrArr[1] === "e") {
+        numPow = numStr.substring(3);
+        numStrArr = [numStrArr[0], 0, 0, 0];
+    }
+    numStr = numStrArr.join("");
+    let newNumStr = numStr.slice(0, numPow % 3 + 1) + "." + numStr.slice(numPow % 3 + 1);
+    if (!forceZeroes) {
+        let newNumArr = newNumStr.substr(0, 5).split("");
+        for (let i = newNumArr.length - 1; i >= 0; i--) {
+            if (newNumArr[i] !== "0") {
+                break;
+            } 
+            else {
+                newNumArr.splice(i, 1);
+            }
+        }
+        if (newNumArr[newNumArr.length - 1] === ".") {
+            newNumArr.splice(newNumArr.length - 1, 1);
+        }
+        newNumStr = newNumArr.join("");
+    }
+    return newNumStr.substr(0, 5) + numberLetters[floor(numPow/3) - 1];
+}
+
+
 // Game classes
 class Crate {
 
@@ -716,35 +766,84 @@ class Crate {
     }
 
     draw () {
+        noStroke();
         fill(255, 0, 0);
         rect(this.x, this.y, this.w, this.h);
+
+        fill(0);
+        textAlign("CENTER", "CENTER");
+        textSize(50);
+        text(abbreviateNum(this.money), this.x + this.w / 2, this.y - this.h / 2);
     }
 
 }
 
 class Miner {
 
+    /**
+     * 
+     * @param { number } x 
+     * @param { number } y 
+     * @param { number } w 
+     * @param { number } h 
+     */
     constructor (x, y, w, h) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        this.digging = false;
-        this.carrying = false;
-        this.money = 0;
+        this.s = 1;
+        this.action = "toDigging";
+        this.maxLoad = 10;
+        this.has = 0;
+        this.loadSpeed = 5;
     }
 
     update () {
-        if (!this.digging && !this.carrying) {
-            if (this.x < 300) {
-                this.x++;
-            }
+        switch (this.action) {
+            case "toDigging" :
+                if (this.x < 500) {
+                    this.x++;
+                }
+                else {
+                    this.action = "digging";
+                }
+            break;
+            case "digging" : 
+                this.has += this.loadSpeed / 60;
+                if (this.has >= this.maxLoad) {
+                    this.has = this.maxLoad;
+                    this.action = "toCrate";
+                }
+            break;
+            case "toCrate" :  
+                if (this.x > 300) {
+                    this.x--;
+                }
+            break;
         }
+        console.log(this.action)
     }
 
     draw () {
-        fill(0);
-        rect(this.x, this.y, this.w, this.h);
+        pushMatrix();
+
+            translate(this.x, this.y);
+            scale(this.s, 1);
+
+            noStroke();
+            fill(0);
+            rect(0, 0, this.w, this.h);
+
+            if (this.action === "digging") {
+                fill(255);
+                rect(-this.w / 6, -this.h / 6, this.w * 4 / 3, this.h / 10);
+
+                fill(255, 214, 89);
+                rect(-this.w / 6, -this.h / 6, map(this.has, 0, this.maxLoad, 0, this.w * 4 / 3), this.h / 10);
+            }
+
+        popMatrix();
     }
 
     display () {
@@ -849,7 +948,7 @@ class Shaft {
     update () {}
 
     draw () {
-        fill(255);
+        fill(150);
         rect(this.x, this.y, this.w, this.h);
         for (var i = 0; i < this.numWorkers; i++) {
             this.workers[i].display();
@@ -880,43 +979,11 @@ class Mine {
     constructor () {
         this.y = 0;
         this.numShafts = 1;
-        this.shafts = [
-            new Shaft(150, this.y + 300, 300, 100),
-            new Shaft(150, this.y + 450, 300, 100),
-            new Shaft(150, this.y + 600, 300, 100),
-            new Shaft(150, this.y + 750, 300, 100),
-            new Shaft(150, this.y + 900, 300, 100),
-            
-            new Shaft(150, this.y + 1200, 300, 100),
-            new Shaft(150, this.y + 1350, 300, 100),
-            new Shaft(150, this.y + 1500, 300, 100),
-            new Shaft(150, this.y + 1650, 300, 100),
-            new Shaft(150, this.y + 1800, 300, 100),
-            
-            new Shaft(150, this.y + 2100, 300, 100),
-            new Shaft(150, this.y + 2250, 300, 100),
-            new Shaft(150, this.y + 2400, 300, 100),
-            new Shaft(150, this.y + 2550, 300, 100),
-            new Shaft(150, this.y + 2700, 300, 100),
-            
-            new Shaft(150, this.y + 3000, 300, 100),
-            new Shaft(150, this.y + 3150, 300, 100),
-            new Shaft(150, this.y + 3300, 300, 100),
-            new Shaft(150, this.y + 3450, 300, 100),
-            new Shaft(150, this.y + 3600, 300, 100),
-            
-            new Shaft(150, this.y + 3900, 300, 100),
-            new Shaft(150, this.y + 4050, 300, 100),
-            new Shaft(150, this.y + 4200, 300, 100),
-            new Shaft(150, this.y + 4350, 300, 100),
-            new Shaft(150, this.y + 4500, 300, 100),
-            
-            new Shaft(150, this.y + 4800, 300, 100),
-            new Shaft(150, this.y + 4950, 300, 100),
-            new Shaft(150, this.y + 5100, 300, 100),
-            new Shaft(150, this.y + 5250, 300, 100),
-            new Shaft(150, this.y + 5400, 300, 100),
-        ];
+        this.shafts = [];
+        for (let i = 0; i < 30; i++) {
+            this.shafts.push(new Shaft(250, this.y + 300 + i * 150, 471.5, 150));
+        }
+
         this.elevator = new Elevator();
         this.storeHouse = new Storehouse();
         this.warehouse = new Warehouse();
