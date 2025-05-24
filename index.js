@@ -1,3 +1,4 @@
+(function () {
 
 // Variables
 let money = 0;
@@ -1105,3 +1106,5 @@ function draw () {
 draw();
 
 //}
+
+}) ();
