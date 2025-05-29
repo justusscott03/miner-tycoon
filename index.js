@@ -4,12 +4,17 @@
 let money = 0;
 let places = 0;
 let superCash = 0;
+
 let curRectMode = "CORNER";
 let curEllipseMode = "CENTER"
 let requiresFirstVertex = true;
 let angleMode = "degrees";
 let globalFont = "serif";
 let globalSize = 10;
+
+let lastTime = Date.now();
+let currentTime;
+let deltaTime;
 
 
 // Screen resize while keeping aspect ratio
@@ -55,19 +60,14 @@ window.addEventListener("resize", debounce(
 ));
 
 
-// Canvases
+// Canvas
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-
-const uiCanvas = document.getElementById("ui-canvas");
 
 
 // Canvas resize
 canvas.width = originalWidth;
 canvas.height = originalHeight;
-
-uiCanvas.width = originalWidth;
-uiCanvas.height = originalHeight;
 
 
 // PJS
@@ -757,6 +757,13 @@ function abbreviateNum (num, forceZeroes) {
 // Game classes
 class Crate {
 
+    /**
+     * Creates a new Crate object
+     * @param { number } x - The x-position of the crate
+     * @param { number } y - The y-position of the crate
+     * @param { number } w - The width of the crate
+     * @param { number } h - The height of the crate
+     */
     constructor (x, y, w, h) {
         this.x = x;
         this.y = y;
@@ -777,24 +784,39 @@ class Crate {
         text(abbreviateNum(this.money), this.x + this.w / 2, this.y - this.h / 2);
     }
 
+    /**
+     * Adds money to the crate
+     * @param { number } amount - The amount of money being added
+     */
+    add (amount) {
+        if (amount > 0) {
+            this.money += amount;
+        }
+    }
+
 }
 
 class Miner {
 
     /**
-     * 
-     * @param { number } x 
-     * @param { number } y 
-     * @param { number } w 
-     * @param { number } h 
+     * Creates a new Miner object
+     * @param { number } x - The x-position of the miner
+     * @param { number } y - The y-position of the miner
+     * @param { number } w - The width of the miner
+     * @param { number } h - The height of the miner
+     * @param { Crate } crate - The crate that the miner will offload into
      */
-    constructor (x, y, w, h) {
+    constructor (x, y, w, h, crate) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+        this.crate = crate;
+
         this.s = 1;
+
         this.action = "toDigging";
+
         this.maxLoad = 10;
         this.has = 0;
         this.loadSpeed = 5;
@@ -803,6 +825,7 @@ class Miner {
     update () {
         switch (this.action) {
             case "toDigging" :
+                this.s = 1;
                 if (this.x < 500) {
                     this.x++;
                 }
@@ -811,37 +834,46 @@ class Miner {
                 }
             break;
             case "digging" : 
-                this.has += this.loadSpeed / 60;
+                this.s = 1;
+                this.has += this.loadSpeed * deltaTime;
                 if (this.has >= this.maxLoad) {
                     this.has = this.maxLoad;
                     this.action = "toCrate";
                 }
             break;
-            case "toCrate" :  
+            case "toCrate" :
+                this.s = -1;
                 if (this.x > 300) {
                     this.x--;
                 }
+                else {
+                    this.crate.add(this.has);
+                    this.has = 0;
+                    this.action = "toDigging";
+                }
             break;
         }
-        console.log(this.action)
     }
 
     draw () {
         pushMatrix();
 
-            translate(this.x, this.y);
+            translate(this.x + this.w / 2, this.y);
             scale(this.s, 1);
+            translate(-this.x - this.w / 2, -this.y);
 
             noStroke();
             fill(0);
-            rect(0, 0, this.w, this.h);
+            rect(this.x, this.y, this.w / 2, this.h);
+            fill(255);
+            rect(this.x + this.w / 2, this.y, this.w / 2, this.h);
 
             if (this.action === "digging") {
                 fill(255);
-                rect(-this.w / 6, -this.h / 6, this.w * 4 / 3, this.h / 10);
+                rect(this.x - this.w / 6, this.y - this.h / 6, this.w * 4 / 3, this.h / 10);
 
                 fill(255, 214, 89);
-                rect(-this.w / 6, -this.h / 6, map(this.has, 0, this.maxLoad, 0, this.w * 4 / 3), this.h / 10);
+                rect(this.x - this.w / 6, this.y - this.h / 6, map(this.has, 0, this.maxLoad, 0, this.w * 4 / 3), this.h / 10);
             }
 
         popMatrix();
@@ -861,10 +893,12 @@ class Elevator {
         this.y = y;
         this.w = w;
         this.h = h;
-        this.loading = false;
-        this.unloading = false;
+        this.action = "";
+
         this.pageOut = false;
     }
+
+    update () {}
 
     draw () {
         fill(0);
@@ -926,33 +960,48 @@ class Warehouse {
 
 class Shaft {
 
+    /**
+     * Creates a new Shaft object
+     * @param { number } x - The x-position of the shaft
+     * @param { number } y - The y-position of the shaft
+     * @param { number } w - The width of the shaft
+     * @param { number } h - The height of the shaft
+     */
     constructor (x, y, w, h) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+
         this.crate = new Crate(this.x + this.w / 20, this.y + this.h * 2 / 3, this.w / 6, this.h / 3);
-        this.workersX = 0;
-        this.numWorkers = 1;
-        this.workers = [
-            new Miner(this.x + this.workersX, this.y + this.h / 3, this.w / 10, this.h * 2 / 3),
-            new Miner(this.x + this.workersX, this.y + this.h / 3, this.w / 10, this.h * 2 / 3),
-            new Miner(this.x + this.workersX, this.y + this.h / 3, this.w / 10, this.h * 2 / 3),
-            new Miner(this.x + this.workersX, this.y + this.h / 3, this.w / 10, this.h * 2 / 3),
-            new Miner(this.x + this.workersX, this.y + this.h / 3, this.w / 10, this.h * 2 / 3),
-            new Miner(this.x + this.workersX, this.y + this.h / 3, this.w / 10, this.h * 2 / 3)
-        ];
-        this.built = false;
+
+        this.minerOffset = this.w / 8;
+        this.numMiners = 0;
+        this.miners = [];
+
         this.pageOut = false;
+
+        this.recruitMiner();
+    }
+
+    recruitMiner() {
+        if (this.numMiners < 6) {
+            this.miners.push(new Miner(this.x + this.minerOffset, this.y + this.h / 3, this.w / 10, this.h * 2 / 3, this.crate));
+            this.numMiners++;
+        }
     }
 
     update () {}
 
+    /**
+     * Draws the shaft
+     * @param { number } deltaTime - The milliseconds between frames
+     */
     draw () {
         fill(150);
         rect(this.x, this.y, this.w, this.h);
-        for (var i = 0; i < this.numWorkers; i++) {
-            this.workers[i].display();
+        for (let i = 0; i < this.miners.length; i++) {
+            this.miners[i].display();
         }
         this.crate.draw();
     }
@@ -979,26 +1028,40 @@ class Mine {
 
     constructor () {
         this.y = 0;
-        this.numShafts = 1;
+
+        this.numShafts = 0;
+        this.shaftOffset = 0;
         this.shafts = [];
-        for (let i = 0; i < 30; i++) {
-            this.shafts.push(new Shaft(250, this.y + 300 + i * 150, 471.5, 150));
-        }
 
         this.elevator = new Elevator();
         this.storeHouse = new Storehouse();
         this.warehouse = new Warehouse();
+
         this.numCarriers = 1;
         this.carriers = [];
+
+        this.buildShaft();
+    }
+
+    buildShaft () {
+        if (this.numShafts < 30) {
+            this.shafts.push(new Shaft(250, this.y + 300 + this.shaftOffset, 471.5, 150));
+            this.numShafts++;
+            this.shaftOffset += 200;
+        }
     }
 
     update () {}
 
     draw () {
-        background(135, 109, 47);
-        for (var i = 0; i < this.numShafts; i++) {
-            this.shafts[i].display();
-        }
+        pushMatrix();
+            translate(0, this.y);
+            fill(135, 109, 47);
+            rect(0, 0, canvas.width, canvas.height * 10)
+            for (let i = 0; i < this.shafts.length; i++) {
+                this.shafts[i].display();
+            }
+        popMatrix();
     }
 
     display () {
@@ -1009,14 +1072,21 @@ class Mine {
 }
 
 const mine = new Mine();
+let currentMine = mine;
 
-//}
 
-/** Buttons **/
-// {
-
+// Button class
 class Button {
 
+    /**
+     * Creates a new Button object
+     * @param { number } x - The x-position
+     * @param { number } y - The y-position
+     * @param { number } w - The width of the button
+     * @param { number } h - The height of the button
+     * @param { string } txt - The text on the button
+     * @param { Function } func - The function to call on click
+     */
     constructor (x, y, w, h, txt, func) {
         this.x = x;
         this.y = y;
@@ -1029,52 +1099,99 @@ class Button {
     }
 
     draw () {
+        this.mouseOver = user.mouseX > this.x && user.mouseX < this.x + this.w &&
+                         user.mouseY > this.y && user.mouseY < this.y + this.h;
+
+        if (this.mouseOver) {
+            this.s = lerp(this.s, 1.2, 0.1);
+            if (user.mouseClicked) {
+                this.func();
+            }
+        }
+        else {
+            this.s = lerp(this.s, 1, 0.1);
+        }
+
         noStroke();
         pushMatrix();
             translate(this.x + this.w / 2, this.y + this.h / 2);
             scale(this.s);
             translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
-            fill(219, 243, 255);
-            quad(this.x + 5, this.y, this.x + 95, this.y, this.x + 92, this.y + 3, this.x + 8, this.y + 3);
-            fill(185, 227, 247);
-            quad(this.x + 5, this.y, this.x + 8, this.y + 3, this.x + 4, this.y + 8, this.x, this.y + 7);
-            quad(this.x + 95, this.y, this.x + 92, this.y + 3, this.x + 96, this.y + 8, this.x + this.w, this.y + 7);
-            fill(150, 222, 255);
-            beginShape();
-                //vertex(this.x + 
-            endShape();
+            fill(255);
+            rect(this.x, this.y, this.w, this.h);
             
             pushMatrix();
                 translate(this.x + this.w / 2, this.y + this.h / 2);
-                scale(this.w / 40, this.h / 20);
+                scale(this.w / 80, this.h / 40);
                 translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
                 fill(0);
-                textAlign(CENTER, CENTER);
+                textSize(20);
+                textAlign("CENTER", "CENTER");
                 text(this.txt, this.x + this.w / 2, this.y + this.h / 2);
             popMatrix();
             
         popMatrix();
-        
-        if (this.mouseOver) {
-            this.s = lerp(this.s, 1.2, 0.1);
-        }
-        else {
-            this.s = lerp(this.s, 1, 0.1);
-        }
-        
-        this.mouseOver = mouseX > this.x && mouseX < this.x + this.w &&
-                         mouseY > this.y && mouseY < this.y + this.h;
-    }
-
-    clicked () {
-        if (this.mouseOver) {
-            this.func();
-        }
     }
 
 }
+const button = new Button(100, 100, 100, 50, "Shaft", function () {
+    currentMine.buildShaft();
+});
 
-//}
+
+// UI, credit to Dat (@Dddatt)
+const user = (function (out) {
+        
+    out.mouseX = 0;
+    out.mouseY = 0;
+    out.mousePressed = false;
+    out.mouseClicked = false;
+    
+    out.keys = {};
+    
+    canvas.addEventListener("mousedown", function (e) {
+        out.mousePressed = true;
+    });
+    
+    canvas.addEventListener("mouseup", function (e) {
+        out.mousePressed = false;
+        out.mouseClicked = true;
+    });
+    
+    canvas.addEventListener("mousemove", function (e) {
+        out.mouseX = e.x;
+        out.mouseY = e.y;
+    });
+    
+    document.addEventListener("keydown", function (e) {
+        let key = e.key.toLowerCase();
+        
+        out.keys[key] = true;
+    });
+    
+    document.addEventListener("keyup", function (e) {
+        out.keys[e.key.toLowerCase()] = false;
+    });
+    
+    document.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+    });
+    
+    canvas.addEventListener("wheel", function (e) {          
+        e.preventDefault();
+        out.targetY = currentMine.y;
+        out.targetY += e.deltaY * 2;
+        currentMine.y = lerp(currentMine.y, out.targetY, 0.1);
+    });
+    
+    out.update = function () {
+        out.mouseClicked = false;
+    };
+    
+    return out;
+    
+}) ({});
+
 
 /** Draw and mouseClicked functions **/
 // {
@@ -1083,16 +1200,25 @@ function draw () {
 
     try {
 
+        currentTime = Date.now();
+        deltaTime = (currentTime - lastTime) / 1000;
+        lastTime = currentTime;
+        
         resetMatrix();
         
         background(255);
 
         pushMatrix();
+
             scale(scaledWidth / originalWidth, scaledHeight / originalHeight);
 
             mine.display();
 
+            button.draw();
+
         popMatrix();
+
+        user.update();
 
         requestAnimationFrame(draw);
 
