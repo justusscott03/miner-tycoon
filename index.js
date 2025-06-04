@@ -888,12 +888,23 @@ class Miner {
 
 class Elevator {
 
-    constructor (x, y, w, h) {
+    /**
+     * Creates a new Elevator object
+     * @param { number } x - The x-position of the elevator
+     * @param { number } y - The y-position of the elevator
+     * @param { number } w - The width of the elevator
+     * @param { number } h - The height of the elevator
+     * @param { Shaft[] } shafts - The shafts the elevator will visit
+     */
+    constructor (x, y, w, h, shafts) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.action = "";
+
+        this.crates = shafts.map(shaft => shaft.crate);
+        console.log(this.crates);
 
         this.pageOut = false;
     }
@@ -1032,15 +1043,14 @@ class Mine {
         this.numShafts = 0;
         this.shaftOffset = 0;
         this.shafts = [];
+        this.buildShaft();
 
-        this.elevator = new Elevator();
+        this.elevator = new Elevator(0, 0, 100, 100, [...this.shafts]);
         this.storeHouse = new Storehouse();
         this.warehouse = new Warehouse();
 
         this.numCarriers = 1;
         this.carriers = [];
-
-        this.buildShaft();
     }
 
     buildShaft () {
@@ -1174,14 +1184,14 @@ const user = (function (out) {
     });
     
     document.addEventListener("contextmenu", function (e) {
-        e.preventDefault();
+        //e.preventDefault();
     });
     
     canvas.addEventListener("wheel", function (e) {          
         e.preventDefault();
-        out.targetY = currentMine.y;
-        out.targetY += e.deltaY * 2;
-        currentMine.y = lerp(currentMine.y, out.targetY, 0.1);
+        let targetY = currentMine.y;
+        targetY += e.deltaY * 2;
+        currentMine.y = lerp(currentMine.y, targetY, 0.1);
     });
     
     out.update = function () {
@@ -1193,9 +1203,7 @@ const user = (function (out) {
 }) ({});
 
 
-/** Draw and mouseClicked functions **/
-// {
-
+// Draw and mouseClicked functions
 function draw () {
 
     try {
@@ -1228,9 +1236,7 @@ function draw () {
     }
 
 }
-
 draw();
 
-//}
 
 }) ();
