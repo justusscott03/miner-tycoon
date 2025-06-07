@@ -904,7 +904,6 @@ class Elevator {
         this.action = "";
 
         this.crates = shafts.map(shaft => shaft.crate);
-        console.log(this.crates);
 
         this.pageOut = false;
     }
@@ -914,6 +913,11 @@ class Elevator {
     draw () {
         fill(0);
         rect(this.x, this.y, this.w, this.h);
+    }
+
+    display () {
+        this.update();
+        this.draw();
     }
 
 }
@@ -928,7 +932,7 @@ class Storehouse {
         this.money = 0;
     }
 
-    draw () {
+    display () {
         fill(0);
         rect(this.x, this.y, this.w, this.h);
     }
@@ -937,18 +941,36 @@ class Storehouse {
 
 class Carrier {
 
-    constructor (x, y, w, h) {
+    /**
+     * Creates a new Carrier object
+     * @param { number } x - The x-coordinate of the carrier
+     * @param { number } y - The y-coordinate of the carrier
+     * @param { number } w - The width of the carrier
+     * @param { number } h - The height of the carrier
+     * @param { Storehouse} storehouse - The storehouse from which the carrier will get its load
+     * @param { Warehouse } warehouse - The warehouse at which the carrier will drop of its load
+     */
+    constructor (x, y, w, h, storehouse, warehouse) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        this.loading = false;
-        this.unloading = false;
+        this.storehouse = storehouse;
+        this.warehouse = warehouse;
+
+        this.state = "toStorehouse";
     }
+
+    update () {}
 
     draw () {
         fill(255);
         rect(this.x, this.y, this.w, this.h);
+    }
+
+    display () {
+        this.update();
+        this.draw();
     }
 
 }
@@ -962,7 +984,7 @@ class Warehouse {
         this.h = h;
     }
 
-    draw () {
+    display () {
         fill(0);
         rect(this.x, this.y, this.w, this.h);
     }
@@ -1046,18 +1068,26 @@ class Mine {
         this.buildShaft();
 
         this.elevator = new Elevator(0, 0, 100, 100, [...this.shafts]);
-        this.storeHouse = new Storehouse();
+        this.storehouse = new Storehouse();
         this.warehouse = new Warehouse();
 
         this.numCarriers = 1;
         this.carriers = [];
+        this.recruitCarrier();
     }
 
     buildShaft () {
         if (this.numShafts < 30) {
-            this.shafts.push(new Shaft(250, this.y + 300 + this.shaftOffset, 471.5, 150));
+            this.shafts.push(new Shaft(250, 300 + this.shaftOffset, 471.5, 150));
             this.numShafts++;
             this.shaftOffset += 200;
+        }
+    }
+
+    recruitCarrier () {
+        if (this.numCarriers < 5) {
+            this.carriers.push(new Carrier(0, 0, 100, 100, this.storehouse, this.warehouse));
+            this.numCarriers++;
         }
     }
 
@@ -1066,11 +1096,23 @@ class Mine {
     draw () {
         pushMatrix();
             translate(0, this.y);
+
             fill(135, 109, 47);
-            rect(0, 0, canvas.width, canvas.height * 10)
+            rect(0, 0, canvas.width, canvas.height * 10);
+
             for (let i = 0; i < this.shafts.length; i++) {
                 this.shafts[i].display();
             }
+
+            this.elevator.display();
+
+            this.storehouse.display();
+
+            for (let i = 0; i < this.carriers.length; i++) {
+                this.carriers[i].display();
+            }
+
+            this.warehouse.display();
         popMatrix();
     }
 
@@ -1189,6 +1231,7 @@ const user = (function (out) {
     
     canvas.addEventListener("wheel", function (e) {          
         e.preventDefault();
+
         let targetY = currentMine.y;
         targetY += e.deltaY * 2;
         currentMine.y = lerp(currentMine.y, targetY, 0.1);
