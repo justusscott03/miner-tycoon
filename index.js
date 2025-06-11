@@ -894,7 +894,7 @@ class Elevator {
      * @param { number } y - The y-position of the elevator
      * @param { number } w - The width of the elevator
      * @param { number } h - The height of the elevator
-     * @param { Shaft[] } shafts - The shafts the elevator will visit
+     * @param { Shaft[] } shafts - The shafts that the elevator will visit
      */
     constructor (x, y, w, h, shafts) {
         this.x = x;
@@ -924,7 +924,15 @@ class Elevator {
 
 class Storehouse {
 
-    constructor (x, y, w, h) {
+    /**
+     * Creates a new Storehouse object
+     * @param { number } x - The x-position of the storehouse
+     * @param { number } y - The y-position of the storehouse
+     * @param { number } w - The width of the storehouse
+     * @param { number } h - The height of the storehouse
+     * @param { Elevator } elevator - The elevator that will drop its load in the storehouse
+     */
+    constructor (x, y, w, h, elevator) {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -977,11 +985,20 @@ class Carrier {
 
 class Warehouse {
 
-    constructor (x, y, w, h) {
+    /**
+     * Creates a new Warehouse object
+     * @param { number } x - The x-position of the warehouse
+     * @param { number } y - The y-position of the warehouse
+     * @param { number } w - The width of the warehouse
+     * @param { number } h - The height of the warehouse
+     * @param { Carrier[] } carriers - The carriers that will drop their load into the warehouse
+     */
+    constructor (x, y, w, h, carriers) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+        this.carriers = carriers;
     }
 
     display () {
@@ -1006,7 +1023,7 @@ class Shaft {
         this.w = w;
         this.h = h;
 
-        this.crate = new Crate(this.x + this.w / 20, this.y + this.h * 2 / 3, this.w / 6, this.h / 3);
+        this.crate = new Crate(this.x + this.w / 80, this.y + this.h * 2 / 3, this.w / 6, this.h / 3);
 
         this.minerOffset = this.w / 8;
         this.numMiners = 0;
@@ -1067,8 +1084,8 @@ class Mine {
         this.shafts = [];
         this.buildShaft();
 
-        this.elevator = new Elevator(0, 0, 100, 100, [...this.shafts]);
-        this.storehouse = new Storehouse();
+        this.elevator = new Elevator(0, 375, 150, 200, [...this.shafts]);
+        this.storehouse = new Storehouse(0, 0, 0, 0, this.elevator);
         this.warehouse = new Warehouse();
 
         this.numCarriers = 1;
@@ -1078,7 +1095,7 @@ class Mine {
 
     buildShaft () {
         if (this.numShafts < 30) {
-            this.shafts.push(new Shaft(250, 300 + this.shaftOffset, 471.5, 150));
+            this.shafts.push(new Shaft(150, 500 + this.shaftOffset, 571.5, 150));
             this.numShafts++;
             this.shaftOffset += 200;
         }
@@ -1100,6 +1117,24 @@ class Mine {
             fill(135, 109, 47);
             rect(0, 0, canvas.width, canvas.height * 10);
 
+            noStroke();
+            fill(34, 139, 34);
+            rect(0, 300, canvas.width, 50);
+
+            for (let i = 0; i < 5; i++) {
+                let lesserValue = (i === 0) ? 0 : 5;
+
+                fill(i * 15 + 20);
+                beginShape();
+                    vertex(i * 5, 350);
+                    vertex(-i * 5 + 150, 350);
+                    vertex(-i * 5 + 150, this.shafts.length * 200 + 445 - lesserValue);
+                    vertex(-i * 5 + 140, this.shafts.length * 200 + 455 - lesserValue);
+                    vertex(i * 5 + 10, this.shafts.length * 200 + 455 - lesserValue);
+                    vertex(i * 5, this.shafts.length * 200 + 445 - lesserValue);
+                endShape();
+            }
+
             for (let i = 0; i < this.shafts.length; i++) {
                 this.shafts[i].display();
             }
@@ -1109,7 +1144,7 @@ class Mine {
             this.storehouse.display();
 
             for (let i = 0; i < this.carriers.length; i++) {
-                this.carriers[i].display();
+                //this.carriers[i].display();
             }
 
             this.warehouse.display();
@@ -1188,6 +1223,9 @@ class Button {
 }
 const button = new Button(100, 100, 100, 50, "Shaft", function () {
     currentMine.buildShaft();
+    if (currentMine.shafts.length !== 30) {
+        currentMine.elevator.crates = currentMine.shafts.map(shaft => shaft.crate);
+    }
 });
 
 
