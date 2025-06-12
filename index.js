@@ -769,8 +769,11 @@ class Crate {
         this.y = y;
         this.w = w;
         this.h = h;
+
         this.lvl = 1;
-        this.money = 0;
+        this.money = 100;
+
+        this.hasUnloaded = false;
     }
 
     draw () {
@@ -895,24 +898,124 @@ class Elevator {
      * @param { number } w - The width of the elevator
      * @param { number } h - The height of the elevator
      * @param { Shaft[] } shafts - The shafts that the elevator will visit
+     * @param { Storehouse } storehouse - The storehouse that the elevator will drop its load in
      */
-    constructor (x, y, w, h, shafts) {
+    constructor (x, y, w, h, shafts, storehouse) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        this.action = "";
+        this.storehouse = storehouse;
+
+        this.action = "movingDown";
+
+        this.money = 0;
+
+        this.moveSpeed = 2;
+        this.loadSpeed = 2;
+        this.maxLoad = 100;
+        this.loadTimer = 0;
+        this.unloadTimer = 0;
 
         this.crates = shafts.map(shaft => shaft.crate);
+        this.curCrate = null;
+        this.curCrateIndex = null;
 
         this.pageOut = false;
     }
 
-    update () {}
+    update () {
+
+        switch (this.action) {
+
+            case "movingDown" :
+
+                this.y += this.moveSpeed;
+
+                for (let i = 0; i < this.crates.length; i++) {
+                    const crate = this.crates[i];
+                    
+                    if (!crate.hasUnloaded && this.y + this.h > crate.y + crate.h) {
+                        this.y = crate.y + crate.h - this.h;
+                        this.curCrate = crate;
+                        this.curCrateIndex = i;
+                        this.action = "loading";
+                    }
+                }
+
+            break;
+
+            case "loading" : 
+                
+                const moneyToLoad = this.curCrate.money;
+
+                if (this.money + moneyToLoad > this.maxLoad) {
+                    moneyToLoad = this.maxLoad - this.money;
+                }
+                
+                const loadTime = moneyToLoad / this.loadSpeed;
+
+                this.loadTimer++;
+                if (this.loadTimer > loadTime) {
+                    this.loadTimer = 0;
+                    this.money += moneyToLoad;
+                    this.curCrate.money -= moneyToLoad;
+                    this.curCrate.hasUnloaded = true;
+                    this.curCrate = null;
+                    if (this.curCrateIndex !== this.crates.length - 1 && this.money < this.maxLoad) {
+                        this.action = "movingDown";
+                    }
+                    else {
+                        this.action = "movingUp";
+                    }
+                }
+                
+            break;
+
+            case "movingUp" :
+
+                this.y -= this.moveSpeed;
+
+                if (this.y < 525) {
+                    this.action = "unloading";
+                }
+
+            break;
+
+            case "unloading" :
+
+                const moneyToUnload = this.money;
+
+                const unloadTime = moneyToUnload / this.loadSpeed;
+
+                this.unloadTimer++;
+                if (this.unloadTimer > unloadTime) {
+                    this.storehouse.money += this.money;
+                    this.money = 0;
+                    this.action = "movingDown";
+
+                    this.crates.forEach(crate => crate.hasUnloaded = false);
+                }
+
+            break;
+
+        }
+
+        //console.log(this.action)
+    }
 
     draw () {
         fill(0);
-        rect(this.x, this.y, this.w, this.h);
+        beginShape();
+            vertex(this.x, this.y + this.h / 20);
+            vertex(this.x + this.w * 2 / 15, this.y);
+            vertex(this.x + this.w * 13 / 15, this.y);
+            vertex(this.x + this.w, this.y + this.h / 20);
+            vertex(this.x + this.w, this.y + this.h * 19 / 20);
+            vertex(this.x + this.w * 13 / 15, this.y + this.h);
+            vertex(this.x + this.w * 2 / 15, this.y + this.h);
+            vertex(this.x, this.y + this.h * 19 / 20);
+        endShape();
     }
 
     display () {
@@ -930,9 +1033,8 @@ class Storehouse {
      * @param { number } y - The y-position of the storehouse
      * @param { number } w - The width of the storehouse
      * @param { number } h - The height of the storehouse
-     * @param { Elevator } elevator - The elevator that will drop its load in the storehouse
      */
-    constructor (x, y, w, h, elevator) {
+    constructor (x, y, w, h) {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -1016,40 +1118,48 @@ class Shaft {
      * @param { number } y - The y-position of the shaft
      * @param { number } w - The width of the shaft
      * @param { number } h - The height of the shaft
+     * @param { number } id - The id of the shaft (1 - 30)
      */
-    constructor (x, y, w, h) {
+    constructor (x, y, w, h, id) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+        this.id = id;
 
-        this.crate = new Crate(this.x + this.w / 80, this.y + this.h * 2 / 3, this.w / 6, this.h / 3);
+        this.crate = new Crate(this.x + this.w / 80, this.y + this.h * 3 / 5, this.w / 7, this.h * 2 / 5);
 
         this.minerOffset = this.w / 8;
         this.numMiners = 0;
         this.miners = [];
+        this.recruitMiner();
 
         this.pageOut = false;
-
-        this.recruitMiner();
     }
 
     recruitMiner() {
         if (this.numMiners < 6) {
-            this.miners.push(new Miner(this.x + this.minerOffset, this.y + this.h / 3, this.w / 10, this.h * 2 / 3, this.crate));
+            this.miners.push(new Miner(this.x + this.minerOffset, this.y + this.h / 4, this.w / 10, this.h * 3 / 4, this.crate));
             this.numMiners++;
         }
     }
 
     update () {}
 
-    /**
-     * Draws the shaft
-     * @param { number } deltaTime - The milliseconds between frames
-     */
     draw () {
         fill(150);
         rect(this.x, this.y, this.w, this.h);
+
+        stroke(0);
+        fill(100, 100, 100);
+        rect(100, this.y + 25, 50, 50, 10);
+        rect(104, this.y + 29, 42, 42, 6);
+
+        fill(255);
+        ctx.font = "bold 30px Arial";
+        textAlign("CENTER", "CENTER");
+        text(this.id, 125, this.y + 53);
+        
         for (let i = 0; i < this.miners.length; i++) {
             this.miners[i].display();
         }
@@ -1084,20 +1194,22 @@ class Mine {
         this.shafts = [];
         this.buildShaft();
 
-        this.elevator = new Elevator(0, 375, 150, 200, [...this.shafts]);
-        this.storehouse = new Storehouse(0, 0, 0, 0, this.elevator);
-        this.warehouse = new Warehouse();
+        this.storehouse = new Storehouse(0, 0, 0, 0);
+
+        this.elevator = new Elevator(60, 525, 130, 200, [...this.shafts], this.storehouse);
 
         this.numCarriers = 1;
         this.carriers = [];
         this.recruitCarrier();
+
+        this.warehouse = new Warehouse(0, 0, 0, 0, [...this.carriers]);
     }
 
     buildShaft () {
         if (this.numShafts < 30) {
-            this.shafts.push(new Shaft(150, 500 + this.shaftOffset, 571.5, 150));
+            this.shafts.push(new Shaft(200, 700 + this.shaftOffset, 521.5, 100, this.numShafts + 1));
             this.numShafts++;
-            this.shaftOffset += 200;
+            this.shaftOffset += 175;
         }
     }
 
@@ -1119,19 +1231,19 @@ class Mine {
 
             noStroke();
             fill(34, 139, 34);
-            rect(0, 300, canvas.width, 50);
+            rect(0, 450, canvas.width, 50);
 
             for (let i = 0; i < 5; i++) {
                 let lesserValue = (i === 0) ? 0 : 5;
 
                 fill(i * 15 + 20);
                 beginShape();
-                    vertex(i * 5, 350);
-                    vertex(-i * 5 + 150, 350);
-                    vertex(-i * 5 + 150, this.shafts.length * 200 + 445 - lesserValue);
-                    vertex(-i * 5 + 140, this.shafts.length * 200 + 455 - lesserValue);
-                    vertex(i * 5 + 10, this.shafts.length * 200 + 455 - lesserValue);
-                    vertex(i * 5, this.shafts.length * 200 + 445 - lesserValue);
+                    vertex(i * 5 + 50, 500);
+                    vertex(-i * 5 + 200, 500);
+                    vertex(-i * 5 + 200, this.shafts.length * 175 + 630 - lesserValue);
+                    vertex(-i * 5 + 190, this.shafts.length * 175 + 640 - lesserValue);
+                    vertex(i * 5 + 60, this.shafts.length * 175 + 640 - lesserValue);
+                    vertex(i * 5 + 50, this.shafts.length * 175 + 630 - lesserValue);
                 endShape();
             }
 
@@ -1139,7 +1251,7 @@ class Mine {
                 this.shafts[i].display();
             }
 
-            this.elevator.display();
+            //this.elevator.display();
 
             this.storehouse.display();
 
@@ -1249,8 +1361,8 @@ const user = (function (out) {
     });
     
     canvas.addEventListener("mousemove", function (e) {
-        out.mouseX = e.x;
-        out.mouseY = e.y;
+        out.mouseX = e.x * (originalWidth / window.innerWidth);
+        out.mouseY = e.y * (originalHeight / window.innerHeight);
     });
     
     document.addEventListener("keydown", function (e) {
@@ -1273,6 +1385,7 @@ const user = (function (out) {
         let targetY = currentMine.y;
         targetY += e.deltaY * 2;
         currentMine.y = lerp(currentMine.y, targetY, 0.1);
+        currentMine.y = constrain(currentMine.y, -4950, 0);
     });
     
     out.update = function () {
