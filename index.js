@@ -1,28 +1,21 @@
-(function () {
+function KhanMiner () {
 
 // Variables
-let money = 0;
-let places = 0;
-let superCash = 0;
+let money = 0, places = 0, superCash = 0;
+let lastTime = Date.now(), currentTime, deltaTime;
 
-let curRectMode = "CORNER";
-let curEllipseMode = "CENTER"
-let requiresFirstVertex = true;
-let angleMode = "degrees";
-let globalFont = "serif";
-let globalSize = 10;
-
-let lastTime = Date.now();
-let currentTime;
-let deltaTime;
+const elevatorStates = {
+    movingUp : 0,
+    movingDown : 1,
+    loading : 2,
+    unloading : 3
+};
 
 
 // Screen resize while keeping aspect ratio
-const originalWidth = 721.5;
-const originalHeight = 962;
+const originalWidth = 721.5, originalHeight = 962;
 
-let screenWidth = window.innerWidth;
-let screenHeight = window.innerHeight;
+let screenWidth = window.innerWidth, screenHeight = window.innerHeight;
 
 const aspectRatio = originalWidth / originalHeight;
 
@@ -61,8 +54,7 @@ window.addEventListener("resize", debounce(
 
 
 // Canvas
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById("canvas"), ctx = canvas.getContext("2d");
 
 
 // Canvas resize
@@ -71,6 +63,9 @@ canvas.height = originalHeight;
 
 
 // PJS
+const CORNER = 0, CORNERS = 1, RADIUS = 2, CENTER = 3, SQUARE = "butt", PROJECT = "square", ROUND = "round", MITER = "miter", BEVEL = "bevel", LEFT = 37, RIGHT = 39, BOTTOM = 102, BASELINE = 0;
+let curRectMode = CORNER, curEllipseMode = CENTER, requiresFirstVertex = true, angleMode = "degrees", globalFont = "serif", globalSize = 10;
+
 function roundRect (x, y, width, height, radius) {
     ctx.beginPath();
         ctx.moveTo(x + radius, y);
@@ -89,25 +84,25 @@ function roundRect (x, y, width, height, radius) {
 function rect (x, y, w, h, radius) {
     let xPos, yPos, width, height;
 
-    if (curRectMode === "CORNER") {
+    if (curRectMode === CORNER) {
         xPos = x;
         yPos = y;
         width = w;
         height = h;
     }
-    else if (curRectMode === "CORNERS") {
+    else if (curRectMode === CORNERS) {
         xPos = x;
         yPos = y;
         width = w - x;
         height = h - y;
     }
-    else if (curRectMode === "CENTER") {
+    else if (curRectMode === CENTER) {
         xPos = x - w / 2;
         yPos = y - h / 2;
         width = w;
         height = h;
     }
-    else if (curRectMode === "RADIUS") {
+    else if (curRectMode === RADIUS) {
         xPos = x - w;
         yPos = y - h;
         width = w * 2;
@@ -141,25 +136,25 @@ function arc (x, y, w, h, start, stop) {
 function ellipse (x, y, w, h) {
     let xPos, yPos, width, height;
     
-    if (curEllipseMode === "CENTER") {
+    if (curEllipseMode === CENTER) {
         xPos = x;
         yPos = y;
         width = w;
         height = h;
     }
-    else if (curEllipseMode === "RADIUS") {
+    else if (curEllipseMode === RADIUS) {
         xPos = x;
         yPos = y;
         width = w * 2;
         height = h * 2;
     }
-    else if (curEllipseMode === "CORNER") {
+    else if (curEllipseMode === CORNER) {
         xPos = x + w / 2;
         yPos = y + h / 2;
         width = w;
         height = h;
     }
-    else if (curEllipseMode === "CORNERS") {
+    else if (curEllipseMode === CORNERS) {
         xPos = (x + w) / 2;
         yPos = (y + h) / 2;
         width = w - x;
@@ -217,22 +212,24 @@ function bezier (x1, y1, cx1, cy1, cx2, cy2, x2, y2) {
     ctx.stroke();
 }
 function ellipseMode (MODE) {
+    if (![CORNER, CORNERS, RADIUS, CENTER].includes(MODE)) {
+        console.error("Invalid ellipseMode MODE:", MODE);
+    }
+
     curEllipseMode = MODE;
 }
 function rectMode (MODE) {
+    if (![CORNER, CORNERS, RADIUS, CENTER].includes(MODE)) {
+        console.error("Invalid rectMode MODE:", MODE);
+    }
+
     curRectMode = MODE;
 }
 function strokeCap (MODE) {
-    if (MODE === "SQUARE") {
-        MODE = "butt";
+    if (![ROUND, SQUARE, PROJECT].includes(MODE)) {
+        console.error("Invalid strokeCap mode:", MODE);
     }
-    if (MODE === "ROUND") {
-        MODE = "round";
-    }
-    if (MODE === "PROJECT") {
-        MODE = "square";
-    }
-    
+
     ctx.lineCap = MODE;
 }
 
@@ -263,6 +260,10 @@ function bezierVertex (cx1, cy1, cx2, cy2, x, y) {
     }
 }
 function strokeJoin (MODE) {
+    if (![MITER, BEVEL, ROUND].includes(MODE)) {
+        console.error("Invalid strokeJoin MODE:", MODE);
+    }
+
     ctx.lineJoin = MODE;
 }
 
@@ -597,26 +598,16 @@ function textSize (size) {
     globalSize = size;
     ctx.font = `${globalSize}px ${globalFont}`;
 }
-function textAlign (ALIGN, YALIGN = "BASELINE") {
-    if (ALIGN === "LEFT") {
-        ALIGN = "start";
+function textAlign (ALIGN, YALIGN = BASELINE) {
+    if (![LEFT, CENTER, RIGHT].includes(ALIGN)) {
+        console.error("Invalid textAlign ALIGN:", ALIGN);
     }
-    if (ALIGN === "CENTER") {
-        ALIGN = "center";
-    }
-    if (ALIGN === "RIGHT") {
-        ALIGN = "end";
+    if (![BASELINE, CENTER, BOTTOM].includes(YALIGN)) {
+        console.error("Invalid textAlign YALIGN:", YALIGN);
     }
 
-    if (YALIGN === "BASELINE") {
-        YALIGN = "alphabetic";
-    }
-    if (YALIGN === "CENTER") {
-        YALIGN = "middle";
-    }
-    if (YALIGN === "BOTTOM") {
-        YALIGN = "bottom";
-    }
+    ALIGN = ALIGN === LEFT ? "start" : ALIGN === CENTER ? "center" : "end";
+    YALIGN = YALIGN === BASELINE ? "alphabetic" : YALIGN === CENTER ? "middle" : "bottom";
     
     ctx.textAlign = ALIGN;
     ctx.textBaseline = YALIGN;
@@ -782,8 +773,8 @@ class Crate {
         rect(this.x, this.y, this.w, this.h);
 
         fill(0);
-        textAlign("CENTER", "CENTER");
-        textSize(50);
+        textAlign(CENTER, CENTER);
+        textSize(30);
         text(abbreviateNum(this.money), this.x + this.w / 2, this.y - this.h / 2);
     }
 
@@ -826,7 +817,9 @@ class Miner {
     }
 
     update () {
+
         switch (this.action) {
+
             case "toDigging" :
                 this.s = 1;
                 if (this.x < 500) {
@@ -836,6 +829,7 @@ class Miner {
                     this.action = "digging";
                 }
             break;
+
             case "digging" : 
                 this.s = 1;
                 this.has += this.loadSpeed * deltaTime;
@@ -844,6 +838,7 @@ class Miner {
                     this.action = "toCrate";
                 }
             break;
+
             case "toCrate" :
                 this.s = -1;
                 if (this.x > 300) {
@@ -855,7 +850,9 @@ class Miner {
                     this.action = "toDigging";
                 }
             break;
+
         }
+
     }
 
     draw () {
@@ -907,7 +904,7 @@ class Elevator {
         this.h = h;
         this.storehouse = storehouse;
 
-        this.action = "movingDown";
+        this.action = elevatorStates.movingDown;
 
         this.money = 0;
 
@@ -916,6 +913,8 @@ class Elevator {
         this.maxLoad = 100;
         this.loadTimer = 0;
         this.unloadTimer = 0;
+
+        this.loadBarMax = 0;
 
         this.crates = shafts.map(shaft => shaft.crate);
         this.curCrate = null;
@@ -928,7 +927,7 @@ class Elevator {
 
         switch (this.action) {
 
-            case "movingDown" :
+            case elevatorStates.movingDown :
 
                 this.y += this.moveSpeed;
 
@@ -939,21 +938,22 @@ class Elevator {
                         this.y = crate.y + crate.h - this.h;
                         this.curCrate = crate;
                         this.curCrateIndex = i;
-                        this.action = "loading";
+                        this.action = elevatorStates.loading;
                     }
                 }
 
             break;
 
-            case "loading" : 
+            case elevatorStates.loading : 
                 
-                const moneyToLoad = this.curCrate.money;
+                let moneyToLoad = this.curCrate.money;
 
                 if (this.money + moneyToLoad > this.maxLoad) {
                     moneyToLoad = this.maxLoad - this.money;
                 }
                 
                 const loadTime = moneyToLoad / this.loadSpeed;
+                this.loadBarMax = loadTime;
 
                 this.loadTimer++;
                 if (this.loadTimer > loadTime) {
@@ -963,45 +963,45 @@ class Elevator {
                     this.curCrate.hasUnloaded = true;
                     this.curCrate = null;
                     if (this.curCrateIndex !== this.crates.length - 1 && this.money < this.maxLoad) {
-                        this.action = "movingDown";
+                        this.action = elevatorStates.movingDown;
                     }
                     else {
-                        this.action = "movingUp";
+                        this.action = elevatorStates.movingUp;
                     }
                 }
                 
             break;
 
-            case "movingUp" :
+            case elevatorStates.movingUp :
 
                 this.y -= this.moveSpeed;
 
                 if (this.y < 525) {
-                    this.action = "unloading";
+                    this.action = elevatorStates.unloading;
                 }
 
             break;
 
-            case "unloading" :
+            case elevatorStates.unloading :
 
                 const moneyToUnload = this.money;
 
                 const unloadTime = moneyToUnload / this.loadSpeed;
+                this.loadBarMax = unloadTime;
 
                 this.unloadTimer++;
                 if (this.unloadTimer > unloadTime) {
+                    this.unloadTimer = 0;
                     this.storehouse.money += this.money;
                     this.money = 0;
-                    this.action = "movingDown";
-
+                    this.action = elevatorStates.movingDown;
                     this.crates.forEach(crate => crate.hasUnloaded = false);
                 }
 
             break;
 
         }
-
-        //console.log(this.action)
+        
     }
 
     draw () {
@@ -1016,6 +1016,17 @@ class Elevator {
             vertex(this.x + this.w * 2 / 15, this.y + this.h);
             vertex(this.x, this.y + this.h * 19 / 20);
         endShape();
+
+        fill(255);
+        textAlign(CENTER, CENTER);
+        text(this.money, this.x + this.w / 2, this.y + this.h / 2);
+
+        if (this.action === elevatorStates.loading || this.action === elevatorStates.unloading) {
+            fill(255);
+            rect(this.x + this.w / 5, this.y - this.h / 16, this.w * 3 / 5, this.h / 20, 1);
+            fill(255, 214, 89);
+            rect(this.x + this.w / 5, this.y - this.h / 16, map(this.action === elevatorStates.loading ? this.loadTimer : this.unloadTimer, 0, this.loadBarMax, 0, this.w * 3 / 5), this.h / 20, 1);
+        }
     }
 
     display () {
@@ -1045,6 +1056,8 @@ class Storehouse {
     display () {
         fill(0);
         rect(this.x, this.y, this.w, this.h);
+        fill(255);
+        text(this.money, this.x + this.w / 2, this.y + this.h / 2);
     }
 
 }
@@ -1157,7 +1170,7 @@ class Shaft {
 
         fill(255);
         ctx.font = "bold 30px Arial";
-        textAlign("CENTER", "CENTER");
+        textAlign(CENTER, CENTER);
         text(this.id, 125, this.y + 53);
         
         for (let i = 0; i < this.miners.length; i++) {
@@ -1194,7 +1207,7 @@ class Mine {
         this.shafts = [];
         this.buildShaft();
 
-        this.storehouse = new Storehouse(0, 0, 0, 0);
+        this.storehouse = new Storehouse(50, 150, 150, 300);
 
         this.elevator = new Elevator(60, 525, 130, 200, [...this.shafts], this.storehouse);
 
@@ -1234,7 +1247,7 @@ class Mine {
             rect(0, 450, canvas.width, 50);
 
             for (let i = 0; i < 5; i++) {
-                let lesserValue = (i === 0) ? 0 : 5;
+                let lesserValue = (i === 0 ? 0 : 5) + i * 5;
 
                 fill(i * 15 + 20);
                 beginShape();
@@ -1251,7 +1264,7 @@ class Mine {
                 this.shafts[i].display();
             }
 
-            //this.elevator.display();
+            this.elevator.display();
 
             this.storehouse.display();
 
@@ -1325,7 +1338,7 @@ class Button {
                 translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
                 fill(0);
                 textSize(20);
-                textAlign("CENTER", "CENTER");
+                textAlign(CENTER, CENTER);
                 text(this.txt, this.x + this.w / 2, this.y + this.h / 2);
             popMatrix();
             
@@ -1433,4 +1446,4 @@ function draw () {
 draw();
 
 
-}) ();
+}
