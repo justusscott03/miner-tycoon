@@ -1,7 +1,7 @@
 function KhanMiner () {
 
 // Variables
-let money = 0, places = 0, superCash = 0;
+let totalMoney = 0, places = 0, superCash = 0;
 let lastTime = Date.now(), currentTime, deltaTime;
 
 const minerStates = {
@@ -14,6 +14,13 @@ const elevatorStates = {
     movingUp : 0,
     movingDown : 1,
     loading : 2,
+    unloading : 3
+};
+
+const carrierStates = {
+    toStorehouse : 0,
+    loading : 1,
+    toWarehouse : 2,
     unloading : 3
 };
 
@@ -832,7 +839,7 @@ class Miner {
         this.maxLoad = 10;
         this.has = 0;
         this.loadSpeed = 5;
-        this.moveSpeed = 50;
+        this.moveSpeed = 60;
     }
 
     update () {
@@ -975,7 +982,6 @@ class Elevator {
             case elevatorStates.loading : 
                 
                 let moneyToLoad = this.curCrate.money;
-
                 if (this.money + moneyToLoad > this.maxLoad) {
                     moneyToLoad = this.maxLoad - this.money;
                 }
@@ -1109,14 +1115,118 @@ class Carrier {
         this.storehouse = storehouse;
         this.warehouse = warehouse;
 
-        this.state = "toStorehouse";
+        this.s = -1;
+
+        this.action = carrierStates.toStorehouse;
+
+        this.money = 0;
+
+        this.moveSpeed = 60;
+        this.loadSpeed = 2;
+        this.maxLoad = 100;
+        this.loadTimer = 0;
+        this.unloadTimer = 0;
+
+        this.loadBarMax = 0;
     }
 
-    update () {}
+    update () {
+
+        switch (this.action) {
+
+            case carrierStates.toStorehouse :
+
+                this.s = -1;    
+            
+                this.x -= this.moveSpeed * deltaTime;
+
+                if (this.x < 300) {
+                    this.action = carrierStates.loading;
+                }
+
+            break;
+
+            case carrierStates.loading :
+
+                let moneyToLoad = this.storehouse.money;
+                if (this.storehouse.money > this.maxLoad) {
+                    moneyToLoad = this.maxLoad;
+                }
+
+                const loadTime = moneyToLoad / this.loadSpeed;
+                this.loadBarMax = loadTime;
+
+                this.loadTimer++;
+                if (this.loadTimer > loadTime) {
+                    this.loadTimer = 0;
+                    this.money += moneyToLoad;
+                    this.storehouse.money -= moneyToLoad;
+                    this.action = carrierStates.toWarehouse;
+                }
+
+            break;
+
+            case carrierStates.toWarehouse :
+
+                this.s = 1;
+
+                this.x += this.moveSpeed * deltaTime;
+
+                if (this.x > 370) {
+                    this.action = carrierStates.unloading;
+                }
+
+            break;
+
+            case carrierStates.unloading :
+
+                let moneyToUnload = this.money;
+
+                const unloadTime = moneyToUnload / this.loadSpeed;
+                this.loadBarMax = unloadTime;
+
+                this.unloadTimer++;
+                if (this.unloadTimer > unloadTime) {
+                    this.unloadTimer = 0;
+                    totalMoney += this.money;
+                    this.money = 0;
+                    this.action = carrierStates.toStorehouse;
+                }
+
+            break;
+
+        }
+
+    }
 
     draw () {
-        fill(255);
-        rect(this.x, this.y, this.w, this.h);
+        pushMatrix();
+            translate(this.x + this.w / 2, this.y);
+            scale(this.s, 1);
+            translate(-this.x - this.w / 2, -this.y);
+
+            fill(255);
+            rect(this.x + this.w / 2, this.y, this.w / 2, this.h);
+            fill(0);
+            rect(this.x, this.y, this.w / 2, this.h);
+
+            fill(0);
+            rect(this.x + this.w + 5, this.y + this.h / 3, this.w * 1.5, this.h * 2 / 3);
+        popMatrix();
+
+        fill(round(255 / 2));
+        textAlign(CENTER, CENTER);
+        textSize(40);
+        text(this.money, this.x + this.w / 2, this.y + this.h / 2);
+
+
+        if (this.action === carrierStates.loading || this.action === carrierStates.unloading) {
+            fill(255);
+            rect(this.x - this.w / 6, this.y - this.h / 6, this.w * 4 / 3, this.h / 10);
+
+            fill(255, 214, 89);
+            rect(this.x - this.w / 6, this.y - this.h / 6, map(this.action === carrierStates.loading ? this.loadTimer : this.unloadTimer, 0, this.loadBarMax, 0, this.w * 4 / 3), this.h / 10);
+        }
     }
 
     display () {
@@ -1134,14 +1244,12 @@ class Warehouse {
      * @param { number } y - The y-position of the warehouse.
      * @param { number } w - The width of the warehouse.
      * @param { number } h - The height of the warehouse.
-     * @param { Carrier[] } carriers - The carriers that will drop their load into the warehouse.
      */
-    constructor (x, y, w, h, carriers) {
+    constructor (x, y, w, h) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        this.carriers = carriers;
     }
 
     display () {
@@ -1243,7 +1351,7 @@ class Mine {
         this.carriers = [];
         this.recruitCarrier();
 
-        this.warehouse = new Warehouse(0, 0, 0, 0, [...this.carriers]);
+        this.warehouse = new Warehouse(521.5, 150, 150, 300, [...this.carriers]);
     }
 
     buildShaft () {
@@ -1256,7 +1364,7 @@ class Mine {
 
     recruitCarrier () {
         if (this.numCarriers < 5) {
-            this.carriers.push(new Carrier(0, 0, 100, 100, this.storehouse, this.warehouse));
+            this.carriers.push(new Carrier(450, 375, 52.15, 75, this.storehouse, this.warehouse));
             this.numCarriers++;
         }
     }
@@ -1297,10 +1405,14 @@ class Mine {
             this.storehouse.display();
 
             for (let i = 0; i < this.carriers.length; i++) {
-                //this.carriers[i].display();
+                this.carriers[i].display();
             }
 
             this.warehouse.display();
+
+            fill(0);
+            textAlign(CENTER, CENTER);
+            text(totalMoney, canvas.width / 2, 50);
         popMatrix();
     }
 
