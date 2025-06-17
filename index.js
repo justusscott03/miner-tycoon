@@ -4,6 +4,12 @@ function KhanMiner () {
 let money = 0, places = 0, superCash = 0;
 let lastTime = Date.now(), currentTime, deltaTime;
 
+const minerStates = {
+    toDigging : 0,
+    digging : 1,
+    toCrate : 2
+};
+
 const elevatorStates = {
     movingUp : 0,
     movingDown : 1,
@@ -697,6 +703,11 @@ function cursor (cursor) {
 
 // Number abbreviation for money counting, credit to Electric Dolphin ⚡️🐬 (@Dolphin0002)
 const numberLetters = ["K", "B", "M", "T", "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak"];
+/**
+ * Estimates the exponent (power of ten) of a given number when expressed in scientific notation.
+ * @param { number } num - The number whose exponent is being extracted.
+ * @returns { string|number } The exponent as a string if scientific notation is used; otherwise, the length of the number minus one.
+ */
 function tenthRoot (num) {
     const numStr = num.toString();
     if (numStr[1] === ".") {
@@ -709,6 +720,13 @@ function tenthRoot (num) {
         return numStr.length - 1;
     }
 }
+
+/**
+ * Abbreviates a large number to a shorter format (e.g., `1,000,000` → `1M`, `10,000,000,000,000` → `10T`).
+ * @param { number } num - The number to abbreviate.
+ * @param { boolean } forceZeroes - Whether to display trailing zeroes (up to four significant digits).
+ * @returns { string } The abbreviated number string.
+ */
 function abbreviateNum (num, forceZeroes) {
     if (num < 1000) {
         return num.toString();
@@ -749,11 +767,11 @@ function abbreviateNum (num, forceZeroes) {
 class Crate {
 
     /**
-     * Creates a new Crate object
-     * @param { number } x - The x-position of the crate
-     * @param { number } y - The y-position of the crate
-     * @param { number } w - The width of the crate
-     * @param { number } h - The height of the crate
+     * Creates a new Crate object.
+     * @param { number } x - The x-position of the crate.
+     * @param { number } y - The y-position of the crate.
+     * @param { number } w - The width of the crate.
+     * @param { number } h - The height of the crate.
      */
     constructor (x, y, w, h) {
         this.x = x;
@@ -779,8 +797,8 @@ class Crate {
     }
 
     /**
-     * Adds money to the crate
-     * @param { number } amount - The amount of money being added
+     * Adds money to the crate.
+     * @param { number } amount - The amount of money being added.
      */
     add (amount) {
         if (amount > 0) {
@@ -793,12 +811,12 @@ class Crate {
 class Miner {
 
     /**
-     * Creates a new Miner object
-     * @param { number } x - The x-position of the miner
-     * @param { number } y - The y-position of the miner
-     * @param { number } w - The width of the miner
-     * @param { number } h - The height of the miner
-     * @param { Crate } crate - The crate that the miner will offload into
+     * Creates a new Miner object.
+     * @param { number } x - The x-position of the miner.
+     * @param { number } y - The y-position of the miner.
+     * @param { number } w - The width of the miner.
+     * @param { number } h - The height of the miner.
+     * @param { Crate } crate - The crate that the miner will offload into.
      */
     constructor (x, y, w, h, crate) {
         this.x = x;
@@ -809,46 +827,56 @@ class Miner {
 
         this.s = 1;
 
-        this.action = "toDigging";
+        this.action = minerStates.toDigging;
 
         this.maxLoad = 10;
         this.has = 0;
         this.loadSpeed = 5;
+        this.moveSpeed = 50;
     }
 
     update () {
 
         switch (this.action) {
 
-            case "toDigging" :
+            case minerStates.toDigging :
+
                 this.s = 1;
+
                 if (this.x < 500) {
-                    this.x++;
+                    this.x += this.moveSpeed * deltaTime;
                 }
                 else {
-                    this.action = "digging";
+                    this.action = minerStates.digging;
                 }
+
             break;
 
-            case "digging" : 
+            case minerStates.digging : 
+
                 this.s = 1;
+
                 this.has += this.loadSpeed * deltaTime;
                 if (this.has >= this.maxLoad) {
                     this.has = this.maxLoad;
-                    this.action = "toCrate";
+                    this.action = minerStates.toCrate;
                 }
+
             break;
 
-            case "toCrate" :
+            case minerStates.toCrate :
+
                 this.s = -1;
+
                 if (this.x > 300) {
-                    this.x--;
+                    this.x -= this.moveSpeed * deltaTime;
                 }
                 else {
                     this.crate.add(this.has);
                     this.has = 0;
-                    this.action = "toDigging";
+                    this.action = minerStates.toDigging;
                 }
+
             break;
 
         }
@@ -868,7 +896,7 @@ class Miner {
             fill(255);
             rect(this.x + this.w / 2, this.y, this.w / 2, this.h);
 
-            if (this.action === "digging") {
+            if (this.action === minerStates.digging) {
                 fill(255);
                 rect(this.x - this.w / 6, this.y - this.h / 6, this.w * 4 / 3, this.h / 10);
 
@@ -889,13 +917,13 @@ class Miner {
 class Elevator {
 
     /**
-     * Creates a new Elevator object
-     * @param { number } x - The x-position of the elevator
-     * @param { number } y - The y-position of the elevator
-     * @param { number } w - The width of the elevator
-     * @param { number } h - The height of the elevator
-     * @param { Shaft[] } shafts - The shafts that the elevator will visit
-     * @param { Storehouse } storehouse - The storehouse that the elevator will drop its load in
+     * Creates a new Elevator object.
+     * @param { number } x - The x-position of the elevator.
+     * @param { number } y - The y-position of the elevator.
+     * @param { number } w - The width of the elevator.
+     * @param { number } h - The height of the elevator.
+     * @param { Shaft[] } shafts - The shafts that the elevator will visit.
+     * @param { Storehouse } storehouse - The storehouse that the elevator will drop its load in.
      */
     constructor (x, y, w, h, shafts, storehouse) {
         this.x = x;
@@ -908,7 +936,7 @@ class Elevator {
 
         this.money = 0;
 
-        this.moveSpeed = 2;
+        this.moveSpeed = 120;
         this.loadSpeed = 2;
         this.maxLoad = 100;
         this.loadTimer = 0;
@@ -929,7 +957,7 @@ class Elevator {
 
             case elevatorStates.movingDown :
 
-                this.y += this.moveSpeed;
+                this.y += this.moveSpeed * deltaTime;
 
                 for (let i = 0; i < this.crates.length; i++) {
                     const crate = this.crates[i];
@@ -974,7 +1002,7 @@ class Elevator {
 
             case elevatorStates.movingUp :
 
-                this.y -= this.moveSpeed;
+                this.y -= this.moveSpeed * deltaTime;
 
                 if (this.y < 525) {
                     this.action = elevatorStates.unloading;
@@ -1039,11 +1067,11 @@ class Elevator {
 class Storehouse {
 
     /**
-     * Creates a new Storehouse object
-     * @param { number } x - The x-position of the storehouse
-     * @param { number } y - The y-position of the storehouse
-     * @param { number } w - The width of the storehouse
-     * @param { number } h - The height of the storehouse
+     * Creates a new Storehouse object.
+     * @param { number } x - The x-position of the storehouse.
+     * @param { number } y - The y-position of the storehouse.
+     * @param { number } w - The width of the storehouse.
+     * @param { number } h - The height of the storehouse.
      */
     constructor (x, y, w, h) {
         this.x = x;
@@ -1065,13 +1093,13 @@ class Storehouse {
 class Carrier {
 
     /**
-     * Creates a new Carrier object
-     * @param { number } x - The x-coordinate of the carrier
-     * @param { number } y - The y-coordinate of the carrier
-     * @param { number } w - The width of the carrier
-     * @param { number } h - The height of the carrier
-     * @param { Storehouse} storehouse - The storehouse from which the carrier will get its load
-     * @param { Warehouse } warehouse - The warehouse at which the carrier will drop of its load
+     * Creates a new Carrier object.
+     * @param { number } x - The x-coordinate of the carrier.
+     * @param { number } y - The y-coordinate of the carrier.
+     * @param { number } w - The width of the carrier.
+     * @param { number } h - The height of the carrier.
+     * @param { Storehouse} storehouse - The storehouse from which the carrier will get its load.
+     * @param { Warehouse } warehouse - The warehouse at which the carrier will drop of its load.
      */
     constructor (x, y, w, h, storehouse, warehouse) {
         this.x = x;
@@ -1101,12 +1129,12 @@ class Carrier {
 class Warehouse {
 
     /**
-     * Creates a new Warehouse object
-     * @param { number } x - The x-position of the warehouse
-     * @param { number } y - The y-position of the warehouse
-     * @param { number } w - The width of the warehouse
-     * @param { number } h - The height of the warehouse
-     * @param { Carrier[] } carriers - The carriers that will drop their load into the warehouse
+     * Creates a new Warehouse object.
+     * @param { number } x - The x-position of the warehouse.
+     * @param { number } y - The y-position of the warehouse.
+     * @param { number } w - The width of the warehouse.
+     * @param { number } h - The height of the warehouse.
+     * @param { Carrier[] } carriers - The carriers that will drop their load into the warehouse.
      */
     constructor (x, y, w, h, carriers) {
         this.x = x;
@@ -1126,12 +1154,12 @@ class Warehouse {
 class Shaft {
 
     /**
-     * Creates a new Shaft object
-     * @param { number } x - The x-position of the shaft
-     * @param { number } y - The y-position of the shaft
-     * @param { number } w - The width of the shaft
-     * @param { number } h - The height of the shaft
-     * @param { number } id - The id of the shaft (1 - 30)
+     * Creates a new Shaft object.
+     * @param { number } x - The x-position of the shaft.
+     * @param { number } y - The y-position of the shaft.
+     * @param { number } w - The width of the shaft.
+     * @param { number } h - The height of the shaft.
+     * @param { number } id - The id of the shaft (1 - 30).
      */
     constructor (x, y, w, h, id) {
         this.x = x;
@@ -1291,13 +1319,13 @@ let currentMine = mine;
 class Button {
 
     /**
-     * Creates a new Button object
-     * @param { number } x - The x-position
-     * @param { number } y - The y-position
-     * @param { number } w - The width of the button
-     * @param { number } h - The height of the button
-     * @param { string } txt - The text on the button
-     * @param { Function } func - The function to call on click
+     * Creates a new Button object.
+     * @param { number } x - The x-position.
+     * @param { number } y - The y-position.
+     * @param { number } w - The width of the button.
+     * @param { number } h - The height of the button.
+     * @param { string } txt - The text on the button.
+     * @param { Function } func - The function to call on click.
      */
     constructor (x, y, w, h, txt, func) {
         this.x = x;
