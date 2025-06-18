@@ -628,6 +628,14 @@ function textAlign (ALIGN, YALIGN = BASELINE) {
 function text (message, x, y) {
     ctx.fillText(message, x, y);
 }
+function outlinedText (message, x, y, weight, main, outline, inc = 10) {
+    fill(outline);
+    for (let i = 0; i < 360; i += inc) {
+        text(message, x + sin(i) * weight, y + cos(i) * weight);
+    }
+    fill(main);
+    text(message, x, y);
+};
 
 function pushMatrix () {
     ctx.save();
@@ -771,6 +779,68 @@ function abbreviateNum (num, forceZeroes) {
 
 
 // Game classes
+class Button {
+
+    /**
+     * Creates a new Button object.
+     * @param { number } x - The x-position.
+     * @param { number } y - The y-position.
+     * @param { number } w - The width of the button.
+     * @param { number } h - The height of the button.
+     * @param { string } txt - The text on the button.
+     * @param { Function } func - The function to call on click.
+     */
+    constructor (x, y, w, h, txt, func) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.txt = txt;
+        this.func = func;
+        this.s = 3;
+        this.mouseOver = false;
+    }
+
+    draw () {
+        this.mouseOver = user.mouseX > this.x && user.mouseX < this.x + this.w &&
+                         user.mouseY > this.y && user.mouseY < this.y + this.h;
+
+        if (this.mouseOver) {
+            this.s = lerp(this.s, 1.2, 0.1);
+            if (user.mouseClicked) {
+                this.func();
+            }
+        }
+        else {
+            this.s = lerp(this.s, 1, 0.1);
+        }
+
+        noStroke();
+        pushMatrix();
+            translate(this.x + this.w / 2, this.y + this.h / 2);
+            scale(this.s);
+            translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
+            fill(255);
+            rect(this.x, this.y, this.w, this.h);
+            
+            pushMatrix();
+                translate(this.x + this.w / 2, this.y + this.h / 2);
+                scale(this.w / 40, this.h / 40);
+                translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
+
+                strokeWeight(0.5);
+                stroke(0);
+                fill(255);
+                textSize(20);
+                textAlign(CENTER, CENTER);
+                outlinedText(this.txt, this.x + this.w / 2, this.y + this.h / 2, 1, color(255), color(0));
+            popMatrix();
+            
+        popMatrix();
+    }
+
+}
+
 class Crate {
 
     /**
@@ -1091,6 +1161,8 @@ class Storehouse {
         fill(0);
         rect(this.x, this.y, this.w, this.h);
         fill(255);
+        textSize(50);
+        textAlign(CENTER, CENTER);
         text(this.money, this.x + this.w / 2, this.y + this.h / 2);
     }
 
@@ -1284,6 +1356,14 @@ class Shaft {
         this.recruitMiner();
 
         this.pageOut = false;
+
+        this.level = 1;
+        this.boostLevels = [10, 25, 50, 100, 200, 300, 400, 500, 600, 800];
+
+        const t = this;
+        this.upgradeButton = new Button(this.x + this.w * 4 / 5, this.y + this.h / 4, 50, 50, this.level, function () {
+            t.pageOut = true;
+        });
     }
 
     recruitMiner() {
@@ -1312,7 +1392,10 @@ class Shaft {
         for (let i = 0; i < this.miners.length; i++) {
             this.miners[i].display();
         }
+
         this.crate.draw();
+
+        this.upgradeButton.draw();
     }
 
     display () {
@@ -1341,10 +1424,10 @@ class Mine {
         this.numShafts = 0;
         this.shaftOffset = 0;
         this.shafts = [];
-        this.buildShaft();
 
         this.storehouse = new Storehouse(50, 150, 150, 300);
 
+        this.displayElevator = false;
         this.elevator = new Elevator(60, 525, 130, 200, [...this.shafts], this.storehouse);
 
         this.numCarriers = 1;
@@ -1357,6 +1440,10 @@ class Mine {
     buildShaft () {
         if (this.numShafts < 30) {
             this.shafts.push(new Shaft(200, 700 + this.shaftOffset, 521.5, 100, this.numShafts + 1));
+            this.elevator.crates = this.shafts.map(shaft => shaft.crate);
+            if (this.numShafts === 0) {
+                this.displayElevator = true;
+            }
             this.numShafts++;
             this.shaftOffset += 175;
         }
@@ -1389,10 +1476,10 @@ class Mine {
                 beginShape();
                     vertex(i * 5 + 50, 500);
                     vertex(-i * 5 + 200, 500);
-                    vertex(-i * 5 + 200, this.shafts.length * 175 + 630 - lesserValue);
-                    vertex(-i * 5 + 190, this.shafts.length * 175 + 640 - lesserValue);
-                    vertex(i * 5 + 60, this.shafts.length * 175 + 640 - lesserValue);
-                    vertex(i * 5 + 50, this.shafts.length * 175 + 630 - lesserValue);
+                    vertex(-i * 5 + 200, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 630 - lesserValue);
+                    vertex(-i * 5 + 190, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 640 - lesserValue);
+                    vertex(i * 5 + 60, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 640 - lesserValue);
+                    vertex(i * 5 + 50, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 630 - lesserValue);
                 endShape();
             }
 
@@ -1400,7 +1487,9 @@ class Mine {
                 this.shafts[i].display();
             }
 
-            this.elevator.display();
+            if (this.displayElevator) {
+                this.elevator.display();
+            }
 
             this.storehouse.display();
 
@@ -1427,70 +1516,9 @@ const mine = new Mine();
 let currentMine = mine;
 
 
-// Button class
-class Button {
-
-    /**
-     * Creates a new Button object.
-     * @param { number } x - The x-position.
-     * @param { number } y - The y-position.
-     * @param { number } w - The width of the button.
-     * @param { number } h - The height of the button.
-     * @param { string } txt - The text on the button.
-     * @param { Function } func - The function to call on click.
-     */
-    constructor (x, y, w, h, txt, func) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-        this.txt = txt;
-        this.func = func;
-        this.s = 3;
-        this.mouseOver = false;
-    }
-
-    draw () {
-        this.mouseOver = user.mouseX > this.x && user.mouseX < this.x + this.w &&
-                         user.mouseY > this.y && user.mouseY < this.y + this.h;
-
-        if (this.mouseOver) {
-            this.s = lerp(this.s, 1.2, 0.1);
-            if (user.mouseClicked) {
-                this.func();
-            }
-        }
-        else {
-            this.s = lerp(this.s, 1, 0.1);
-        }
-
-        noStroke();
-        pushMatrix();
-            translate(this.x + this.w / 2, this.y + this.h / 2);
-            scale(this.s);
-            translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
-            fill(255);
-            rect(this.x, this.y, this.w, this.h);
-            
-            pushMatrix();
-                translate(this.x + this.w / 2, this.y + this.h / 2);
-                scale(this.w / 80, this.h / 40);
-                translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
-                fill(0);
-                textSize(20);
-                textAlign(CENTER, CENTER);
-                text(this.txt, this.x + this.w / 2, this.y + this.h / 2);
-            popMatrix();
-            
-        popMatrix();
-    }
-
-}
-const button = new Button(100, 100, 100, 50, "Shaft", function () {
+// Button definitions
+const button = new Button(100, 100, 100, 100, "Shaft", function () {
     currentMine.buildShaft();
-    if (currentMine.shafts.length !== 30) {
-        currentMine.elevator.crates = currentMine.shafts.map(shaft => shaft.crate);
-    }
 });
 
 
