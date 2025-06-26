@@ -1,4 +1,79 @@
+async function createDatabase () {
+    return new Promise((resolve, reject) => {
+        const request = window.indexedDB.open("KhanMinerDB", 1);
+
+        request.onupgradeneeded = function (event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains("worlds")) {
+                db.createObjectStore("worlds", { keyPath: "id" });
+            }
+        };
+
+        request.onsuccess = function () {
+            resolve(request.result);
+        };
+
+        request.onerror = function (e) {
+            reject(e);
+        };
+    });
+}
+
+// Helper to get the object store and transaction
+async function getStore (mode = "readonly") {
+    const db = await createDatabase();
+    const tx = db.transaction("worlds", mode);
+    const store = tx.objectStore("worlds");
+    return { db, store };
+}
+
+async function loadFromDB (id) {
+    const { db, store } = await getStore("readonly");
+    return new Promise((resolve) => {
+        const req = id ? store.get(id) : store.getAll();
+        req.onsuccess = function () {
+            resolve(req.result);
+            db.close();
+        };
+        req.onerror = function () {
+            resolve(null);
+            db.close();
+        };
+    });
+}
+
+async function saveToDB (id, data) {
+    const { db, store } = await getStore("readwrite");
+    return new Promise((resolve, reject) => {
+        const req = store.put({ id: id, data: data });
+        req.onsuccess = function () {
+            resolve(req.result);
+            db.close();
+        };
+        req.onerror = function (e) {
+            reject(e);
+            db.close();
+        };
+    });
+}
+
+async function deleteFromDB (id) {
+    const { db, store } = await getStore("readwrite");
+    return new Promise((resolve, reject) => {
+        const req = store.delete(id);
+        req.onsuccess = function () {
+            resolve(req.result);
+            db.close();
+        };
+        req.onerror = function (e) {
+            reject(e);
+            db.close();
+        };
+    });
+}
+
 function KhanMiner () {
+
 
 // Variables
 let totalMoney = 0, places = 0, superCash = 0;
@@ -26,7 +101,7 @@ const carrierStates = {
 
 
 // Screen resize while keeping aspect ratio
-const originalWidth = 721.5, originalHeight = 962;
+const originalWidth = 716, originalHeight = 962;
 
 let screenWidth = window.innerWidth, screenHeight = window.innerHeight;
 
@@ -348,11 +423,12 @@ class Marsaglia {
         return i < 0 ? i + 1 : i;
     }
 
+    static createRandomized () {
+        let now = new Date();
+        return new Marsaglia((now / 60000) & 0xFFFFFFFF, now & 0xFFFFFFFF);
+    }
+
 }
-Marsaglia.createRandomized = function () {
-    let now = new Date();
-    return new Marsaglia((now / 60000) & 0xFFFFFFFF, now & 0xFFFFFFFF);
-};
 class PerlinNoise {
     constructor (seed) {
         let rnd = seed !== undefined ? new Marsaglia(seed) : Marsaglia.createRandomized();
@@ -779,6 +855,12 @@ function abbreviateNum (num, forceZeroes) {
 
 
 // Game classes
+class UpgradePage {
+
+    constructor () {}
+
+}
+
 class Button {
 
     /**
@@ -806,7 +888,7 @@ class Button {
                          user.mouseY > this.y && user.mouseY < this.y + this.h;
 
         if (this.mouseOver) {
-            this.s = lerp(this.s, 1.2, 0.1);
+            this.s = lerp(this.s, 1.1, 0.1);
             if (user.mouseClicked) {
                 this.func();
             }
@@ -881,6 +963,27 @@ class Crate {
         if (amount > 0) {
             this.money += amount;
         }
+    }
+
+    toJSON () {
+        return {
+            x : this.x,
+            y : this.y,
+            w : this.w,
+            h : this.h,
+            lvl : this.lvl,
+            money : this.money,
+            hasUnloaded : this.hasUnloaded
+        };
+    }
+
+    static fromJSON (data) {
+        const crate = new Crate(data.x, data.y, data.w, data.h);
+        crate.lvl = data.lvl;
+        crate.money = data.money;
+        crate.hasUnloaded = data.hasUnloaded;
+
+        return crate;
     }
 
 }
@@ -987,6 +1090,38 @@ class Miner {
     display () {
         this.update();
         this.draw();
+    }
+
+    toJSON () {
+        return {
+            x : this.x,
+            y : this.y,
+            w : this.w,
+            h : this.h,
+            crate : this.crate.toJSON(),
+            s : this.s,
+            action : this.action,
+            maxLoad : this.maxLoad,
+            has : this.has,
+            loadSpeed : this.loadSpeed,
+            moveSpeed : this.moveSpeed
+        };
+    }
+
+    static fromJSON (data, crate) {
+        const miner = new Miner(data.x, data.y, data.w, data.h, crate);
+        miner.x = data.x;
+        miner.y = data.y;
+        miner.w = data.w;
+        miner.h = data.h;
+        miner.s = data.s;
+        miner.action = data.action;
+        miner.maxLoad = data.maxLoad;
+        miner.has = data.has;
+        miner.loadSpeed = data.loadSpeed;
+        miner.moveSpeed = data.moveSpeed;
+
+        return miner;
     }
 
 }
@@ -1109,33 +1244,103 @@ class Elevator {
     }
 
     draw () {
-        fill(0);
-        beginShape();
-            vertex(this.x, this.y + this.h / 20);
-            vertex(this.x + this.w * 2 / 15, this.y);
-            vertex(this.x + this.w * 13 / 15, this.y);
-            vertex(this.x + this.w, this.y + this.h / 20);
-            vertex(this.x + this.w, this.y + this.h * 19 / 20);
-            vertex(this.x + this.w * 13 / 15, this.y + this.h);
-            vertex(this.x + this.w * 2 / 15, this.y + this.h);
-            vertex(this.x, this.y + this.h * 19 / 20);
-        endShape();
 
-        fill(255);
-        textAlign(CENTER, CENTER);
-        text(this.money, this.x + this.w / 2, this.y + this.h / 2);
+        pushMatrix();
 
-        if (this.action === elevatorStates.loading || this.action === elevatorStates.unloading) {
+            translate(this.x, this.y);
+            scale(this.w / 110, this.h / 170)
+
+            fill(0);
+            beginShape();
+                vertex(0, 17 / 2);
+                vertex(44 / 3, 0);
+                vertex(286 / 3, 0);
+                vertex(110, 17 / 2);
+                vertex(110, 323 / 2);
+                vertex(286 / 3, 170);
+                vertex(44 / 3, 170);
+                vertex(0, 323 / 2);
+            endShape();
+
+            fill(136, 198, 221);
+            strokeWeight(2);
+            stroke(0);
+            beginShape();
+                vertex(0, 11);
+                vertex(110, 11);
+                vertex(110, 133);
+                vertex(90, 145);
+                vertex(25, 145);
+                vertex(0, 133);
+            endShape();
+
+            ellipse(20, 7, 18, 18);
+            ellipse(90, 7, 18, 18);
+
+            fill(0, 0, 0, 0);
+            stroke(0);
+            beginShape();
+                vertex(8, 19);
+                vertex(102, 19);
+                vertex(102, 126);
+                vertex(85, 137);
+                vertex(30, 137);
+                vertex(8, 126);
+            endShape();
+
             fill(255);
-            rect(this.x + this.w / 5, this.y - this.h / 16, this.w * 3 / 5, this.h / 20, 1);
-            fill(255, 214, 89);
-            rect(this.x + this.w / 5, this.y - this.h / 16, map(this.action === elevatorStates.loading ? this.loadTimer : this.unloadTimer, 0, this.loadBarMax, 0, this.w * 3 / 5), this.h / 20, 1);
-        }
+            textAlign(CENTER, CENTER);
+            text(this.money, this.w / 2, this.h / 2);
+
+            if (this.action === elevatorStates.loading || this.action === elevatorStates.unloading) {
+                noStroke();
+                fill(255);
+                rect(22, -85 / 8, 66, 17 / 2, 1);
+                fill(255, 214, 89);
+                rect(this.w / 5, -this.h / 16, map(this.action === elevatorStates.loading ? this.loadTimer : this.unloadTimer, 0, this.loadBarMax, 0, this.w * 3 / 5), this.h / 20, 1);
+            }
+
+        popMatrix();
     }
 
     display () {
         this.update();
         this.draw();
+    }
+
+    toJSON () {
+        return {
+            x : this.x,
+            y : this.y,
+            w : this.w,
+            h : this.h,
+            storehouse : this.storehouse.toJSON(),
+            action : this.action,
+            money : this.money,
+            moveSpeed : this.moveSpeed,
+            loadSpeed : this.loadSpeed,
+            maxLoad : this.maxLoad,
+            loadTimer : this.loadTimer,
+            unloadTimer : this.unloadTimer,
+            loadBarMax : this.loadBarMax,
+            crates : this.crates.map(crate => crate.toJSON()),
+            curCrateIndex : this.curCrateIndex
+        };
+    }
+
+    static fromJSON (data, shafts, storehouse) {
+        const elevator = new Elevator(data.x, data.y, data.w, data.h, shafts, storehouse);
+        elevator.action = data.action;
+        elevator.money = data.money;
+        elevator.moveSpeed = data.moveSpeed;
+        elevator.loadSpeed = data.loadSpeed;
+        elevator.maxLoad = data.maxLoad;
+        elevator.loadTimer = data.loadTimer;
+        elevator.unloadTimer = data.unloadTimer;
+        elevator.loadBarMax = data.loadBarMax;
+        elevator.curCrateIndex = data.curCrateIndex;
+
+        return elevator;
     }
 
 }
@@ -1164,6 +1369,23 @@ class Storehouse {
         textSize(50);
         textAlign(CENTER, CENTER);
         text(this.money, this.x + this.w / 2, this.y + this.h / 2);
+    }
+
+    toJSON () {
+        return {
+            x : this.x,
+            y : this.y,
+            w : this.w,
+            h : this.h,
+            money : this.money
+        };
+    }
+
+    static fromJSON (data) {
+        const storehouse = new Storehouse(data.x, data.y, data.w, data.h);
+        storehouse.money = data.money;
+
+        return storehouse;
     }
 
 }
@@ -1306,6 +1528,41 @@ class Carrier {
         this.draw();
     }
 
+    toJSON () {
+        return {
+            x : this.x,
+            y : this.y,
+            w : this.w,
+            h : this.h,
+            storehouse : this.storehouse.toJSON(),
+            warehouse : this.warehouse.toJSON(),
+            s : this.s,
+            action : this.action,
+            money : this.money,
+            moveSpeed : this.moveSpeed,
+            loadSpeed : this.loadSpeed,
+            maxLoad : this.maxLoad,
+            loadTimer : this.loadTimer,
+            unloadTimer : this.unloadTimer,
+            loadBarMax : this.loadBarMax
+        };
+    }
+
+    static fromJSON (data, storehouse, warehouse) {
+        const carrier = new Carrier(data.x, data.y, data.w, data.h, storehouse, warehouse);
+        carrier.s = data.s;
+        carrier.action = data.action;
+        carrier.money = data.money;
+        carrier.moveSpeed = data.moveSpeed;
+        carrier.loadSpeed = data.loadSpeed;
+        carrier.maxLoad = data.maxLoad;
+        carrier.loadTimer = data.loadTimer;
+        carrier.unloadTimer = data.unloadTimer;
+        carrier.loadBarMax = data.loadBarMax;
+
+        return carrier;
+    }
+
 }
 
 class Warehouse {
@@ -1327,6 +1584,19 @@ class Warehouse {
     display () {
         fill(0);
         rect(this.x, this.y, this.w, this.h);
+    }
+
+    toJSON () {
+        return {
+            x : this.x,
+            y : this.y,
+            w : this.w,
+            h : this.h
+        };
+    }
+    
+    static fromJSON (data) {
+        return new Warehouse(data.x, data.y, data.w, data.h);
     }
 
 }
@@ -1361,7 +1631,7 @@ class Shaft {
         this.boostLevels = [10, 25, 50, 100, 200, 300, 400, 500, 600, 800];
 
         const t = this;
-        this.upgradeButton = new Button(this.x + this.w * 4 / 5, this.y + this.h / 4, 50, 50, this.level, function () {
+        this.pageOutButton = new Button(this.x + this.w * 4 / 5, this.y + this.h / 4, 50, 50, this.level, function () {
             t.pageOut = true;
         });
     }
@@ -1381,13 +1651,13 @@ class Shaft {
 
         stroke(0);
         fill(100, 100, 100);
-        rect(100, this.y + 25, 50, 50, 10);
-        rect(104, this.y + 29, 42, 42, 6);
+        rect(127, this.y + 25, 46, 46, 10);
+        rect(131, this.y + 29, 38, 38, 8);
 
         fill(255);
         ctx.font = "bold 30px Arial";
         textAlign(CENTER, CENTER);
-        text(this.id, 125, this.y + 53);
+        text(this.id, 150, this.y + 50);
         
         for (let i = 0; i < this.miners.length; i++) {
             this.miners[i].display();
@@ -1395,12 +1665,38 @@ class Shaft {
 
         this.crate.draw();
 
-        this.upgradeButton.draw();
+        this.pageOutButton.draw();
     }
 
     display () {
         this.update();
         this.draw();
+    }
+
+    toJSON () {
+        return {
+            x : this.x,
+            y : this.y,
+            w : this.w,
+            h : this.h,
+            id : this.id,
+            crate : this.crate.toJSON(),
+            minerOffset : this.minerOffset,
+            numMiners : this.numMiners,
+            miners : this.miners.map(miner => miner.toJSON()),
+            level : this.level
+        };
+    }
+
+    static fromJSON (data) {
+        const shaft = new Shaft(data.x, data.y, data.w, data.h, data.id);
+        shaft.crate = Crate.fromJSON(data.crate);
+        shaft.minerOffset = data.minerOffset;
+        shaft.numMiners = data.numMiners;
+        shaft.miners = data.miners.map(minerData => Miner.fromJSON(minerData, shaft.crate));
+        shaft.level = data.level;
+
+        return shaft;
     }
 
 }
@@ -1425,21 +1721,20 @@ class Mine {
         this.shaftOffset = 0;
         this.shafts = [];
 
-        this.storehouse = new Storehouse(50, 150, 150, 300);
+        this.storehouse = new Storehouse(85, 275, 130, 275);
+        this.warehouse = new Warehouse(485, 275, 130, 275);
 
         this.displayElevator = false;
-        this.elevator = new Elevator(60, 525, 130, 200, [...this.shafts], this.storehouse);
+        this.elevator = new Elevator(95, 525, 110, 170, [...this.shafts], this.storehouse);
 
         this.numCarriers = 1;
         this.carriers = [];
         this.recruitCarrier();
-
-        this.warehouse = new Warehouse(521.5, 150, 150, 300, [...this.carriers]);
     }
 
     buildShaft () {
         if (this.numShafts < 30) {
-            this.shafts.push(new Shaft(200, 700 + this.shaftOffset, 521.5, 100, this.numShafts + 1));
+            this.shafts.push(new Shaft(215, 740 + this.shaftOffset, 501, 100, this.numShafts + 1));
             this.elevator.crates = this.shafts.map(shaft => shaft.crate);
             if (this.numShafts === 0) {
                 this.displayElevator = true;
@@ -1467,21 +1762,39 @@ class Mine {
 
             noStroke();
             fill(34, 139, 34);
-            rect(0, 450, canvas.width, 50);
+            rect(0, 550, canvas.width, 10);
 
-            for (let i = 0; i < 5; i++) {
-                let lesserValue = (i === 0 ? 0 : 5) + i * 5;
+            // for (let i = 0; i < 5; i++) {
+            //     let lesserValue = (i === 0 ? 0 : 5) + i * 5;
 
-                fill(i * 15 + 20);
-                beginShape();
-                    vertex(i * 5 + 50, 500);
-                    vertex(-i * 5 + 200, 500);
-                    vertex(-i * 5 + 200, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 630 - lesserValue);
-                    vertex(-i * 5 + 190, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 640 - lesserValue);
-                    vertex(i * 5 + 60, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 640 - lesserValue);
-                    vertex(i * 5 + 50, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 630 - lesserValue);
-                endShape();
-            }
+            //     fill(i * 15 + 20);
+            //     beginShape();
+            //         vertex(i * 5 + 85, 500);
+            //         vertex(-i * 5 + 215, 500);
+            //         vertex(-i * 5 + 215, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 630 - lesserValue);
+            //         vertex(-i * 5 + 205, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 640 - lesserValue);
+            //         vertex(i * 5 + 95, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 640 - lesserValue);
+            //         vertex(i * 5 + 85, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 630 - lesserValue);
+            //     endShape();
+            // }
+            
+            fill(31, 58, 67);
+            strokeWeight(2);
+            stroke(0);
+            beginShape();
+                vertex(85, 450);
+                vertex(85, 747);
+                vertex(115, 765);
+                vertex(185, 765);
+                vertex(215, 747);
+                vertex(215, 450);
+                vertex(205, 450);
+                vertex(205, 740);
+                vertex(180, 755);
+                vertex(120, 755);
+                vertex(95, 740);
+                vertex(95, 450);
+            endShape();
 
             for (let i = 0; i < this.shafts.length; i++) {
                 this.shafts[i].display();
@@ -1493,11 +1806,11 @@ class Mine {
 
             this.storehouse.display();
 
-            for (let i = 0; i < this.carriers.length; i++) {
-                this.carriers[i].display();
-            }
-
             this.warehouse.display();
+
+            // for (let i = 0; i < this.carriers.length; i++) {
+            //     this.carriers[i].display();
+            // }
 
             fill(0);
             textAlign(CENTER, CENTER);
@@ -1508,6 +1821,37 @@ class Mine {
     display () {
         this.update();
         this.draw();
+    }
+
+    toJSON () {
+        return {
+            y : 0,
+            numShafts : this.numShafts,
+            shaftOffset : this.shaftOffset,
+            shafts : this.shafts.map(shaft => shaft.toJSON()),
+            storehouse : this.storehouse.toJSON(),
+            displayElevator : this.displayElevator,
+            elevator : this.elevator.toJSON(),
+            numCarriers : this.numCarriers,
+            carriers : this.carriers.map(carrier => carrier.toJSON()),
+            warehouse : this.warehouse.toJSON()
+        };
+    }
+
+    static fromJSON (data) {
+        const mine = new Mine();
+        mine.y = data.y ?? 0;
+        mine.numShafts = data.numShafts ?? 0;
+        mine.shaftOffset = data.shaftOffset ?? 0;
+        mine.shafts = data.shafts.map(shaftData => Shaft.fromJSON(shaftData));
+        mine.storehouse = Storehouse.fromJSON(data.storehouse);
+        mine.warehouse = Warehouse.fromJSON(data.warehouse);
+        mine.displayElevator = data.displayElevator;
+        mine.elevator = Elevator.fromJSON(data.elevator, [...mine.shafts], mine.storehouse);
+        mine.numCarriers = data.numCarriers;
+        mine.carriers = data.carriers.map(carrierData => Carrier.fromJSON(carrierData, mine.storehouse, mine.warehouse));
+
+        return mine;
     }
 
 }
@@ -1576,6 +1920,30 @@ const user = (function (out) {
     return out;
     
 }) ({});
+
+
+// Load and save game functions
+function saveGame () {
+    const state = {
+        totalMoney : totalMoney,
+        superCash : superCash,
+        mine : currentMine.toJSON()
+    };
+    console.log("Saving game state:", state);
+    saveToDB("main", state);
+}
+
+async function loadGame () {
+    const state = await loadFromDB("main");
+    if (state) {
+        totalMoney = state.totalMoney ?? 0;
+        superCash = state.superCash ?? 0;
+        currentMine = Mine.fromJSON(state.mine); // Call fromJSON to restore Mine
+    }
+}
+let hasSaved = false;
+// saveGame();
+setInterval(() => { if (!hasSaved) { saveGame(); hasSaved = true; } }, 10000);
 
 
 // Draw and mouseClicked functions
