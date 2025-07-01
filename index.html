@@ -8,7 +8,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Fredoka&family=Lilita+One&display=swap" rel="stylesheet">
         <link rel="icon" type="image/png" href="./images/favicon.png">
     </head>
-    <body onload="KhanMiner()">
+    <body>
         
         <!-- Canvas element -->
         <canvas id="canvas"></canvas>
@@ -19,8 +19,9 @@
             <button id="returnToGame">Return to game</button>
         </div>
 
-        <!-- Main script -->
-        <script src="./index.js"></script>
+        <!-- Run scripts -->
+        <script type="module" src="./helpers/screenResize.js"></script>
+        <script type="module" src="./index.js"></script>
 
     </body>
 </html>
