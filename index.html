@@ -4,20 +4,20 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Idle Miner Tycoon: Money Games</title>
-        <style>
-
-            body {
-                margin: 0px;
-                overflow: hidden;
-            }
-
-        </style>
+        <link rel="stylesheet" href="./styles.css">
+        <link href="https://fonts.googleapis.com/css2?family=Fredoka&family=Lilita+One&display=swap" rel="stylesheet">
         <link rel="icon" type="image/png" href="./images/favicon.png">
     </head>
     <body onload="KhanMiner()">
         
         <!-- Canvas element -->
         <canvas id="canvas"></canvas>
+
+        <!-- Saves page -->
+        <div id="savePage" class="fredoka">
+            <h1>Saves</h1>
+            <button id="returnToGame">Return to game</button>
+        </div>
 
         <!-- Main script -->
         <script src="./index.js"></script>

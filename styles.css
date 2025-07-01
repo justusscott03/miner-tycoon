@@ -1,0 +1,43 @@
+body {
+    margin: 0px;
+    overflow: hidden;
+}
+
+.fredoka {
+    font-family: "Fredoka", sans-serif;
+}
+
+#savePage {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    min-height: 100vh;
+}
+
+#savePage > h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.saves {
+    margin-left: calc(50vw - 200px);
+    width: 400px;
+    height: 58px;
+    border-radius: 5px;
+    border: 4px solid rgb(180, 160, 0);
+    background-color: rgb(250, 230, 50);
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 23px;
+}
+
+#returnToGame {
+    font-size: 20px;
+    width: 200px;
+    margin-left: calc(50vw - 100px);
+    margin-bottom: 20px;
+    padding: 10px;
+}

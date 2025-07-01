@@ -75,6 +75,10 @@ async function deleteFromDB (id) {
 function KhanMiner () {
 
 
+document.getElementById("returnToGame").addEventListener("click", function () {
+    document.getElementById("savePage").style.display = "none";
+});
+
 // Variables
 let totalMoney = 0, places = 0, superCash = 0;
 let lastTime = Date.now(), currentTime, deltaTime;
@@ -792,6 +796,33 @@ function cursor (cursor) {
 }
 
 
+// Image library
+const images = {
+    elevator : function () {
+
+        background(0, 0, 0, 0);
+
+        return get(0, 0, 110, 170);
+
+    }
+};
+let curLoad = 0;
+let loaded = false;
+function load () {
+    let obj = Object.keys(images);
+
+    resetCanvas(canvas, ctx);
+    
+    images[obj[curLoad]] = images[obj[curLoad]]();
+    
+    curLoad++;
+    
+    if (curLoad >= Object.keys(images).length) {
+        loaded = true;
+    }
+    
+}
+
 // Number abbreviation for money counting, credit to Electric Dolphin ⚡️🐬 (@Dolphin0002)
 const numberLetters = ["K", "B", "M", "T", "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak"];
 /**
@@ -1174,8 +1205,8 @@ class Elevator {
                 for (let i = 0; i < this.crates.length; i++) {
                     const crate = this.crates[i];
                     
-                    if (!crate.hasUnloaded && this.y + this.h > crate.y + crate.h) {
-                        this.y = crate.y + crate.h - this.h;
+                    if (!crate.hasUnloaded && this.y + this.h * 14 / 17 > crate.y + crate.h) {
+                        this.y = crate.y + crate.h - this.h * 14 / 17;
                         this.curCrate = crate;
                         this.curCrateIndex = i;
                         this.action = elevatorStates.loading;
@@ -1248,23 +1279,14 @@ class Elevator {
         pushMatrix();
 
             translate(this.x, this.y);
-            scale(this.w / 110, this.h / 170)
-
-            fill(0);
-            beginShape();
-                vertex(0, 17 / 2);
-                vertex(44 / 3, 0);
-                vertex(286 / 3, 0);
-                vertex(110, 17 / 2);
-                vertex(110, 323 / 2);
-                vertex(286 / 3, 170);
-                vertex(44 / 3, 170);
-                vertex(0, 323 / 2);
-            endShape();
+            scale(this.w / 110, this.h / 170);
 
             fill(136, 198, 221);
             strokeWeight(2);
             stroke(0);
+            rect(30, 150, 50, 12, 5);
+            rect(15, 140, 80, 13, 1);
+
             beginShape();
                 vertex(0, 11);
                 vertex(110, 11);
@@ -1274,18 +1296,45 @@ class Elevator {
                 vertex(0, 133);
             endShape();
 
-            ellipse(20, 7, 18, 18);
-            ellipse(90, 7, 18, 18);
+            ellipse(20, 8, 16, 16);
+            ellipse(90, 8, 16, 16);
+            ellipse(20, 8, 2, 2);
+            ellipse(90, 8, 2, 2);
+
+            beginShape();
+                vertex(30, 11);
+                vertex(80, 11);
+                vertex(80, 7);
+                vertex(70, 0);
+                vertex(40, 0);
+                vertex(30, 7);
+            endShape();
 
             fill(0, 0, 0, 0);
             stroke(0);
             beginShape();
                 vertex(8, 19);
                 vertex(102, 19);
+                vertex(102, 40);
+                vertex(100, 45);
+                vertex(100, 65);
+                vertex(98, 70);
+                vertex(98, 85);
+                vertex(100, 90);
+                vertex(100, 110);
+                vertex(102, 115);
                 vertex(102, 126);
                 vertex(85, 137);
                 vertex(30, 137);
                 vertex(8, 126);
+                vertex(8, 115);
+                vertex(10, 110);
+                vertex(10, 90);
+                vertex(12, 85);
+                vertex(12, 70);
+                vertex(10, 65);
+                vertex(10, 45);
+                vertex(8, 40);
             endShape();
 
             fill(255);
@@ -1654,6 +1703,9 @@ class Shaft {
         rect(127, this.y + 25, 46, 46, 10);
         rect(131, this.y + 29, 38, 38, 8);
 
+        fill(0);
+        rect(this.x, this.y + this.h, this.w, 13);
+
         fill(255);
         ctx.font = "bold 30px Arial";
         textAlign(CENTER, CENTER);
@@ -1763,38 +1815,28 @@ class Mine {
             noStroke();
             fill(34, 139, 34);
             rect(0, 550, canvas.width, 10);
-
-            // for (let i = 0; i < 5; i++) {
-            //     let lesserValue = (i === 0 ? 0 : 5) + i * 5;
-
-            //     fill(i * 15 + 20);
-            //     beginShape();
-            //         vertex(i * 5 + 85, 500);
-            //         vertex(-i * 5 + 215, 500);
-            //         vertex(-i * 5 + 215, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 630 - lesserValue);
-            //         vertex(-i * 5 + 205, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 640 - lesserValue);
-            //         vertex(i * 5 + 95, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 640 - lesserValue);
-            //         vertex(i * 5 + 85, (this.shafts.length === 0 ? 1 : this.shafts.length) * 175 + 630 - lesserValue);
-            //     endShape();
-            // }
             
             fill(31, 58, 67);
             strokeWeight(2);
             stroke(0);
             beginShape();
-                vertex(85, 450);
-                vertex(85, 747);
-                vertex(115, 765);
-                vertex(185, 765);
-                vertex(215, 747);
-                vertex(215, 450);
-                vertex(205, 450);
-                vertex(205, 740);
-                vertex(180, 755);
-                vertex(120, 755);
-                vertex(95, 740);
-                vertex(95, 450);
+                vertex(85, 550);
+                vertex(85, 697 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(115, 715 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(185, 715 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(215, 697 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(215, 550);
+                vertex(205, 550);
+                vertex(205, 690 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(180, 705 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(120, 705 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(95, 690 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(95, 550);
             endShape();
+
+            fill(28);
+            rect(115, 360, 7, this.elevator.y - 349);
+            rect(178, 360, 7, this.elevator.y - 349);
 
             for (let i = 0; i < this.shafts.length; i++) {
                 this.shafts[i].display();
@@ -1825,7 +1867,7 @@ class Mine {
 
     toJSON () {
         return {
-            y : 0,
+            y : this.y,
             numShafts : this.numShafts,
             shaftOffset : this.shaftOffset,
             shafts : this.shafts.map(shaft => shaft.toJSON()),
@@ -1840,9 +1882,9 @@ class Mine {
 
     static fromJSON (data) {
         const mine = new Mine();
-        mine.y = data.y ?? 0;
-        mine.numShafts = data.numShafts ?? 0;
-        mine.shaftOffset = data.shaftOffset ?? 0;
+        mine.y = data.y;
+        mine.numShafts = data.numShafts;
+        mine.shaftOffset = data.shaftOffset;
         mine.shafts = data.shafts.map(shaftData => Shaft.fromJSON(shaftData));
         mine.storehouse = Storehouse.fromJSON(data.storehouse);
         mine.warehouse = Warehouse.fromJSON(data.warehouse);
@@ -1863,6 +1905,9 @@ let currentMine = mine;
 // Button definitions
 const button = new Button(100, 100, 100, 100, "Shaft", function () {
     currentMine.buildShaft();
+});
+const savePageButton = new Button(500, 0, 50, 50, "", function () {
+    document.getElementById("savePage").style.display = "block";
 });
 
 
@@ -1923,28 +1968,70 @@ const user = (function (out) {
 
 
 // Load and save game functions
+let saves = [];
+
 function saveGame () {
+    const now = new Date();
+    const formattedDate = `${now.getMonth() + 1} \u2022 ${now.getDate()} \u2022 ${now.getFullYear()}`;
+    const formattedTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+
     const state = {
         totalMoney : totalMoney,
         superCash : superCash,
         mine : currentMine.toJSON()
     };
-    console.log("Saving game state:", state);
-    saveToDB("main", state);
+    if (saves.length >= 10) {
+        saves.shift();
+        for (let i = 0; i < document.getElementsByClassName("saves").length; i++) {
+            const saveDiv = document.getElementsByClassName("saves")[i];
+            if (saveDiv.dataset.saveIndex) {
+                saveDiv.dataset.saveIndex = Number(saveDiv.dataset.saveIndex) - 1;
+            }
+        }
+        document.getElementById("savePage").removeChild(document.getElementsByClassName("saves")[0]);
+    }
+    saves.push(state);
+    saveToDB("main", saves);
+
+    const newSave = document.createElement("div");
+    newSave.className = "saves fredoka";
+    newSave.innerHTML = `${formattedTime}&nbsp;&nbsp;|&nbsp;&nbsp;${formattedDate}<br>Click to load save`;
+    newSave.dataset.saveIndex = saves.length - 1;
+
+    newSave.addEventListener("click", function(e) {
+        e.stopPropagation();
+        loadGame(Number(this.dataset.saveIndex)).then(() => {
+            console.log(`Loaded save ${this.dataset.saveIndex}`);
+        });
+    });
+
+    document.getElementById("savePage").appendChild(newSave);
 }
 
-async function loadGame () {
-    const state = await loadFromDB("main");
-    if (state) {
-        totalMoney = state.totalMoney ?? 0;
-        superCash = state.superCash ?? 0;
-        currentMine = Mine.fromJSON(state.mine); // Call fromJSON to restore Mine
+async function loadGame(index) {
+    const allSaves = await loadFromDB("main");
+    const savesArr = allSaves && Array.isArray(allSaves.data) ? allSaves.data : [];
+    if (savesArr.length > 0) {
+        saves = savesArr;
+        const save = saves[index];
+        if (save) {
+            totalMoney = save.totalMoney;
+            superCash = save.superCash;
+            currentMine = Mine.fromJSON(save.mine);
+        } 
+        else {
+            console.error("Save not found at index:", index);
+        }
+    } 
+    else {
+        console.error("No saves found.");
     }
 }
-let hasSaved = false;
-// saveGame();
-setInterval(() => { if (!hasSaved) { saveGame(); hasSaved = true; } }, 10000);
 
+setInterval(() => { saveGame(); }, 60000);
+window.addEventListener("beforeunload", function (e) {
+    saveGame();
+});
 
 // Draw and mouseClicked functions
 function draw () {
@@ -1963,9 +2050,10 @@ function draw () {
 
             scale(scaledWidth / originalWidth, scaledHeight / originalHeight);
 
-            mine.display();
+            currentMine.display();
 
             button.draw();
+            savePageButton.draw();
 
         popMatrix();
 
