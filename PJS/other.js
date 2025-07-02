@@ -1,3 +1,5 @@
+const ctx = document.getElementById("canvas").getContext("2d");
+
 function get (x = 0, y = 0, w = canvas.width, h = canvas.height) {
     if (arguments.length === 0 || arguments.length === 4) {
         let imgData = ctx.getImageData(x, y, w, h);

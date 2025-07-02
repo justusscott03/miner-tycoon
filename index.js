@@ -1,100 +1,14 @@
-import { rect, arc, ellipse, triangle, quad, image, line, point, bezier, ellipseMode, rectMode, strokeCap } from "./PJS/shapes.js";
-import { beginShape, endShape, vertex, bezierVertex, strokeJoin } from "./PJS/complexShapes.js";
-import { random, dist, constrain, min, max, abs, log, pow, sq, sqrt, round, ceil, floor, map, lerp, noise } from "./PJS/math.js";
-import { color, fill, noFill, background, noStroke, strokeWeight, stroke, lerpColor } from "./PJS/colors.js";
-import { textFont, textSize, textAlign, text, outlinedText } from "./PJS/text.js";
-import { radians, degrees, sin, cos, tan, asin, acos, atan, atan2 } from "./PJS/trigonometry.js";
-import { pushMatrix, translate, rotate, scale, popMatrix, resetMatrix } from "./PJS/transformation.js";
-import { get, cursor } from "./PJS/other.js";
+import { constrain, lerp } from "./PJS/math.js";
+import { background } from "./PJS/colors.js";
+import { pushMatrix, scale, popMatrix, resetMatrix } from "./PJS/transformation.js";
 
-import { Crate } from "./entities/crate.js";
-import { Miner } from "./entities/miner.js";
-import { Elevator } from "./entities/elevator.js";
-import { Carrier } from "./entities/carrier.js";
-import { Storehouse } from "./entities/storehouse.js";
-import { Warehouse } from "./entities/warehouse.js";
-import { Shaft } from "./entities/shaft.js";
 import { Button } from "./entities/button.js";
 import { Mine } from "./entities/mine.js";
 
 import { user } from "./helpers/ui.js";
 import { screenSize } from "./helpers/screenResize.js";
 import { money } from "./helpers/moneyManagment.js";
-
-
-async function createDatabase () {
-    return new Promise((resolve, reject) => {
-        const request = window.indexedDB.open("KhanMinerDB", 1);
-
-        request.onupgradeneeded = function (event) {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains("worlds")) {
-                db.createObjectStore("worlds", { keyPath: "id" });
-            }
-        };
-
-        request.onsuccess = function () {
-            resolve(request.result);
-        };
-
-        request.onerror = function (e) {
-            reject(e);
-        };
-    });
-}
-
-// Helper to get the object store and transaction
-async function getStore (mode = "readonly") {
-    const db = await createDatabase();
-    const tx = db.transaction("worlds", mode);
-    const store = tx.objectStore("worlds");
-    return { db, store };
-}
-
-async function loadFromDB (id) {
-    const { db, store } = await getStore("readonly");
-    return new Promise((resolve) => {
-        const req = id ? store.get(id) : store.getAll();
-        req.onsuccess = function () {
-            resolve(req.result);
-            db.close();
-        };
-        req.onerror = function () {
-            resolve(null);
-            db.close();
-        };
-    });
-}
-
-async function saveToDB (id, data) {
-    const { db, store } = await getStore("readwrite");
-    return new Promise((resolve, reject) => {
-        const req = store.put({ id: id, data: data });
-        req.onsuccess = function () {
-            resolve(req.result);
-            db.close();
-        };
-        req.onerror = function (e) {
-            reject(e);
-            db.close();
-        };
-    });
-}
-
-async function deleteFromDB (id) {
-    const { db, store } = await getStore("readwrite");
-    return new Promise((resolve, reject) => {
-        const req = store.delete(id);
-        req.onsuccess = function () {
-            resolve(req.result);
-            db.close();
-        };
-        req.onerror = function (e) {
-            reject(e);
-            db.close();
-        };
-    });
-}
+import { loadFromDB, saveToDB } from "./helpers/database.js";
 
 function KhanMiner () {
 
@@ -107,56 +21,9 @@ document.getElementById("returnToGame").addEventListener("click", function () {
 let lastTime = Date.now(), currentTime, deltaTime;
 
 // Canvas
-const canvas = document.getElementById("canvas"), ctx = canvas.getContext("2d");
+const canvas = document.getElementById("canvas");
 canvas.width = screenSize.originalWidth;
 canvas.height = screenSize.originalHeight;
-
-
-// Image library
-const images = {
-    elevator : function () {
-
-        background(0, 0, 0, 0);
-
-        return get(0, 0, 110, 170);
-
-    }
-};
-let curLoad = 0;
-let loaded = false;
-function load () {
-    let obj = Object.keys(images);
-
-    resetCanvas(canvas, ctx);
-    
-    images[obj[curLoad]] = images[obj[curLoad]]();
-    
-    curLoad++;
-    
-    if (curLoad >= Object.keys(images).length) {
-        loaded = true;
-    }
-    
-}
-
-
-// Game classes
-class UpgradePage {
-
-    constructor () {}
-
-}
-
-class Barrier {
-
-    constructor (x, y, w, h) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-    }
-
-}
 
 const mine = new Mine();
 let currentMine = mine;
