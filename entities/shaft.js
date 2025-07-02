@@ -51,7 +51,7 @@ export class Shaft {
 
     update () {}
 
-    draw (deltaTime) {
+    draw () {
         fill(150);
         rect(this.x, this.y, this.w, this.h);
 
@@ -69,7 +69,7 @@ export class Shaft {
         text(this.id, 150, this.y + 50);
         
         for (let i = 0; i < this.miners.length; i++) {
-            this.miners[i].display(deltaTime);
+            this.miners[i].display();
         }
 
         this.crate.draw();
@@ -77,9 +77,9 @@ export class Shaft {
         this.pageOutButton.draw();
     }
 
-    display (deltaTime) {
+    display () {
         this.update();
-        this.draw(deltaTime);
+        this.draw();
     }
 
     toJSON () {

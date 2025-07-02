@@ -51,7 +51,7 @@ export class Mine {
 
     update () {}
 
-    draw (deltaTime) {
+    draw () {
         pushMatrix();
             translate(0, this.y);
 
@@ -85,11 +85,11 @@ export class Mine {
             rect(178, 360, 7, this.elevator.y - 349);
 
             for (let i = 0; i < this.shafts.length; i++) {
-                this.shafts[i].display(deltaTime);
+                this.shafts[i].display();
             }
 
             if (this.displayElevator) {
-                this.elevator.display(deltaTime);
+                this.elevator.display();
             }
 
             this.storehouse.display();
@@ -97,7 +97,7 @@ export class Mine {
             this.warehouse.display();
 
             // for (let i = 0; i < this.carriers.length; i++) {
-            //     this.carriers[i].display(deltaTime);
+            //     this.carriers[i].display();
             // }
 
             fill(0);
@@ -106,9 +106,9 @@ export class Mine {
         popMatrix();
     }
 
-    display (deltaTime) {
+    display () {
         this.update();
-        this.draw(deltaTime);
+        this.draw();
     }
 
     toJSON () {

@@ -1,6 +1,8 @@
 import { images } from "../lib/imageLibrary.js";
 
-function resetCanvas (canvas, ctx) {
+const canvas = document.getElementById("canvas"), ctx = canvas.getContext("2d");
+
+function resetCanvas () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = 1.0;
@@ -16,15 +18,13 @@ function resetCanvas (canvas, ctx) {
     ctx.textBaseline = "alphabetic";
 }
 
-const canvas = document.getElementById("canvas"), ctx = canvas.getContext("2d");
-
-export const imageLoad = {
+export const imageLoader = {
     curLoad : 0,
     loaded : false,
     load : function () {
         let obj = Object.keys(images);
 
-        resetCanvas(canvas, ctx);
+        resetCanvas();
         
         images[obj[this.curLoad]] = images[obj[this.curLoad]]();
         

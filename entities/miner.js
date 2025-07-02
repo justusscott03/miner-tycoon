@@ -1,8 +1,10 @@
 import { minerStates } from "../config/entityStates.js";
 import { pushMatrix, translate, scale, popMatrix } from "../PJS/transformation.js";
 import { noStroke, fill } from "../PJS/colors.js";
-import { rect } from "../PJS/shapes.js";
+import { image, rect } from "../PJS/shapes.js";
 import { map } from "../PJS/math.js";
+import { frameTime } from "../helpers/timeManager.js";
+import { images } from "../lib/imageLibrary.js";
 
 export class Miner {
 
@@ -31,7 +33,7 @@ export class Miner {
         this.moveSpeed = 60;
     }
 
-    update (deltaTime) {
+    update () {
 
         switch (this.action) {
 
@@ -40,7 +42,7 @@ export class Miner {
                 this.s = 1;
 
                 if (this.x < 500) {
-                    this.x += this.moveSpeed * deltaTime;
+                    this.x += this.moveSpeed * frameTime.delta;
                 }
                 else {
                     this.action = minerStates.digging;
@@ -52,7 +54,7 @@ export class Miner {
 
                 this.s = 1;
 
-                this.has += this.loadSpeed * deltaTime;
+                this.has += this.loadSpeed * frameTime.delta;
                 if (this.has >= this.maxLoad) {
                     this.has = this.maxLoad;
                     this.action = minerStates.toCrate;
@@ -65,7 +67,7 @@ export class Miner {
                 this.s = -1;
 
                 if (this.x > 300) {
-                    this.x -= this.moveSpeed * deltaTime;
+                    this.x -= this.moveSpeed * frameTime.delta;
                 }
                 else {
                     this.crate.add(this.has);
@@ -83,28 +85,24 @@ export class Miner {
         pushMatrix();
 
             translate(this.x + this.w / 2, this.y);
-            scale(this.s, 1);
-            translate(-this.x - this.w / 2, -this.y);
+            scale(this.w / 50 * this.s, this.h / 75);
 
-            noStroke();
-            fill(0);
-            rect(this.x, this.y, this.w / 2, this.h);
-            fill(255);
-            rect(this.x + this.w / 2, this.y, this.w / 2, this.h);
+            image(images.miner, -25, 0, 50, 75);
 
             if (this.action === minerStates.digging) {
+                noStroke();
                 fill(255);
-                rect(this.x - this.w / 6, this.y - this.h / 6, this.w * 4 / 3, this.h / 10);
+                rect(-100 / 3, -25 / 2, 200 / 3, 15 / 2);
 
                 fill(255, 214, 89);
-                rect(this.x - this.w / 6, this.y - this.h / 6, map(this.has, 0, this.maxLoad, 0, this.w * 4 / 3), this.h / 10);
+                rect(-100 / 3, -25 / 2, map(this.has, 0, this.maxLoad, 0, 200 / 3), 15 / 2);
             }
 
         popMatrix();
     }
 
-    display (deltaTime) {
-        this.update(deltaTime);
+    display () {
+        this.update();
         this.draw();
     }
 

@@ -4,6 +4,7 @@ import { fill } from "../PJS/colors.js";
 import { rect } from "../PJS/shapes.js";
 import { textAlign, textSize, text } from "../PJS/text.js";
 import { round, map } from "../PJS/math.js";
+import { frameTime } from "../helpers/timeManager.js";
 
 export class Carrier {
 
@@ -39,7 +40,7 @@ export class Carrier {
         this.loadBarMax = 0;
     }
 
-    update (deltaTime) {
+    update () {
 
         switch (this.action) {
 
@@ -47,7 +48,7 @@ export class Carrier {
 
                 this.s = -1;    
             
-                this.x -= this.moveSpeed * deltaTime;
+                this.x -= this.moveSpeed * frameTime.delta;
 
                 if (this.x < 300) {
                     this.action = carrierStates.loading;
@@ -79,7 +80,7 @@ export class Carrier {
 
                 this.s = 1;
 
-                this.x += this.moveSpeed * deltaTime;
+                this.x += this.moveSpeed * frameTime.delta;
 
                 if (this.x > 370) {
                     this.action = carrierStates.unloading;
@@ -138,8 +139,8 @@ export class Carrier {
         }
     }
 
-    display (deltaTime) {
-        this.update(deltaTime);
+    display () {
+        this.update();
         this.draw();
     }
 

@@ -9,6 +9,8 @@ import { user } from "./helpers/ui.js";
 import { screenSize } from "./helpers/screenResize.js";
 import { money } from "./helpers/moneyManagment.js";
 import { loadFromDB, saveToDB } from "./helpers/database.js";
+import { frameTime, getFormattedTime, getFormattedDate } from "./helpers/timeManager.js";
+import { imageLoader } from "./helpers/imageLoading.js";
 
 function KhanMiner () {
 
@@ -17,14 +19,13 @@ document.getElementById("returnToGame").addEventListener("click", function () {
     document.getElementById("savePage").style.display = "none";
 });
 
-// Variables
-let lastTime = Date.now(), currentTime, deltaTime;
-
 // Canvas
 const canvas = document.getElementById("canvas");
 canvas.width = screenSize.originalWidth;
 canvas.height = screenSize.originalHeight;
 
+
+// Mine
 const mine = new Mine();
 let currentMine = mine;
 
@@ -51,15 +52,13 @@ const savePageButton = new Button(500, 0, 50, 50, "", function () {
 let saves = [];
 
 function saveGame () {
-    const now = new Date();
-    const formattedDate = `${now.getMonth() + 1} \u2022 ${now.getDate()} \u2022 ${now.getFullYear()}`;
-    const formattedTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
 
     const state = {
         totalMoney : money.total,
         superCash : money.super,
         mine : currentMine.toJSON()
     };
+
     if (saves.length >= 10) {
         saves.shift();
         for (let i = 0; i < document.getElementsByClassName("saves").length; i++) {
@@ -70,12 +69,13 @@ function saveGame () {
         }
         document.getElementById("savePage").removeChild(document.getElementsByClassName("saves")[0]);
     }
+
     saves.push(state);
     saveToDB("main", saves);
 
     const newSave = document.createElement("div");
     newSave.className = "saves fredoka";
-    newSave.innerHTML = `${formattedTime}&nbsp;&nbsp;|&nbsp;&nbsp;${formattedDate}<br>Click to load save`;
+    newSave.innerHTML = `${getFormattedTime()}&nbsp;&nbsp;|&nbsp;&nbsp;${getFormattedDate()}<br>Click to load save`;
     newSave.dataset.saveIndex = saves.length - 1;
 
     newSave.addEventListener("click", function(e) {
@@ -95,8 +95,8 @@ async function loadGame(index) {
         saves = savesArr;
         const save = saves[index];
         if (save) {
-            totalMoney = save.totalMoney;
-            superCash = save.superCash;
+            money.total = save.totalMoney;
+            money.super = save.superCash;
             currentMine = Mine.fromJSON(save.mine);
         } 
         else {
@@ -108,7 +108,7 @@ async function loadGame(index) {
     }
 }
 
-setInterval(() => { saveGame(); }, 60000);
+setInterval(() => { saveGame(); }, 1000);
 window.addEventListener("beforeunload", function (e) {
     saveGame();
 });
@@ -118,26 +118,33 @@ function draw () {
 
     try {
 
-        currentTime = Date.now();
-        deltaTime = (currentTime - lastTime) / 1000;
-        lastTime = currentTime;
-        
-        resetMatrix();
-        
-        background(255);
+        if (!imageLoader.loaded) {
+            imageLoader.load();
+        }
+        else {
 
-        pushMatrix();
+            frameTime.current = Date.now();
+            frameTime.delta = (frameTime.current - frameTime.last) / 1000;
+            frameTime.last = frameTime.current;
+            
+            resetMatrix();
+            
+            background(255);
 
-            scale(screenSize.scaledWidth / screenSize.originalWidth, screenSize.scaledHeight / screenSize.originalHeight);
+            pushMatrix();
 
-            currentMine.display(deltaTime);
+                scale(screenSize.scaledWidth / screenSize.originalWidth, screenSize.scaledHeight / screenSize.originalHeight);
 
-            button.draw();
-            savePageButton.draw();
+                currentMine.display();
 
-        popMatrix();
+                button.draw();
+                savePageButton.draw();
 
-        user.update();
+            popMatrix();
+
+            user.update();
+
+        }
 
         requestAnimationFrame(draw);
 
