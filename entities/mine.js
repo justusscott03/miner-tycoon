@@ -3,12 +3,20 @@ import { Warehouse } from "./warehouse.js";
 import { Elevator } from "./elevator.js";
 import { Shaft } from "./shaft.js";
 import { Carrier } from "./carrier.js";
+
 import { pushMatrix, translate, popMatrix } from "../PJS/transformation.js";
 import { fill, noStroke, strokeWeight, stroke } from "../PJS/colors.js";
-import { rect } from "../PJS/shapes.js";
+import { image, rect } from "../PJS/shapes.js";
 import { beginShape, vertex, endShape } from "../PJS/complexShapes.js";
 import { textAlign, text } from "../PJS/text.js";
+
 import { money } from "../helpers/moneyManagment.js";
+
+import { images } from "../lib/imageLibrary.js";
+
+import { upgradePages } from "../config/entityUpgradePages.js";
+
+const canvas = document.getElementById("canvas");
 
 export class Mine {
 
@@ -23,7 +31,7 @@ export class Mine {
         this.warehouse = new Warehouse(485, 275, 130, 275);
 
         this.displayElevator = false;
-        this.elevator = new Elevator(95, 525, 110, 170, [...this.shafts], this.storehouse);
+        this.elevator = new Elevator(95, this.storehouse.y + this.storehouse.h + 31, 110, 170, [...this.shafts], this.storehouse);
 
         this.numCarriers = 1;
         this.carriers = [];
@@ -80,19 +88,51 @@ export class Mine {
                 vertex(95, 550);
             endShape();
 
-            fill(28);
-            rect(115, 360, 7, this.elevator.y - 349);
-            rect(178, 360, 7, this.elevator.y - 349);
+            noStroke();
+            fill(32);
+            beginShape();
+                vertex(96, 550);
+                vertex(96, 690 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(120, 704 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(180, 704 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(204, 690 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(204, 550);
+            endShape();
+
+            fill(42);
+            beginShape();
+                vertex(106, 550);
+                vertex(106, 685 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(121, 695 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(179, 695 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(194, 685 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(194, 550);
+            endShape();
+
+            fill(62);
+            beginShape();
+                vertex(114, 550);
+                vertex(114, 682 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(122, 687 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(178, 687 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(186, 682 + (this.shafts.length === 0 ? 1 : this.shafts.length) * 175);
+                vertex(186, 550);
+            endShape();
 
             for (let i = 0; i < this.shafts.length; i++) {
                 this.shafts[i].display();
             }
 
             if (this.displayElevator) {
+                fill(28);
+                rect(115, 360, 7, this.elevator.y - 349);
+                rect(178, 360, 7, this.elevator.y - 349);
                 this.elevator.display();
             }
 
             this.storehouse.display();
+
+            image(images.elevatorDropoff, 83, 545, 134, 31);
 
             this.warehouse.display();
 
@@ -103,6 +143,13 @@ export class Mine {
             fill(0);
             textAlign("CENTER", "CENTER");
             text(money.total, canvas.width / 2, 50);
+
+            image(images.topBottomGradient, 0, 0, canvas.width, 50);
+            image(images.topBottomGradient, 0, canvas.height - 50, canvas.width, 50);
+
+            for (let i = 0; i < upgradePages.length; i++) {
+                upgradePages[i].display();
+            }
         popMatrix();
     }
 
@@ -126,6 +173,11 @@ export class Mine {
         };
     }
 
+    /**
+     * Creates a Mine instance from a JSON object.
+     * @param { Object } data - The JSON object containing mine data.
+     * @returns { Mine } A new Mine instance populated with the data from the JSON object.
+     */
     static fromJSON (data) {
         const mine = new Mine();
         mine.y = data.y;

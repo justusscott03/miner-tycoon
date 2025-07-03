@@ -96,7 +96,7 @@ export class Elevator {
 
                 this.y -= this.moveSpeed * frameTime.delta;
 
-                if (this.y < 525) {
+                if (this.y < this.storehouse.y + this.storehouse.h + 31) {
                     this.action = elevatorStates.unloading;
                 }
 
@@ -140,9 +140,9 @@ export class Elevator {
             if (this.action === elevatorStates.loading || this.action === elevatorStates.unloading) {
                 noStroke();
                 fill(255);
-                rect(22, -85 / 8, 66, 17 / 2, 1);
+                rect(35, 8.5, 40, 5, 1);
                 fill(255, 214, 89);
-                rect(this.w / 5, -this.h / 16, map(this.action === elevatorStates.loading ? this.loadTimer : this.unloadTimer, 0, this.loadBarMax, 0, this.w * 3 / 5), this.h / 20, 1);
+                rect(35, 8.5, map(this.action === elevatorStates.loading ? this.loadTimer : this.unloadTimer, 0, this.loadBarMax, 0, 40), 5, 1);
             }
 
         popMatrix();
@@ -173,6 +173,13 @@ export class Elevator {
         };
     }
 
+    /**
+     * Takes a JSON object and creates an Elevator object from it.
+     * @param { Object } data - The JSON data to create the Elevator from.
+     * @param { Shaft[] } shafts - The shafts that the elevator will visit.
+     * @param { Storehouse } storehouse - The storehouse that the elevator will drop its load in.
+     * @returns { Elevator } - The created Elevator object.
+     */
     static fromJSON (data, shafts, storehouse) {
         const elevator = new Elevator(data.x, data.y, data.w, data.h, shafts, storehouse);
         elevator.action = data.action;

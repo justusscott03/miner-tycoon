@@ -16,13 +16,14 @@ export class Button {
      * @param { string } txt - The text on the button.
      * @param { Function } func - The function to call on click.
      */
-    constructor (x, y, w, h, txt, func) {
+    constructor (x, y, w, h, txt, txtSize, func) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.txt = txt;
         this.func = func;
+        this.txtSize = txtSize;
         this.s = 3;
         this.mouseOver = false;
     }
@@ -48,19 +49,22 @@ export class Button {
             translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
             fill(255);
             rect(this.x, this.y, this.w, this.h);
-            
-            pushMatrix();
-                translate(this.x + this.w / 2, this.y + this.h / 2);
-                scale(this.w / 40, this.h / 40);
-                translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
 
-                strokeWeight(0.5);
-                stroke(0);
-                fill(255);
-                textSize(20);
-                textAlign("CENTER", "CENTER");
-                outlinedText(this.txt, this.x + this.w / 2, this.y + this.h / 2, 1, color(255), color(0));
-            popMatrix();
+            strokeWeight(0.5);
+            stroke(0);
+            fill(255);
+            textSize(this.txtSize);
+            textAlign("CENTER", "CENTER");
+            //outlinedText(this.txt, this.x + this.w / 2, this.y + this.h / 2, 2, color(255), color(0));
+
+            const lines = this.txt.split('\n');
+            const lineHeight = this.txtSize * 1.1;
+            const totalHeight = lines.length * lineHeight;
+            const startY = this.y + this.h / 2 - totalHeight / 2 + lineHeight / 2;
+
+            lines.forEach((line, i) => {
+                outlinedText(line, this.x + this.w / 2, startY + i * lineHeight, 2, color(255), color(0));
+            });
             
         popMatrix();
     }

@@ -10,7 +10,7 @@ import { screenSize } from "./helpers/screenResize.js";
 import { money } from "./helpers/moneyManagment.js";
 import { loadFromDB, saveToDB } from "./helpers/database.js";
 import { frameTime, getFormattedTime, getFormattedDate } from "./helpers/timeManager.js";
-import { imageLoader } from "./helpers/imageLoading.js";
+import { imageLoader } from "./helpers/imageLoader.js";
 
 function KhanMiner () {
 
@@ -40,10 +40,10 @@ canvas.addEventListener("wheel", function (e) {
 
 
 // Button definitions
-const button = new Button(100, 100, 100, 100, "Shaft", function () {
+const button = new Button(100, 100, 100, 100, "Shaft", 40, function () {
     currentMine.buildShaft();
 });
-const savePageButton = new Button(500, 0, 50, 50, "", function () {
+const savePageButton = new Button(500, 0, 50, 50, "", 20, function () {
     document.getElementById("savePage").style.display = "block";
 });
 
@@ -108,7 +108,7 @@ async function loadGame(index) {
     }
 }
 
-setInterval(() => { saveGame(); }, 1000);
+setInterval(() => { saveGame(); }, 60000);
 window.addEventListener("beforeunload", function (e) {
     saveGame();
 });

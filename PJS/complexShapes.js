@@ -13,6 +13,11 @@ function endShape () {
     ctx.stroke();
 }
 
+/**
+ * Adds a vertex to the current shape.
+ * @param { number } x - The x-coordinate of the vertex.
+ * @param { number } y - The y-coordinate of the vertex.
+ */
 function vertex (x, y) {
     if (pjsSettings.requiresFirstVertex) {
         ctx.moveTo(x, y);

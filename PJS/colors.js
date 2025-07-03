@@ -27,6 +27,13 @@ function color (r, g, b, a) {
     return "#" + toHex(r) + toHex(g) + toHex(b);
 }
 
+/**
+ * Sets the fill color for shapes.
+ * @param { number } r - The red value of the color.
+ * @param { number } g - The green value of the color.
+ * @param { number } b - The blue value of the color.
+ * @param { number } a - The alpha value of the color (opacity).
+ */
 function fill (r, g, b, a) {
     if (typeof r === "string") {
         ctx.fillStyle = r;
@@ -120,4 +127,36 @@ function lerpColor (color1, color2, amt) {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-export { color, fill, noFill, background, noStroke, strokeWeight, stroke, lerpColor };
+/**
+ * Creates a linear gradient and fills a rectangle with it.
+ * @param { number } x - The x-coordinate of the gradient's starting point.
+ * @param { number } y - The y-coordinate of the gradient's starting point.
+ * @param { number } width - The width of the gradient rectangle.
+ * @param { number } height - The height of the gradient rectangle.
+ * @param { string } color1 - The color at the start of the gradient.
+ * @param { string } color2 - The color at the end of the gradient.
+ * @param { string } direction - The direction of the gradient ("vertical" or "horizontal"). 
+ */
+function gradient (x, y, width, height, color1, color2, direction = "vertical") {
+    if (direction !== "vertical" && direction !== "horizontal") {
+        throw new Error("Direction must be 'vertical' or 'horizontal'.");
+    }
+    if (direction === "vertical") {
+        const gradient = ctx.createLinearGradient(x, y, x, y + height);
+        gradient.addColorStop(0, color1);
+        gradient.addColorStop(1, color2);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, width, height);
+        return;
+    }
+    else if (direction === "horizontal") {
+        const gradient = ctx.createLinearGradient(x, y, x + width, y);
+        gradient.addColorStop(0, color1);
+        gradient.addColorStop(1, color2);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, width, height);
+        return;
+    }
+}
+
+export { color, fill, noFill, background, noStroke, strokeWeight, stroke, lerpColor, gradient };

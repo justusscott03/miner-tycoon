@@ -103,6 +103,15 @@ function ellipse (x, y, w, h) {
     arc(xPos, yPos, width, height, 0, 360);
 }
 
+/**
+ * Draws a triangle shape defined by three vertices.
+ * @param { number } x1 - The x-coordinate of the first vertex.
+ * @param { number } y1 - The y-coordinate of the first vertex.
+ * @param { number } x2 - The x-coordinate of the second vertex.
+ * @param { number } y2 - The y-coordinate of the second vertex.
+ * @param { number } x3 - The x-coordinate of the third vertex.
+ * @param { number } y3 - The y-coordinate of the third vertex.
+ */
 function triangle (x1, y1, x2, y2, x3, y3) {
     ctx.beginPath();
         ctx.moveTo(x1, y1);
@@ -114,6 +123,17 @@ function triangle (x1, y1, x2, y2, x3, y3) {
     ctx.stroke();
 }
 
+/**
+ * Draws a quadrilateral shape defined by four vertices.
+ * @param { number } x1 - The x-coordinate of the first vertex.
+ * @param { number } y1 - The y-coordinate of the first vertex.
+ * @param { number } x2 - The x-coordinate of the second vertex.
+ * @param { number } y2 - The y-coordinate of the second vertex.
+ * @param { number } x3 - The x-coordinate of the third vertex.
+ * @param { number } y3 - The y-coordinate of the third vertex.
+ * @param { number } x4 - The x-coordinate of the fourth vertex.
+ * @param { number } y4 - The y-coordinate of the fourth vertex.
+ */
 function quad (x1, y1, x2, y2, x3, y3, x4, y4) {
     ctx.beginPath();
         ctx.moveTo(x1, y1);
@@ -126,6 +146,14 @@ function quad (x1, y1, x2, y2, x3, y3, x4, y4) {
     ctx.stroke();
 }
 
+/**
+ * Draws an image on the canvas.
+ * @param { HTMLCanvasElement } image - The image to draw.
+ * @param { number } x - The x-coordinate where the image will be drawn.
+ * @param { number } y - The y-coordinate where the image will be drawn.
+ * @param { number } w - The width of the image. Defaults to the image's width.
+ * @param { number } h - The height of the image. Defaults to the image's height.
+ */
 function image (image, x, y, w = image.width, h = image.height) {
 
     ctx.drawImage(image, x, y, w, h);
