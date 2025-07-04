@@ -144,13 +144,13 @@ export class Mine {
             textAlign("CENTER", "CENTER");
             text(money.total, canvas.width / 2, 50);
 
-            image(images.topBottomGradient, 0, 0, canvas.width, 50);
-            image(images.topBottomGradient, 0, canvas.height - 50, canvas.width, 50);
-
             for (let i = 0; i < upgradePages.length; i++) {
                 upgradePages[i].display();
             }
         popMatrix();
+
+        image(images.topBottomGradient, 0, 0, canvas.width, 50);
+        image(images.topBottomGradient, 0, canvas.height - 50, canvas.width, 50);
     }
 
     display () {
