@@ -3,7 +3,7 @@ import { user } from "../helpers/ui.js";
 import { noStroke, fill, strokeWeight, stroke, color } from "../PJS/colors.js";
 import { pushMatrix, translate, scale, popMatrix } from "../PJS/transformation.js";
 import { rect } from "../PJS/shapes.js";
-import { textSize, textAlign, outlinedText } from "../PJS/text.js";
+import { textSize, textAlign, outlinedText, textFont } from "../PJS/text.js";
 
 export class Button {
 
@@ -55,7 +55,7 @@ export class Button {
             fill(255);
             textSize(this.txtSize);
             textAlign("CENTER", "CENTER");
-            //outlinedText(this.txt, this.x + this.w / 2, this.y + this.h / 2, 2, color(255), color(0));
+            textFont("fredoka")
 
             const lines = this.txt.split('\n');
             const lineHeight = this.txtSize * 1.1;
@@ -63,7 +63,7 @@ export class Button {
             const startY = this.y + this.h / 2 - totalHeight / 2 + lineHeight / 2;
 
             lines.forEach((line, i) => {
-                outlinedText(line, this.x + this.w / 2, startY + i * lineHeight, 2, color(255), color(0));
+                outlinedText(line, this.x + this.w / 2, startY + i * lineHeight, 1, color(255), color(0));
             });
             
         popMatrix();
