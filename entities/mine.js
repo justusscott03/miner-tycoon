@@ -14,7 +14,7 @@ import { money } from "../helpers/moneyManagment.js";
 
 import { images } from "../lib/imageLibrary.js";
 
-import { upgradePages } from "../config/entityUpgradePages.js";
+import { upgradePages } from "./upgradePage.js";
 
 const canvas = document.getElementById("canvas");
 

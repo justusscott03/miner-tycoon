@@ -5,7 +5,9 @@ import { popMatrix, pushMatrix, scale, translate } from "../PJS/transformation.j
 
 const canvas = document.getElementById("canvas");
 
-export class UpgradePage {
+const upgradePages = [];
+
+class UpgradePage {
 
     constructor (subject) {
         this.subject = subject;
@@ -44,3 +46,5 @@ export class UpgradePage {
     }
 
 }
+
+export { upgradePages, UpgradePage };

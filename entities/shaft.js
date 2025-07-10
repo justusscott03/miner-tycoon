@@ -7,7 +7,7 @@ import { fill, stroke } from "../PJS/colors.js";
 import { rect } from "../PJS/shapes.js";
 import { textAlign, text } from "../PJS/text.js";
 
-import { upgradePages } from "../config/entityUpgradePages.js";
+import { upgradePages } from "./upgradePage.js";
 
 const ctx = document.getElementById("canvas").getContext("2d");
 
