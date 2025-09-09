@@ -24,7 +24,7 @@ export class Button {
         this.txt = txt;
         this.func = func;
         this.txtSize = txtSize;
-        this.s = 3;
+        this.s = 1;
         this.mouseOver = false;
     }
 

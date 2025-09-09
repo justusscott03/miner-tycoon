@@ -10,13 +10,15 @@ export class Storehouse {
      * @param { number } y - The y-position of the storehouse.
      * @param { number } w - The width of the storehouse.
      * @param { number } h - The height of the storehouse.
+     * @param { Elevator } elevator - The elevator associated with the storehouse.
      */
-    constructor (x, y, w, h) {
+    constructor (x, y, w, h, elevator) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.money = 0;
+        this.elevator = elevator;
     }
 
     display () {

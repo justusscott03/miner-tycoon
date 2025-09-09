@@ -1,11 +1,16 @@
 import { elevatorStates } from "../config/entityStates.js";
+
 import { pushMatrix, translate, scale, popMatrix } from "../PJS/transformation.js";
 import { noStroke, fill } from "../PJS/colors.js";
 import { rect, image } from "../PJS/shapes.js";
 import { textAlign, text } from "../PJS/text.js";
 import { map } from "../PJS/math.js";
+
 import { frameTime } from "../helpers/timeManager.js";
+
 import { images } from "../lib/imageLibrary.js";
+
+import { Upgradeable } from "./upgradeable.js";
 
 export class Elevator {
 

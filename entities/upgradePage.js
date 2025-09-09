@@ -11,6 +11,7 @@ class UpgradePage {
 
     constructor (subject) {
         this.subject = subject;
+        this.isShown = false;
 
         this.x = 100;
         this.y = 100;
@@ -21,7 +22,7 @@ class UpgradePage {
     }
     
     update () {
-        if (this.subject.pageOut) {
+        if (this.pageOut) {
             this.s = lerp(this.s, 1, 0.2);
         }
         else {

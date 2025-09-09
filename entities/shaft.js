@@ -1,17 +1,15 @@
 import { Crate } from "./crate.js";
-import { Button } from "./button.js";
 import { Miner } from "./miner.js";
-import { UpgradePage } from "./upgradePage.js";
 
 import { fill, stroke } from "../PJS/colors.js";
 import { rect } from "../PJS/shapes.js";
 import { textAlign, text } from "../PJS/text.js";
 
-import { upgradePages } from "./upgradePage.js";
+import { Upgradeable } from "./upgradeable.js";
 
 const ctx = document.getElementById("canvas").getContext("2d");
 
-export class Shaft {
+export class Shaft extends Upgradeable {
 
     /**
      * Creates a new Shaft object.
@@ -22,6 +20,8 @@ export class Shaft {
      * @param { number } id - The id of the shaft (1 - 30).
      */
     constructor (x, y, w, h, id) {
+        super();
+        
         this.x = x;
         this.y = y;
         this.w = w;
@@ -35,18 +35,11 @@ export class Shaft {
         this.miners = [];
         this.recruitMiner();
 
-        this.pageOut = false;
-
-        this.level = 1;
-        this.boostLevels = [10, 25, 50, 100, 200, 300, 400, 500, 600, 800];
-
-        const t = this;
-        this.pageOutButton = new Button(this.x + this.w * 4 / 5, this.y + this.h / 4, 50, 50, "Level\n" + this.level, 17, function () {
-            t.pageOut = true;
+        this.initButton({
+            x : this.x + this.w * 4 / 5, 
+            y : this.y + this.h / 4,
+            fontSize : 17
         });
-
-        this.page = new UpgradePage(this);
-        upgradePages.push(this.page);
     }
 
     recruitMiner() {
@@ -82,8 +75,8 @@ export class Shaft {
         this.crate.draw();
 
         this.pageOutButton.draw();
-        
 
+        this.pageOutButton.draw();
 
     }
 
