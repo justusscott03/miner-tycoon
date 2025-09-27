@@ -2,8 +2,10 @@ import { lerp } from "../PJS/math.js";
 import { user } from "../helpers/ui.js";
 import { noStroke, fill, strokeWeight, stroke, color } from "../PJS/colors.js";
 import { pushMatrix, translate, scale, popMatrix } from "../PJS/transformation.js";
-import { rect } from "../PJS/shapes.js";
+import { image, rect } from "../PJS/shapes.js";
 import { textSize, textAlign, outlinedText, textFont } from "../PJS/text.js";
+
+import { images } from "../lib/imageLibrary.js";
 
 export class Button {
 
@@ -47,15 +49,17 @@ export class Button {
             translate(this.x + this.w / 2, this.y + this.h / 2);
             scale(this.s);
             translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
-            fill(255);
-            rect(this.x, this.y, this.w, this.h);
+            // fill(255);
+            // rect(this.x, this.y, this.w, this.h);
+
+            image(images.button, this.x, this.y, this.w, this.h);
 
             strokeWeight(0.5);
             stroke(0);
             fill(255);
             textSize(this.txtSize);
             textAlign("CENTER", "CENTER");
-            textFont("fredoka")
+            textFont("fredoka");
 
             const lines = this.txt.split('\n');
             const lineHeight = this.txtSize * 1.1;

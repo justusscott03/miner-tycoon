@@ -1,11 +1,11 @@
 import { Crate } from "./crate.js";
-import { Miner } from "./miner.js";
+import { Miner } from "./Miner.js";
 
 import { fill, stroke } from "../PJS/colors.js";
 import { rect } from "../PJS/shapes.js";
 import { textAlign, text } from "../PJS/text.js";
 
-import { Upgradeable } from "./upgradeable.js";
+import { Upgradeable } from "./Upgradeable.js";
 
 const ctx = document.getElementById("canvas").getContext("2d");
 
@@ -38,6 +38,8 @@ export class Shaft extends Upgradeable {
         this.initButton({
             x : this.x + this.w * 4 / 5, 
             y : this.y + this.h / 4,
+            w : 60,
+            h : 60,
             fontSize : 17
         });
     }

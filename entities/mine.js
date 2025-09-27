@@ -1,7 +1,7 @@
-import { Storehouse } from "./storehouse.js";
-import { Warehouse } from "./warehouse.js";
+import { Storehouse } from "./Storehouse.js";
+import { Warehouse } from "./Warehouse.js";
 import { Elevator } from "./elevator.js";
-import { Shaft } from "./shaft.js";
+import { Shaft } from "./Shaft.js";
 import { Carrier } from "./carrier.js";
 
 import { pushMatrix, translate, popMatrix } from "../PJS/transformation.js";
@@ -14,7 +14,7 @@ import { money } from "../helpers/moneyManagment.js";
 
 import { images } from "../lib/imageLibrary.js";
 
-import { upgradePages } from "./upgradePage.js";
+import { upgradePages } from "./UpgradePage.js";
 
 const canvas = document.getElementById("canvas");
 
@@ -40,7 +40,7 @@ export class Mine {
 
     buildShaft () {
         if (this.numShafts < 30) {
-            this.shafts.push(new Shaft(215, 740 + this.shaftOffset, 501, 100, this.numShafts + 1));
+            this.shafts.push(new Shaft(215, 740 + this.shaftOffset, 500, 100, this.numShafts + 1));
             this.elevator.crates = this.shafts.map(shaft => shaft.crate);
             if (this.numShafts === 0) {
                 this.displayElevator = true;

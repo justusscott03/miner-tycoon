@@ -10,7 +10,7 @@ import { frameTime } from "../helpers/timeManager.js";
 
 import { images } from "../lib/imageLibrary.js";
 
-import { Upgradeable } from "./upgradeable.js";
+import { Upgradeable } from "./Upgradeable.js";
 
 export class Elevator {
 

@@ -14,6 +14,11 @@ function textSize (size) {
     ctx.font = `${pjsSettings.globalSize}px ${pjsSettings.globalFont}`;
 }
 
+/**
+ * Configures the alignment of text drawn to the canvas.
+ * @param { string } ALIGN - The horizontal alignment of the text. Can be "LEFT", "CENTER", or "RIGHT". Default is "LEFT".
+ * @param { string } YALIGN - The vertical alignment of the text. Can be "BASELINE", "CENTER", or "BOTTOM". Default is "BASELINE".
+ */
 function textAlign (ALIGN, YALIGN = "BASELINE") {
     if (!["LEFT", "CENTER", "RIGHT"].includes(ALIGN)) {
         console.error("Invalid textAlign ALIGN:", ALIGN);

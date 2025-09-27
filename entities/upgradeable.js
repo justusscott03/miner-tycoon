@@ -1,6 +1,6 @@
 import { entityBoostLevels } from "../config/entityBoostLevels.js";
-import { Button } from "./button.js";
-import { upgradePages, UpgradePage } from "./upgradePage.js";
+import { Button } from "./Button.js";
+import { upgradePages, UpgradePage } from "./UpgradePage.js";
 
 export class Upgradeable {
 
@@ -23,9 +23,11 @@ export class Upgradeable {
         // console.log("button initizlized in", this.constructor.name, { data });
         this.buttonData.x = data.x ?? console.error("No x position provided for upgradeable button.");
         this.buttonData.y = data.y ?? console.error("No y position provided for upgradeable button.");
+        this.buttonData.w = data.w ?? console.error("No width provided for upgradeable button.");
+        this.buttonData.h = data.h ?? console.error("No height provided for upgradeable button.");
         this.buttonData.fontSize = data.fontSize ?? console.error("No font size provided for upgradeable button.");
 
-        this.pageOutButton = new Button(this.buttonData.x, this.buttonData.y, 50, 50, "Level\n" + this.level, this.buttonData.fontSize, () => {
+        this.pageOutButton = new Button(this.buttonData.x, this.buttonData.y, this.buttonData.w, this.buttonData.h, "Level\n" + this.level, this.buttonData.fontSize, () => {
             this.upgradePage.pageOut = true;
         });
     }

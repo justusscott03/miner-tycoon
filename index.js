@@ -2,8 +2,8 @@ import { constrain, lerp } from "./PJS/math.js";
 import { background } from "./PJS/colors.js";
 import { pushMatrix, scale, popMatrix, resetMatrix } from "./PJS/transformation.js";
 
-import { Button } from "./entities/button.js";
-import { Mine } from "./entities/mine.js";
+import { Button } from "./entities/Button.js";
+import { Mine } from "./entities/Mine.js";
 
 import { user } from "./helpers/ui.js";
 import { screenSize } from "./helpers/screenResize.js";
