@@ -12,7 +12,7 @@ import { StorehouseRenderer } from "./StorehouseRenderer.js";
 import { WarehouseRenderer } from "./WarehouseRenderer.js";
 import { CarrierRenderer } from "./CarrierRenderer.js";
 
-import { ImageManager } from "../../helpers/ImageManager.js";
+import { ImageManager } from "../../../engine/helpers/ImageManager.js";
 import { MoneyState } from "../../state/MoneyState.js";
 
 import { MineState } from "../state/MineState.js";

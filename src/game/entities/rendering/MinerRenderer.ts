@@ -5,7 +5,7 @@ import { noStroke, fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLib
 import { image, rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
 import { map } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
 
-import { ImageManager } from "../../helpers/ImageManager.js";
+import { ImageManager } from "../../../engine/helpers/ImageManager.js";
 import { MinerStates } from "../../config/MinerStates.js";
 
 import { MinerState } from "../state/MinerState.js";

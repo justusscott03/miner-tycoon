@@ -1,7 +1,7 @@
 import { TimeManager } from "../engine/helpers/TimeManager.js";
 import { ScreenManager } from "../engine/helpers/ScreenManager.js";
 import { UserInput } from "../engine/ui/UserInput.js";
-import { ImageManager } from "./helpers/ImageManager.js";
+import { ImageManager } from "../engine/helpers/ImageManager.js";
 import { Database } from "../engine/helpers/Database.js";
 import { MoneyState } from "./state/MoneyState.js";
 

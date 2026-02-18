@@ -4,7 +4,7 @@ import { noStroke, fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLib
 import { rect, image } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
 import { textAlign, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
 import { map } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
-import { ImageManager } from "../../helpers/ImageManager.js";
+import { ImageManager } from "../../../engine/helpers/ImageManager.js";
 import { ElevatorStates } from "../../config/ElevatorStates.js";
 export class ElevatorRenderer {
     constructor(state) {

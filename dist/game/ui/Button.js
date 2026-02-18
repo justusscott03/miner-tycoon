@@ -3,7 +3,7 @@ import { pushMatrix, translate, scale, popMatrix } from "https://cdn.jsdelivr.ne
 import { image } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
 import { textSize, textAlign, outlinedText, textFont } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
 import { lerp } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
-import { ImageManager } from "../helpers/ImageManager.js";
+import { ImageManager } from "../../engine/helpers/ImageManager.js";
 export class Button {
     constructor(x, y, w, h, txt, txtSize, func, input) {
         // WORLD-SPACE POSITION (centered)
