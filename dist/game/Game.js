@@ -52,7 +52,7 @@ export class Game {
     setupScroll() {
         CanvasManager.canvas.addEventListener("wheel", (e) => {
             e.preventDefault();
-            const targetY = this.mineState.y + e.deltaY * 2;
+            const targetY = this.mineState.y - e.deltaY * 2;
             this.mineState.y = Math.max(Math.min(targetY, 0), -4950);
         });
     }
