@@ -10,28 +10,25 @@ import { UpgradeableRenderer } from "./UpgradeableRenderer.js";
 
 import { ShaftState } from "../state/ShaftState.js";
 import { CanvasManager } from "../../../engine/helpers/CanvasManager.js";
-import { UserInput } from "../../../engine/ui/UserInput.js";
 
-export class ShaftRenderer {
-    state: ShaftState;
+export class ShaftRenderer extends UpgradeableRenderer {
+    protected state: ShaftState;
 
-    upgradeRenderer: UpgradeableRenderer;
-    crateRenderer: CrateRenderer;
-    minerRenderers: MinerRenderer[];
+    private crateRenderer: CrateRenderer;
+    private minerRenderers: MinerRenderer[];
 
-    constructor(state: ShaftState, input: UserInput) {
+    constructor(state: ShaftState) {
+        super(state);
         this.state = state;
 
-        this.upgradeRenderer = new UpgradeableRenderer(state, input);
         this.crateRenderer = new CrateRenderer(state.crate);
-        this.minerRenderers = state.miners.map(
-            miner => new MinerRenderer(miner)
-        );
+        this.minerRenderers = state.miners.map(m => new MinerRenderer(m));
     }
 
-    draw(delta: number) {
+    render() {
         const s = this.state;
 
+        // Draw shaft
         fill(150);
         rect(s.x, s.y, s.w, s.h);
 
@@ -48,21 +45,15 @@ export class ShaftRenderer {
         textAlign("CENTER", "CENTER");
         text(s.id.toString(), 150, s.y + 50);
 
+        // Draw miners
         for (const minerRenderer of this.minerRenderers) {
-            minerRenderer.display(delta);
+            minerRenderer.render();
         }
 
-        this.crateRenderer.display();
+        // Draw crate
+        this.crateRenderer.render();
 
-        if (s.pageOutButton) {
-            s.pageOutButton.draw();
-        }
-
-        this.upgradeRenderer.display();
-    }
-
-    display(delta: number) {
-        this.state.update(delta);
-        this.draw(delta);
+        // Draw upgrade UI (from base class)
+        super.render();
     }
 }

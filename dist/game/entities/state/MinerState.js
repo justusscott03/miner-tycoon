@@ -1,5 +1,6 @@
 // src/engine/MinerState.ts
 import { MinerStates } from "../../config/MinerStates.js";
+import { Time } from "../../../engine/helpers/TimeManager.js";
 export class MinerState {
     constructor(x, y, w, h, crate) {
         this.s = 1;
@@ -14,12 +15,12 @@ export class MinerState {
         this.h = h;
         this.crate = crate;
     }
-    update(delta) {
+    update() {
         switch (this.action) {
             case MinerStates.ToDigging:
                 this.s = 1;
                 if (this.x < 500) {
-                    this.x += this.moveSpeed * delta;
+                    this.x += this.moveSpeed * Time.deltaTime;
                 }
                 else {
                     this.action = MinerStates.Digging;
@@ -27,7 +28,7 @@ export class MinerState {
                 break;
             case MinerStates.Digging:
                 this.s = 1;
-                this.has += this.loadSpeed * delta;
+                this.has += this.loadSpeed * Time.deltaTime;
                 if (this.has >= this.maxLoad) {
                     this.has = this.maxLoad;
                     this.action = MinerStates.ToCrate;
@@ -36,7 +37,7 @@ export class MinerState {
             case MinerStates.ToCrate:
                 this.s = -1;
                 if (this.x > 300) {
-                    this.x -= this.moveSpeed * delta;
+                    this.x -= this.moveSpeed * Time.deltaTime;
                 }
                 else {
                     this.crate.add(this.has);

@@ -2,6 +2,7 @@
 
 import type { CrateState } from "./CrateState.js";
 import { MinerStates } from "../../config/MinerStates.js";
+import { Time } from "../../../engine/helpers/TimeManager.js";
 
 export interface MinerSaveData {
     x: number;
@@ -32,8 +33,6 @@ export class MinerState {
     loadSpeed = 5;
     moveSpeed = 60;
 
-    renderer: any;
-
     constructor(x: number, y: number, w: number, h: number, crate: CrateState) {
         this.x = x;
         this.y = y;
@@ -42,13 +41,13 @@ export class MinerState {
         this.crate = crate;
     }
 
-    update(delta: number) {
+    update() {
         switch (this.action) {
             case MinerStates.ToDigging:
                 this.s = 1;
 
                 if (this.x < 500) {
-                    this.x += this.moveSpeed * delta;
+                    this.x += this.moveSpeed * Time.deltaTime;
                 } else {
                     this.action = MinerStates.Digging;
                 }
@@ -57,7 +56,7 @@ export class MinerState {
             case MinerStates.Digging:
                 this.s = 1;
 
-                this.has += this.loadSpeed * delta;
+                this.has += this.loadSpeed * Time.deltaTime;
                 if (this.has >= this.maxLoad) {
                     this.has = this.maxLoad;
                     this.action = MinerStates.ToCrate;
@@ -68,7 +67,7 @@ export class MinerState {
                 this.s = -1;
 
                 if (this.x > 300) {
-                    this.x -= this.moveSpeed * delta;
+                    this.x -= this.moveSpeed * Time.deltaTime;
                 } else {
                     this.crate.add(this.has);
                     this.has = 0;

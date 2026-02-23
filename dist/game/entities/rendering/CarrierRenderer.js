@@ -9,7 +9,7 @@ export class CarrierRenderer {
     constructor(state) {
         this.state = state;
     }
-    draw() {
+    render() {
         const c = this.state;
         pushMatrix();
         translate(c.x + c.w / 2, c.y);
@@ -33,9 +33,5 @@ export class CarrierRenderer {
             const timer = c.action === CarrierStates.Loading ? c.loadTimer : c.unloadTimer;
             rect(c.x - c.w / 6, c.y - c.h / 6, map(timer, 0, c.loadBarMax, 0, c.w * 4 / 3), c.h / 10);
         }
-    }
-    display(delta) {
-        this.state.update(delta);
-        this.draw();
     }
 }

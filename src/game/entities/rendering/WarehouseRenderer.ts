@@ -6,20 +6,16 @@ import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.
 import { WarehouseState } from "../state/WarehouseState.js";
 
 export class WarehouseRenderer {
-    state: WarehouseState;
+    private state: WarehouseState;
 
     constructor(state: WarehouseState) {
         this.state = state;
     }
 
-    draw() {
+    render() {
         const w = this.state;
 
         fill(0);
         rect(w.x, w.y, w.w, w.h);
-    }
-
-    display() {
-        this.draw();
     }
 }

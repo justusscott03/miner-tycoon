@@ -1,5 +1,6 @@
 // src/engine/ElevatorState.ts
 
+import { Time } from "../../../engine/helpers/TimeManager.js";
 import { ElevatorStates } from "../../config/ElevatorStates.js";
 import type { CrateState } from "./CrateState.js";
 import type { StorehouseState } from "./StorehouseState.js";
@@ -53,10 +54,10 @@ export class ElevatorState {
         this.storehouse = storehouse;
     }
 
-    update(delta: number) {
+    update() {
         switch (this.action) {
             case ElevatorStates.MovingDown:
-                this.y += this.moveSpeed * delta;
+                this.y += this.moveSpeed * Time.deltaTime;
 
                 for (let i = 0; i < this.crates.length; i++) {
                     const crate = this.crates[i];
@@ -96,7 +97,7 @@ export class ElevatorState {
                 break;
 
             case ElevatorStates.MovingUp:
-                this.y -= this.moveSpeed * delta;
+                this.y -= this.moveSpeed * Time.deltaTime;
 
                 if (this.y < this.storehouse.y + this.storehouse.h + 31) {
                     this.action = ElevatorStates.Unloading;

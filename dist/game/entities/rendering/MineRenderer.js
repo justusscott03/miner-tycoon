@@ -13,10 +13,9 @@ import { ImageManager } from "../../../engine/helpers/ImageManager.js";
 import { MoneyState } from "../../state/MoneyState.js";
 import { CanvasManager } from "../../../engine/helpers/CanvasManager.js";
 export class MineRenderer {
-    constructor(state, input) {
+    constructor(state) {
         this.state = state;
-        this.input = input;
-        this.shaftRenderers = state.shafts.map(s => new ShaftRenderer(s, input));
+        this.shaftRenderers = state.shafts.map(s => new ShaftRenderer(s));
         this.elevatorRenderer = new ElevatorRenderer(state.elevator);
         this.storehouseRenderer = new StorehouseRenderer(state.storehouse);
         this.warehouseRenderer = new WarehouseRenderer(state.warehouse);
@@ -24,7 +23,7 @@ export class MineRenderer {
     }
     syncChildren() {
         if (this.shaftRenderers.length !== this.state.shafts.length) {
-            this.shaftRenderers = this.state.shafts.map(s => new ShaftRenderer(s, this.input));
+            this.shaftRenderers = this.state.shafts.map(s => new ShaftRenderer(s));
         }
         if (this.carrierRenderers.length !== this.state.carriers.length) {
             this.carrierRenderers = this.state.carriers.map(c => new CarrierRenderer(c));
@@ -84,32 +83,31 @@ export class MineRenderer {
         vertex(186, 550);
         endShape();
     }
-    drawForeground(delta) {
+    drawForeground() {
         const s = this.state;
-        this.shaftRenderers.forEach(r => r.display(delta));
+        this.shaftRenderers.forEach(r => r.render());
         if (s.displayElevator) {
             fill(28);
             rect(115, 360, 7, s.elevator.y - 349);
             rect(178, 360, 7, s.elevator.y - 349);
-            this.elevatorRenderer.display(delta);
+            this.elevatorRenderer.render();
         }
-        this.storehouseRenderer.display();
+        this.storehouseRenderer.render();
         image(ImageManager.Instance.get("elevatorDropoff"), 83, 545, 134, 31);
-        this.warehouseRenderer.display();
-        this.carrierRenderers.forEach(r => r.display(delta));
+        this.warehouseRenderer.render();
+        this.carrierRenderers.forEach(r => r.render());
         fill(0);
         textAlign("CENTER", "CENTER");
         text(MoneyState.Instance.total.toString(), CanvasManager.width / 2, 50);
         image(ImageManager.Instance.get("topBottomGradient"), 0, 0, CanvasManager.width, 50);
         image(ImageManager.Instance.get("topBottomGradient"), 0, CanvasManager.height - 50, CanvasManager.width, 50);
     }
-    display(delta) {
-        this.state.update(delta);
+    render() {
         this.syncChildren();
         pushMatrix();
         translate(0, this.state.y);
         this.drawBackground();
-        this.drawForeground(delta);
+        this.drawForeground();
         popMatrix();
     }
 }

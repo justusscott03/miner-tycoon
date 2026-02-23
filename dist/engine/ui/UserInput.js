@@ -1,31 +1,45 @@
+import { CanvasManager } from "../helpers/CanvasManager.js";
+import { ScreenManager } from "../helpers/ScreenManager.js";
 export class UserInput {
-    constructor(canvas, screen) {
+    static init() {
+        if (!this._instance) {
+            this._instance = new UserInput();
+        }
+        return this._instance;
+    }
+    static get Instance() {
+        if (!this._instance) {
+            throw new Error("UserInput not initialized. Call UserInput.init() first.");
+        }
+        return this._instance;
+    }
+    constructor() {
         this.mouseX = 0;
         this.mouseY = 0;
         this.mousePressed = false;
         this.mouseClicked = false;
         this.keys = {};
-        this.canvas = canvas;
-        this.screen = screen;
         this.attachMouseListeners();
         this.attachKeyboardListeners();
     }
     attachMouseListeners() {
-        this.canvas.addEventListener("mousedown", () => {
+        const canvas = CanvasManager.canvas;
+        canvas.addEventListener("mousedown", () => {
             this.mousePressed = true;
         });
-        this.canvas.addEventListener("mouseup", () => {
+        canvas.addEventListener("mouseup", () => {
             this.mousePressed = false;
             this.mouseClicked = true;
         });
-        this.canvas.addEventListener("mousemove", (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            const scaleX = this.screen.originalWidth / rect.width;
-            const scaleY = this.screen.originalHeight / rect.height;
+        canvas.addEventListener("mousemove", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const screen = ScreenManager.Instance;
+            const scaleX = screen.originalWidth / rect.width;
+            const scaleY = screen.originalHeight / rect.height;
             this.mouseX = (e.clientX - rect.left) * scaleX;
             this.mouseY = (e.clientY - rect.top) * scaleY;
         });
-        this.canvas.addEventListener("contextmenu", (e) => {
+        canvas.addEventListener("contextmenu", (e) => {
             // e.preventDefault(); // optional
         });
     }
@@ -41,3 +55,4 @@ export class UserInput {
         this.mouseClicked = false;
     }
 }
+UserInput._instance = null;

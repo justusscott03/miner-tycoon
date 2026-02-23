@@ -1,6 +1,23 @@
-import { ScreenManager } from "../helpers/ScreenManager";
+import { CanvasManager } from "../helpers/CanvasManager.js";
+import { ScreenManager } from "../helpers/ScreenManager.js";
 
 export class UserInput {
+    private static _instance: UserInput | null = null;
+
+    static init(): UserInput {
+        if (!this._instance) {
+            this._instance = new UserInput();
+        }
+        return this._instance;
+    }
+
+    static get Instance(): UserInput {
+        if (!this._instance) {
+            throw new Error("UserInput not initialized. Call UserInput.init() first.");
+        }
+        return this._instance;
+    }
+
     mouseX = 0;
     mouseY = 0;
     mousePressed = false;
@@ -8,38 +25,35 @@ export class UserInput {
 
     keys: Record<string, boolean> = {};
 
-    private canvas: HTMLCanvasElement;
-    private screen: ScreenManager;
-
-    constructor(canvas: HTMLCanvasElement, screen: ScreenManager) {
-        this.canvas = canvas;
-        this.screen = screen;
-
+    private constructor() {
         this.attachMouseListeners();
         this.attachKeyboardListeners();
     }
 
     private attachMouseListeners() {
-        this.canvas.addEventListener("mousedown", () => {
+        const canvas = CanvasManager.canvas;
+
+        canvas.addEventListener("mousedown", () => {
             this.mousePressed = true;
         });
 
-        this.canvas.addEventListener("mouseup", () => {
+        canvas.addEventListener("mouseup", () => {
             this.mousePressed = false;
             this.mouseClicked = true;
         });
 
-        this.canvas.addEventListener("mousemove", (e) => {
-            const rect = this.canvas.getBoundingClientRect();
+        canvas.addEventListener("mousemove", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const screen = ScreenManager.Instance;
 
-            const scaleX = this.screen.originalWidth / rect.width;
-            const scaleY = this.screen.originalHeight / rect.height;
+            const scaleX = screen.originalWidth / rect.width;
+            const scaleY = screen.originalHeight / rect.height;
 
             this.mouseX = (e.clientX - rect.left) * scaleX;
             this.mouseY = (e.clientY - rect.top) * scaleY;
         });
 
-        this.canvas.addEventListener("contextmenu", (e) => {
+        canvas.addEventListener("contextmenu", (e) => {
             // e.preventDefault(); // optional
         });
     }

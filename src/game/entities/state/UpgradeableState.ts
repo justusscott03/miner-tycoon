@@ -3,13 +3,7 @@
 import { entityBoostLevels } from "../../config/entityBoostLevels.js";
 import { UpgradePageState } from "./UpgradePageState.js";
 
-export interface ButtonData {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    fontSize: number;
-}
+import { ButtonData } from "../../ui/Button.js";
 
 export class UpgradeableState {
     level = 1;
@@ -25,7 +19,6 @@ export class UpgradeableState {
     };
 
     upgradePage: UpgradePageState;
-    pageOutButton: any = null; // renderer fills this in
 
     constructor() {
         const entityName = this.constructor.name

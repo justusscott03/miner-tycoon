@@ -1,14 +1,30 @@
 export class ScreenManager {
+    private static _instance: ScreenManager | null = null;
+
+    static init(originalWidth: number, originalHeight: number): ScreenManager {
+        if (!this._instance) {
+            this._instance = new ScreenManager(originalWidth, originalHeight);
+        }
+        return this._instance;
+    }
+
+    static get Instance(): ScreenManager {
+        if (!this._instance) {
+            throw new Error("ScreenManager not initialized. Call ScreenManager.init() first.");
+        }
+        return this._instance;
+    }
+
     originalWidth: number;
     originalHeight: number;
 
-    scaledWidth: number = 0;
-    scaledHeight: number = 0;
+    scaledWidth = 0;
+    scaledHeight = 0;
 
     private aspectRatio: number;
     private onResizeCallback: (() => void) | null = null;
 
-    constructor(originalWidth: number, originalHeight: number) {
+    private constructor(originalWidth: number, originalHeight: number) {
         this.originalWidth = originalWidth;
         this.originalHeight = originalHeight;
         this.aspectRatio = originalWidth / originalHeight;

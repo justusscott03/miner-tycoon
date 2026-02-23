@@ -4,8 +4,9 @@ import { image } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1
 import { textSize, textAlign, outlinedText, textFont } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
 import { lerp } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
 import { ImageManager } from "../../engine/helpers/ImageManager.js";
+import { UserInput } from "../../engine/ui/UserInput.js";
 export class Button {
-    constructor(x, y, w, h, txt, txtSize, func, input) {
+    constructor(x, y, w, h, txt, txtSize, func) {
         // WORLD-SPACE POSITION (centered)
         this.x = x;
         this.y = y;
@@ -15,7 +16,7 @@ export class Button {
         this.txt = txt;
         this.txtSize = txtSize;
         this.func = func;
-        this.input = input;
+        this.input = UserInput.Instance;
         this.s = 1; // scale
         this.mouseOver = false;
     }

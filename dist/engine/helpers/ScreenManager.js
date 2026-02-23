@@ -1,4 +1,16 @@
 export class ScreenManager {
+    static init(originalWidth, originalHeight) {
+        if (!this._instance) {
+            this._instance = new ScreenManager(originalWidth, originalHeight);
+        }
+        return this._instance;
+    }
+    static get Instance() {
+        if (!this._instance) {
+            throw new Error("ScreenManager not initialized. Call ScreenManager.init() first.");
+        }
+        return this._instance;
+    }
     constructor(originalWidth, originalHeight) {
         this.scaledWidth = 0;
         this.scaledHeight = 0;
@@ -44,3 +56,4 @@ export class ScreenManager {
         return this.scaledHeight;
     }
 }
+ScreenManager._instance = null;

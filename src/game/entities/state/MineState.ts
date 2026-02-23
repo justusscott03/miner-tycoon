@@ -88,12 +88,12 @@ export class MineState {
         }
     }
 
-    update(delta: number) {
-        this.shafts.forEach(s => s.update(delta));
+    update() {
+        this.shafts.forEach(s => s.update());
         if (this.displayElevator) {
-            this.elevator.update(delta);
+            this.elevator.update();
         }
-        this.carriers.forEach(c => c.update(delta));
+        this.carriers.forEach(c => c.update());
     }
 
     toJSON(): MineSaveData {

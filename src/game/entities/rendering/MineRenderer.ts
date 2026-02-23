@@ -28,13 +28,10 @@ export class MineRenderer {
     warehouseRenderer: WarehouseRenderer;
     carrierRenderers: CarrierRenderer[];
 
-    input: UserInput
-
-    constructor(state: MineState, input: UserInput) {
+    constructor(state: MineState) {
         this.state = state;
-        this.input = input;
 
-        this.shaftRenderers = state.shafts.map(s => new ShaftRenderer(s, input));
+        this.shaftRenderers = state.shafts.map(s => new ShaftRenderer(s));
         this.elevatorRenderer = new ElevatorRenderer(state.elevator);
         this.storehouseRenderer = new StorehouseRenderer(state.storehouse);
         this.warehouseRenderer = new WarehouseRenderer(state.warehouse);
@@ -43,7 +40,7 @@ export class MineRenderer {
 
     syncChildren() {
         if (this.shaftRenderers.length !== this.state.shafts.length) {
-            this.shaftRenderers = this.state.shafts.map(s => new ShaftRenderer(s, this.input));
+            this.shaftRenderers = this.state.shafts.map(s => new ShaftRenderer(s));
         }
         if (this.carrierRenderers.length !== this.state.carriers.length) {
             this.carrierRenderers = this.state.carriers.map(c => new CarrierRenderer(c));
@@ -111,23 +108,23 @@ export class MineRenderer {
         endShape();
     }
 
-    drawForeground(delta: number) {
+    drawForeground() {
         const s = this.state;
 
-        this.shaftRenderers.forEach(r => r.display(delta));
+        this.shaftRenderers.forEach(r => r.render());
 
         if (s.displayElevator) {
             fill(28);
             rect(115, 360, 7, s.elevator.y - 349);
             rect(178, 360, 7, s.elevator.y - 349);
-            this.elevatorRenderer.display(delta);
+            this.elevatorRenderer.render();
         }
 
-        this.storehouseRenderer.display();
+        this.storehouseRenderer.render();
         image(ImageManager.Instance.get("elevatorDropoff"), 83, 545, 134, 31);
-        this.warehouseRenderer.display();
+        this.warehouseRenderer.render();
 
-        this.carrierRenderers.forEach(r => r.display(delta));
+        this.carrierRenderers.forEach(r => r.render());
 
         fill(0);
         textAlign("CENTER", "CENTER");
@@ -137,15 +134,14 @@ export class MineRenderer {
         image(ImageManager.Instance.get("topBottomGradient"), 0, CanvasManager.height - 50, CanvasManager.width, 50);
     }
 
-    display(delta: number) {
-        this.state.update(delta);
+    render() {
         this.syncChildren();
 
         pushMatrix();
         translate(0, this.state.y);
 
         this.drawBackground();
-        this.drawForeground(delta);
+        this.drawForeground();
 
         popMatrix();
     }

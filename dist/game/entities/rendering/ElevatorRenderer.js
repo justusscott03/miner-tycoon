@@ -10,7 +10,7 @@ export class ElevatorRenderer {
     constructor(state) {
         this.state = state;
     }
-    draw() {
+    render() {
         const e = this.state;
         pushMatrix();
         translate(e.x, e.y);
@@ -28,9 +28,5 @@ export class ElevatorRenderer {
             rect(35, 8.5, map(timer, 0, e.loadBarMax, 0, 40), 5, 1);
         }
         popMatrix();
-    }
-    display(delta) {
-        this.state.update(delta);
-        this.draw();
     }
 }

@@ -7,9 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { TimeManager } from "../engine/helpers/TimeManager.js";
 import { ScreenManager } from "../engine/helpers/ScreenManager.js";
-import { UserInput } from "../engine/ui/UserInput.js";
 import { ImageManager } from "../engine/helpers/ImageManager.js";
 import { Database } from "../engine/helpers/Database.js";
 import { MoneyState } from "./state/MoneyState.js";
@@ -20,34 +18,29 @@ import { background } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary
 import { CanvasManager } from "../engine/helpers/CanvasManager.js";
 export class Game {
     constructor() {
+        this.screen = ScreenManager.Instance;
         this.money = MoneyState.Instance;
         this.buttons = [];
-        // CanvasManager already initialized in index.ts
-        const canvas = CanvasManager.canvas;
-        this.screen = new ScreenManager(716, 962);
         // Internal resolution
         CanvasManager.resize(this.screen.originalWidth, this.screen.originalHeight, this.screen.width, this.screen.height);
         this.screen.onResize(() => {
             CanvasManager.resize(this.screen.originalWidth, this.screen.originalHeight, this.screen.width, this.screen.height);
         });
-        this.time = new TimeManager();
-        this.input = new UserInput(canvas, this.screen);
-        this.images = ImageManager.init(canvas);
+        this.images = ImageManager.Instance;
         this.db = new Database("KhanMinerDB", 1);
         this.mineState = new MineState();
-        this.mineRenderer = new MineRenderer(this.mineState, this.input);
+        this.mineRenderer = new MineRenderer(this.mineState);
         this.setupButtons();
         this.setupScroll();
         this.setupAutoSave();
-        requestAnimationFrame(() => this.loop());
     }
     setupButtons() {
         this.buttons.push(new Button(100, 100, 100, 100, "Shaft", 40, () => {
             this.mineState.buildShaft();
-        }, this.input));
+        }));
         this.buttons.push(new Button(500, 0, 50, 50, "", 20, () => {
             document.getElementById("savePage").style.display = "block";
-        }, this.input));
+        }));
     }
     setupScroll() {
         CanvasManager.canvas.addEventListener("wheel", (e) => {
@@ -76,23 +69,27 @@ export class Game {
                 return;
             this.money = MoneyState.fromJSON(save.data.money);
             this.mineState = MineState.fromJSON(save.data.mine);
-            this.mineRenderer = new MineRenderer(this.mineState, this.input);
+            this.mineRenderer = new MineRenderer(this.mineState);
         });
     }
-    loop() {
-        this.time.update();
+    update() {
         if (!this.images.loaded) {
             this.images.loadNext();
-            requestAnimationFrame(() => this.loop());
             return;
         }
-        this.mineState.update(this.time.delta);
+        this.mineState.update();
+    }
+    render() {
+        if (!this.images.loaded) {
+            // Optional: draw a loading screen
+            background(200);
+            return;
+        }
         background(255);
-        this.mineRenderer.display(this.time.delta);
+        this.mineState.update();
+        this.mineRenderer.render();
         for (const btn of this.buttons) {
             btn.display();
         }
-        this.input.update();
-        requestAnimationFrame(() => this.loop());
     }
 }

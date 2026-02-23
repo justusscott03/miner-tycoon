@@ -9,7 +9,7 @@ export class MinerRenderer {
     constructor(state) {
         this.state = state;
     }
-    draw() {
+    render() {
         const m = this.state;
         pushMatrix();
         translate(m.x + m.w / 2, m.y);
@@ -23,9 +23,5 @@ export class MinerRenderer {
             rect(-100 / 3, -25 / 2, map(m.has, 0, m.maxLoad, 0, 200 / 3), 15 / 2);
         }
         popMatrix();
-    }
-    display(delta) {
-        this.state.update(delta);
-        this.draw();
     }
 }

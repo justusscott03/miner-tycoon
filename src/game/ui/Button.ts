@@ -5,8 +5,15 @@ import { textSize, textAlign, outlinedText, textFont } from "https://cdn.jsdeliv
 import { lerp } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
 
 import { ImageManager } from "../../engine/helpers/ImageManager.js";
-
 import { UserInput } from "../../engine/ui/UserInput.js";
+
+export interface ButtonData {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    fontSize: number;
+}
 
 export class Button {
     x: number;
@@ -22,7 +29,7 @@ export class Button {
     s: number;
     mouseOver: boolean;
 
-    constructor(x: number, y: number, w: number, h: number, txt: string, txtSize: number, func: CallableFunction, input: UserInput) {
+    constructor(x: number, y: number, w: number, h: number, txt: string, txtSize: number, func: CallableFunction) {
         // WORLD-SPACE POSITION (centered)
         this.x = x;
         this.y = y;
@@ -34,7 +41,7 @@ export class Button {
         this.txt = txt;
         this.txtSize = txtSize;
         this.func = func;
-        this.input = input;
+        this.input = UserInput.Instance;
 
         this.s = 1;          // scale
         this.mouseOver = false;

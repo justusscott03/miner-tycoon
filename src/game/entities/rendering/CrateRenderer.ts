@@ -15,7 +15,7 @@ export class CrateRenderer {
         this.state = state;
     }
 
-    draw() {
+    render() {
         const c = this.state;
 
         noStroke();
@@ -26,9 +26,5 @@ export class CrateRenderer {
         textAlign("CENTER", "CENTER");
         textSize(30);
         text(MoneyFormatter.abbreviate(c.money), c.x + c.w / 2, c.y - c.h / 2);
-    }
-
-    display() {
-        this.draw();
     }
 }

@@ -1,26 +1,24 @@
-export class TimeManager {
-    constructor() {
-        this.last = Date.now();
-        this.current = 0;
-        this.delta = 0;
+export class Time {
+    static update() {
+        this._current = performance.now();
+        this.deltaTime = (this._current - this._last) / 1000; // seconds
+        this.time += this.deltaTime;
+        this._last = this._current;
     }
-    update() {
-        this.current = Date.now();
-        this.delta = (this.current - this.last) / 1000; // seconds
-        this.last = this.current;
-    }
-    getFormattedTime() {
+    static getFormattedTime() {
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, "0");
-        const minutes = String(now.getMinutes()).padStart(2, "0");
-        const seconds = String(now.getSeconds()).padStart(2, "0");
-        return `${hours}:${minutes}:${seconds}`;
+        return now.toLocaleTimeString();
     }
-    getFormattedDate() {
+    static getFormattedDate() {
         const now = new Date();
-        const month = String(now.getMonth() + 1).padStart(2, "0");
-        const day = String(now.getDate()).padStart(2, "0");
-        const year = now.getFullYear();
-        return `${month} \u2022 ${day} \u2022 ${year}`;
+        return now.toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric"
+        }).replace(/\//g, " • ");
     }
 }
+Time._last = performance.now();
+Time._current = performance.now();
+Time.deltaTime = 0;
+Time.time = 0;

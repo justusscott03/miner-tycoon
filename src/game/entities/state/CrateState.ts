@@ -20,9 +20,6 @@ export class CrateState {
     money = 100;
     hasUnloaded = false;
 
-    // Renderer will be attached later in JS
-    renderer: any;
-
     constructor(x: number, y: number, w: number, h: number) {
         this.x = x;
         this.y = y;

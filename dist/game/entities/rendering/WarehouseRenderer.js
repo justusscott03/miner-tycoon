@@ -5,12 +5,9 @@ export class WarehouseRenderer {
     constructor(state) {
         this.state = state;
     }
-    draw() {
+    render() {
         const w = this.state;
         fill(0);
         rect(w.x, w.y, w.w, w.h);
-    }
-    display() {
-        this.draw();
     }
 }

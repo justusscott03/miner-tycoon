@@ -17,7 +17,7 @@ export class MinerRenderer {
         this.state = state;
     }
 
-    draw() {
+    render() {
         const m = this.state;
 
         pushMatrix();
@@ -42,10 +42,5 @@ export class MinerRenderer {
         }
 
         popMatrix();
-    }
-
-    display(delta: number) {
-        this.state.update(delta);
-        this.draw();
     }
 }

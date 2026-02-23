@@ -1,12 +1,3 @@
-// src/engine/helpers/ImageManager.ts
-
-import {
-    background, fill, strokeWeight, stroke, noStroke, gradient, color
-} from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { get } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/other.js";
-import { rect, ellipse, quad } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { beginShape, vertex, endShape } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/complexShapes.js";
-
 export class ImageManager {
     // ─────────────────────────────────────────────
     // Singleton

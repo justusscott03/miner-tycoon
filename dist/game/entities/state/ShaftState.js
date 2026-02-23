@@ -26,10 +26,11 @@ export class ShaftState extends UpgradeableState {
             this.numMiners++;
         }
     }
-    update(delta) {
+    update() {
         for (const miner of this.miners) {
-            miner.update(delta);
+            miner.update();
         }
+        this.upgradePage.update();
     }
     toJSON() {
         return {

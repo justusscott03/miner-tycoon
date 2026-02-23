@@ -31,8 +31,6 @@ export class ShaftState extends UpgradeableState {
     numMiners = 0;
     miners: MinerState[] = [];
 
-    renderer: any;
-
     constructor(x: number, y: number, w: number, h: number, id: number) {
         super();
 
@@ -73,10 +71,12 @@ export class ShaftState extends UpgradeableState {
         }
     }
 
-    update(delta: number) {
+    update() {
         for (const miner of this.miners) {
-            miner.update(delta);
+            miner.update();
         }
+
+        this.upgradePage.update();
     }
 
     toJSON(): ShaftSaveData {

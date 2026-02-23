@@ -1,4 +1,3 @@
-// src/engine/helpers/ImageManager.ts
 export class ImageManager {
     static init(canvas) {
         if (!this._instance) {

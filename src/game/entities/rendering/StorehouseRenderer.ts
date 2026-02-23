@@ -13,7 +13,7 @@ export class StorehouseRenderer {
         this.state = state;
     }
 
-    draw() {
+    render() {
         const s = this.state;
 
         fill(0);
@@ -23,9 +23,5 @@ export class StorehouseRenderer {
         textSize(50);
         textAlign("CENTER", "CENTER");
         text(s.money.toString(), s.x + s.w / 2, s.y + s.h / 2);
-    }
-
-    display() {
-        this.draw();
     }
 }

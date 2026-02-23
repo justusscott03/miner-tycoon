@@ -1,5 +1,6 @@
 // src/engine/CarrierState.ts
 
+import { Time } from "../../../engine/helpers/TimeManager.js";
 import { CarrierStates } from "../../config/CarrierStates.js";
 import type { StorehouseState } from "./StorehouseState.js";
 import type { WarehouseState } from "./WarehouseState.js";
@@ -35,7 +36,7 @@ export class CarrierState {
 
     money = 0;
     moveSpeed = 60;
-    loadSpeed = 2;
+    loadSpeed = 50;
     maxLoad = 100;
 
     loadTimer = 0;
@@ -52,11 +53,11 @@ export class CarrierState {
         this.warehouse = warehouse;
     }
 
-    update(delta: number) {
+    update() {
         switch (this.action) {
             case CarrierStates.ToStorehouse:
                 this.s = -1;
-                this.x -= this.moveSpeed * delta;
+                this.x -= this.moveSpeed * Time.deltaTime;
 
                 if (this.x < 300) {
                     this.action = CarrierStates.Loading;
@@ -69,7 +70,7 @@ export class CarrierState {
                 const loadTime = moneyToLoad / this.loadSpeed;
                 this.loadBarMax = loadTime;
 
-                this.loadTimer++;
+                this.loadTimer += this.loadSpeed * Time.deltaTime;
                 if (this.loadTimer > loadTime) {
                     this.loadTimer = 0;
                     this.money += moneyToLoad;
@@ -80,7 +81,7 @@ export class CarrierState {
 
             case CarrierStates.ToWarehouse:
                 this.s = 1;
-                this.x += this.moveSpeed * delta;
+                this.x += this.moveSpeed * Time.deltaTime;
 
                 if (this.x > 370) {
                     this.action = CarrierStates.Unloading;
@@ -92,7 +93,7 @@ export class CarrierState {
                 const unloadTime = moneyToUnload / this.loadSpeed;
                 this.loadBarMax = unloadTime;
 
-                this.unloadTimer++;
+                this.unloadTimer += Time.deltaTime;
                 if (this.unloadTimer > unloadTime) {
                     this.unloadTimer = 0;
                     this.warehouse.money += this.money;

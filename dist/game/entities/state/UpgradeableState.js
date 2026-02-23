@@ -11,7 +11,6 @@ export class UpgradeableState {
             h: 0,
             fontSize: 15
         };
-        this.pageOutButton = null; // renderer fills this in
         const entityName = this.constructor.name
             .replace("State", "")
             .toLowerCase();
