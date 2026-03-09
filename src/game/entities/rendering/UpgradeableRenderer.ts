@@ -1,11 +1,12 @@
+import { Renderer } from "../../../engine/core/components/Renderer.js";
 import { Button } from "../../ui/Button.js";
 import { UpgradeableState } from "../state/UpgradeableState.js";
 
-export class UpgradeableRenderer {
-    protected state: UpgradeableState;
-    protected button: Button;
+export class UpgradeableRenderer extends Renderer {
+    protected state!: UpgradeableState;
+    button!: Button;
 
-    constructor(state: UpgradeableState) {
+    initialize(state: UpgradeableState): void {
         this.state = state;
 
         const b = state.buttonData;
@@ -23,11 +24,8 @@ export class UpgradeableRenderer {
         );
     }
 
-    render() {
-        // Update presentation
+    Render(): void {
         this.button.txt = `Level\n${this.state.level}`;
-
-        // Draw
         this.button.display();
     }
 }

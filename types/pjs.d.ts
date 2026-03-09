@@ -1,5 +1,5 @@
 declare module "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js" {
-    export function fill(r: number, g?: number, b?: number, a?: number): void;
+    export function fill(r: number | string, g?: number, b?: number, a?: number): void;
     export function stroke(r: number, g?: number, b?: number, a?: number): void;
     export function strokeWeight(thickness: number): void;
     export function noStroke(): void;

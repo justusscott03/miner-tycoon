@@ -62,7 +62,7 @@ export class ImageManager {
     }
 
     /** Register a new image generator (game layer calls this) */
-    register(name: string, generator: () => any) {
+    register(name: string, generator: () => HTMLCanvasElement) {
         this.generators[name] = generator;
     }
 
@@ -83,7 +83,7 @@ export class ImageManager {
     }
 
     /** Retrieve a generated image */
-    get(name: string) {
+    get(name: string): HTMLCanvasElement {
         return this.cache[name];
     }
 }

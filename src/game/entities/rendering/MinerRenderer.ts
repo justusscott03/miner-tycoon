@@ -9,11 +9,12 @@ import { ImageManager } from "../../../engine/helpers/ImageManager.js";
 import { MinerStates } from "../../config/MinerStates.js";
 
 import { MinerState } from "../state/MinerState.js";
+import { Renderer } from "../../../engine/core/components/Renderer.js";
 
-export class MinerRenderer {
-    state: MinerState;
+export class MinerRenderer extends Renderer {
+    state!: MinerState;
 
-    constructor(state: MinerState) {
+    initialize(state: MinerState) {
         this.state = state;
     }
 

@@ -3,15 +3,15 @@ import { fill, stroke } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibra
 import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
 import { textAlign, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
 import { MinerRenderer } from "./MinerRenderer.js";
-import { CrateRenderer } from "./CrateRenderer.js";
+//import { CrateRenderer } from "./CrateRenderer.js";
 import { UpgradeableRenderer } from "./UpgradeableRenderer.js";
 import { CanvasManager } from "../../../engine/helpers/CanvasManager.js";
 export class ShaftRenderer extends UpgradeableRenderer {
     constructor(state) {
-        super(state);
+        super();
         this.state = state;
-        this.crateRenderer = new CrateRenderer(state.crate);
-        this.minerRenderers = state.miners.map(m => new MinerRenderer(m));
+        //this.crateRenderer = new CrateRenderer(state.crate);
+        this.minerRenderers = state.miners.map(m => new MinerRenderer());
     }
     render() {
         const s = this.state;
@@ -33,8 +33,8 @@ export class ShaftRenderer extends UpgradeableRenderer {
             minerRenderer.render();
         }
         // Draw crate
-        this.crateRenderer.render();
+        //this.crateRenderer.Render();
         // Draw upgrade UI (from base class)
-        super.render();
+        super.Render();
     }
 }

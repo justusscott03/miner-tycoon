@@ -1,16 +1,15 @@
+import { Renderer } from "../../../engine/core/components/Renderer.js";
 import { Button } from "../../ui/Button.js";
-export class UpgradeableRenderer {
-    constructor(state) {
+export class UpgradeableRenderer extends Renderer {
+    initialize(state) {
         this.state = state;
         const b = state.buttonData;
         this.button = new Button(b.x, b.y, b.w, b.h, `Level\n${state.level}`, b.fontSize, () => {
             state.upgradePage.pageOut = true;
         });
     }
-    render() {
-        // Update presentation
+    Render() {
         this.button.txt = `Level\n${this.state.level}`;
-        // Draw
         this.button.display();
     }
 }

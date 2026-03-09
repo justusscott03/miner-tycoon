@@ -5,8 +5,9 @@ import { image, rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrar
 import { map } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
 import { ImageManager } from "../../../engine/helpers/ImageManager.js";
 import { MinerStates } from "../../config/MinerStates.js";
-export class MinerRenderer {
-    constructor(state) {
+import { Renderer } from "../../../engine/core/components/Renderer.js";
+export class MinerRenderer extends Renderer {
+    initialize(state) {
         this.state = state;
     }
     render() {

@@ -1,7 +1,7 @@
 import { EngineObject } from "./EngineObject.js";
 export class Component extends EngineObject {
-    constructor() {
-        super();
+    get transform() {
+        return this.gameObject.transform;
     }
     GetComponent(type) {
         return this.gameObject.GetComponent(type);

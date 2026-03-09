@@ -16,7 +16,7 @@ export class CarrierRenderer {
         this.state = state;
     }
 
-    render() {
+    render(): void {
         const c = this.state;
 
         pushMatrix();

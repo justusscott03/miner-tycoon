@@ -1,10 +1,17 @@
 import { Component } from "./Component.js";
+import { Transform } from "./components/Transform.js";
 import { EngineObject } from "./EngineObject.js";
 export class GameObject extends EngineObject {
     constructor() {
-        super(...arguments);
+        super();
         this.components = [];
+        this.children = [];
+        this.transform = new Transform();
+        this.transform = this.AddComponent(Transform);
     }
+    // -------------------------
+    // AddComponent<T>
+    // -------------------------
     AddComponent(type) {
         const comp = new type();
         comp.gameObject = this;
@@ -13,10 +20,14 @@ export class GameObject extends EngineObject {
     }
     GetComponent(type) {
         if (typeof type === "string") {
-            return this.components.find(c => c.constructor.name === type) || null;
+            return (this.components.find(c => c.constructor.name === type) || null);
         }
-        return this.components.find(c => c instanceof type) || null;
+        const comp = this.components.find(c => c instanceof type);
+        return comp ? comp : null;
     }
+    // -------------------------
+    // RemoveComponent
+    // -------------------------
     RemoveComponent(type) {
         // Remove by instance
         if (type instanceof Component) {
@@ -43,5 +54,9 @@ export class GameObject extends EngineObject {
             return true;
         }
         return false;
+    }
+    addChild(child) {
+        child.transform.parent = this.transform;
+        this.children.push(child);
     }
 }

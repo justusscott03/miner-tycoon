@@ -147,5 +147,22 @@ export class ImageManifest {
             endShape();
             return get(0, 0, 60, 60);
         });
+        img.register("crate", () => {
+            noStroke();
+            fill(255, 0, 0);
+            rect(0, 0, 70, 40);
+            return get(0, 0, 70, 40);
+        });
+        img.register("shaft", () => {
+            fill(150);
+            rect(0, 0, 500, 100);
+            stroke(0);
+            fill(100, 100, 100);
+            rect(127, 25, 46, 46, 10);
+            rect(131, 29, 38, 38, 8);
+            fill(0);
+            rect(0, 100, 500, 13);
+            return get(0, 0, 500, 100);
+        });
     }
 }
