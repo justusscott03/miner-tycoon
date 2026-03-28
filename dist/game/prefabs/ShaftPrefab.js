@@ -1,10 +1,10 @@
-import { MonoBehavior } from "../../engine/core/MonoBehavior.js";
+import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior.js";
 import { MinerPrefab } from "../prefabs/MinerPrefab.js";
-import { TextUI } from "../../engine/core/components/ui/TextUI.js";
+import { TextUI } from "../../engine/core/ECS/components/ui/TextUI.js";
 import { MinerBehavior } from "../entities/MinerBehavior.js";
 import { CrateBehavior } from "../entities/CrateBehavior.js";
-import { Prefab } from "../../engine/core/Prefab.js";
-import { SpriteRenderer } from "../../engine/core/components/SpriteRenderer.js";
+import { Prefab } from "../../engine/core/ECS/Prefab.js";
+import { SpriteRenderer } from "../../engine/core/ECS/components/SpriteRenderer.js";
 export class ShaftBehavior extends MonoBehavior {
     constructor() {
         super(...arguments);

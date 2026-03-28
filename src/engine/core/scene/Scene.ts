@@ -1,10 +1,10 @@
 import { background } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
 import { CanvasManager } from "../../helpers/CanvasManager.js";
-import { RigidBody2D } from "../components/physics/RigidBody2D.js";
-import { Renderer } from "../components/Renderer.js";
-import { UIComponent } from "../components/UIComponent.js";
-import { GameObject } from "../GameObject.js";
-import { MonoBehavior } from "../MonoBehavior.js";
+import { RigidBody2D } from "../ECS/components/physics/RigidBody2D.js";
+import { Renderer } from "../ECS/components/Renderer.js";
+import { UIComponent } from "../ECS/components/UIComponent.js";
+import { GameObject } from "../ECS/main/GameObject.js";
+import { MonoBehavior } from "../ECS/main/MonoBehavior.js";
 
 export class Scene {
     private gameObjects: GameObject[] = [];

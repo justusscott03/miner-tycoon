@@ -1,0 +1,44 @@
+import { ParamUI } from "../ParamUI.js";
+
+export class Vector2UI extends ParamUI<{ x: number; y: number }> {
+    render(onChange: (value: { x: number; y: number }) => void): HTMLElement {
+        const container = document.createElement("div");
+
+        const xInput = document.createElement("input");
+        const yInput = document.createElement("input");
+
+        xInput.type = "number";
+        yInput.type = "number";
+
+        xInput.value = this.value.x.toString();
+        yInput.value = this.value.y.toString();
+
+        const update = () => {
+            this.value = {
+                x: Number(xInput.value),
+                y: Number(yInput.value)
+            };
+            onChange(this.value);
+        };
+
+        xInput.oninput = update;
+        yInput.oninput = update;
+
+        container.appendChild(xInput);
+        container.appendChild(yInput);
+
+        return container;
+    }
+
+    toCode(): string {
+        return `new Vector2(${this.value.x}, ${this.value.y})`;
+    }
+
+    clone() {
+        return new Vector2UI({ x: this.value.x, y: this.value.y });
+    }
+
+    getImports(): string[] {
+        return ["Vector2"];
+    }
+}

@@ -1,5 +1,5 @@
-import { ProgressBarUI } from "../../engine/core/components/ui/ProgressBarUI.js";
-import { MonoBehavior } from "../../engine/core/MonoBehavior.js";
+import { ProgressBarUI } from "../../engine/core/ECS/components/ui/ProgressBarUI.js";
+import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior.js";
 import { Time } from "../../engine/helpers/TimeManager.js";
 import { MinerStates } from "../config/MinerStates.js";
 import { MinerPrefab } from "../prefabs/MinerPrefab.js";

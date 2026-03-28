@@ -1,24 +1,79 @@
 <!DOCTYPE html>
 <html lang="en-US">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Idle Miner Tycoon: Money Games</title>
-        <link rel="stylesheet" href="./styles.css">
-        <link href="https://fonts.googleapis.com/css2?family=Fredoka&family=Lilita+One&display=swap" rel="stylesheet">
-        <link rel="icon" type="image/png" href="./images/favicon.png">
-    </head>
-    <body>
-        <script src="https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/initPJS.js"></script>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle Miner Tycoon: Money Games</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka&family=Lilita+One&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./images/favicon.png">
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/initPJS.js"></script>
 
-        <!-- Saves page -->
-        <div id="savePage" class="fredoka">
-            <h1>Saves</h1>
-            <button id="returnToGame" type="button">Return to game</button>
+    <nav id="topNav">
+        <button class="tab-button active" data-tab="shapeEditor">Shape Editor</button>
+        <button class="tab-button" data-tab="prefabBuilder">Prefab Builder</button>
+        <button class="tab-button" data-tab="spriteManager">Sprite Manager</button>
+    </nav>
+
+    <div id="shapeEditor" class="tab-content active">
+        <h2>Shape Editor</h2>
+        <p>Canvas and shape tools go here...</p>
+    </div>
+
+    <div id="prefabBuilder" class="tab-content">
+        <!-- Prefab Generator -->
+        <div id="prefabGenerator">
+            <h2>Prefab Generator</h2>
+            <input id="className" placeholder="Class Name (e.g. MinerPrefab)" />
+            <br><br>
+            <select id="componentSelect"></select>
+            <button id="addComponentButton">Add Component</button>
+            <div id="componentList"></div>
+            <br>
+            <button id="generateButton">Generate Code</button>
+            <button id="downloadButton">Download File</button>
+            <pre id="output"></pre>
         </div>
+    </div>
 
-        <!-- Run scripts -->
-        <script type="module" src="./dist/index.js"></script>
+    <div id="spriteManager" class="tab-content">
+        <h2>Sprite Manager</h2>
+        <p>All sprites loaded and managed here...</p>
+    </div>
 
-    </body>
+    <div id="spriteManager" class="tab-content">
+        <h2>Sprite Manager</h2>
+        <p>All sprites loaded and managed here...</p>
+    </div>
+
+    <!-- Saves page -->
+    <div id="savePage" class="fredoka">
+        <h1>Saves</h1>
+        <button id="returnToGame" type="button">Return to game</button>
+    </div>
+
+    <!-- Run scripts -->
+    <script type="module" src="./dist/index.js"></script>
+    <script type="module" src="./dist/engine/utils/Prefab Generator System/PrefabGenerator.js"></script>
+
+    <script>
+    // Tab switching logic
+    const buttons = document.querySelectorAll(".tab-button");
+    const contents = document.querySelectorAll(".tab-content");
+
+    buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            // Remove active class from all buttons and contents
+            buttons.forEach(b => b.classList.remove("active"));
+            contents.forEach(c => c.classList.remove("active"));
+
+            // Activate clicked button
+            btn.classList.add("active");
+            document.getElementById(btn.dataset.tab).classList.add("active");
+        });
+    });
+    </script>
+</body>
 </html>

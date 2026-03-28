@@ -1,4 +1,4 @@
-import { Renderer } from "../../../engine/core/components/Renderer.js";
+import { Renderer } from "../../../engine/core/ECS/components/Renderer.js";
 import { Button } from "../../ui/Button.js";
 import { UpgradeableState } from "../state/UpgradeableState.js";
 

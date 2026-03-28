@@ -13,6 +13,9 @@ export class Database {
         this.name = name;
         this.version = version;
     }
+    // -------------------------
+    // OPEN DATABASE
+    // -------------------------
     open() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(this.name, this.version);
@@ -23,9 +26,12 @@ export class Database {
                 }
             };
             request.onsuccess = () => resolve(request.result);
-            request.onerror = (e) => reject(e);
+            request.onerror = (e) => reject(request.error);
         });
     }
+    // -------------------------
+    // GET TRANSACTION & STORE
+    // -------------------------
     getStore() {
         return __awaiter(this, arguments, void 0, function* (mode = "readonly") {
             if (!this.db) {
@@ -36,33 +42,53 @@ export class Database {
             return { tx, store };
         });
     }
+    // -------------------------
+    // LOAD DATA
+    // -------------------------
     load(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const { store } = yield this.getStore("readonly");
-            return new Promise((resolve) => {
-                const req = id ? store.get(id) : store.getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => resolve(null);
-            });
+            if (id) {
+                // request for a single item
+                const request = store.get(id);
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => { var _a; return resolve((_a = request.result) !== null && _a !== void 0 ? _a : null); };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            else {
+                // request for all items
+                const request = store.getAll();
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => { var _a; return resolve((_a = request.result) !== null && _a !== void 0 ? _a : []); };
+                    request.onerror = () => reject(request.error);
+                });
+            }
         });
     }
-    save(id, data) {
+    // -------------------------
+    // SAVE DATA
+    // -------------------------
+    save(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const { store } = yield this.getStore("readwrite");
             return new Promise((resolve, reject) => {
-                const req = store.put({ id, data });
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = (e) => reject(e);
+                const request = store.put(data);
+                request.onsuccess = () => resolve(data);
+                request.onerror = () => reject(request.error);
             });
         });
     }
+    // -------------------------
+    // DELETE DATA
+    // -------------------------
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const { store } = yield this.getStore("readwrite");
             return new Promise((resolve, reject) => {
-                const req = store.delete(id);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = (e) => reject(e);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
             });
         });
     }

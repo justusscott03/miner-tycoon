@@ -21,27 +21,34 @@ export class Game {
         this.screen = ScreenManager.Instance;
         this.money = MoneyState.Instance;
         this.buttons = [];
-        // Internal resolution
+        // Setup canvas and resize listener
         CanvasManager.resize(this.screen.originalWidth, this.screen.originalHeight, this.screen.width, this.screen.height);
         this.screen.onResize(() => {
             CanvasManager.resize(this.screen.originalWidth, this.screen.originalHeight, this.screen.width, this.screen.height);
         });
+        // Managers
         this.images = ImageManager.Instance;
         this.db = new Database("KhanMinerDB", 1);
+        // Game state
         this.mineState = new MineState();
         this.mineRenderer = new MineRenderer(this.mineState);
+        // UI
         this.setupButtons();
         this.setupScroll();
         this.setupAutoSave();
     }
+    // --------------------------
+    // BUTTONS
+    // --------------------------
     setupButtons() {
-        this.buttons.push(new Button(100, 100, 100, 100, "Shaft", 40, () => {
-            this.mineState.buildShaft();
-        }));
+        this.buttons.push(new Button(100, 100, 100, 100, "Shaft", 40, () => this.mineState.buildShaft()));
         this.buttons.push(new Button(500, 0, 50, 50, "", 20, () => {
             document.getElementById("savePage").style.display = "block";
         }));
     }
+    // --------------------------
+    // SCROLL HANDLING
+    // --------------------------
     setupScroll() {
         CanvasManager.canvas.addEventListener("wheel", (e) => {
             e.preventDefault();
@@ -49,29 +56,43 @@ export class Game {
             this.mineState.y = Math.max(Math.min(targetY, 0), -4950);
         });
     }
+    // --------------------------
+    // AUTOSAVE
+    // --------------------------
     setupAutoSave() {
         setInterval(() => this.saveGame(), 60000);
         window.addEventListener("beforeunload", () => this.saveGame());
     }
+    // --------------------------
+    // SAVE GAME
+    // --------------------------
     saveGame() {
         return __awaiter(this, void 0, void 0, function* () {
             const state = {
+                id: "main",
                 money: this.money.toJSON(),
-                mine: this.mineState.toJSON()
+                mineState: this.mineState.toJSON()
             };
-            yield this.db.save("main", state);
+            yield this.db.save(state);
         });
     }
+    // --------------------------
+    // LOAD GAME
+    // --------------------------
     loadGame() {
         return __awaiter(this, void 0, void 0, function* () {
             const save = yield this.db.load("main");
             if (!save)
                 return;
-            this.money = MoneyState.fromJSON(save.data.money);
-            this.mineState = MineState.fromJSON(save.data.mine);
+            // Restore states
+            this.money = MoneyState.fromJSON(save.money);
+            this.mineState = MineState.fromJSON(save.mineState);
             this.mineRenderer = new MineRenderer(this.mineState);
         });
     }
+    // --------------------------
+    // UPDATE
+    // --------------------------
     update() {
         if (!this.images.loaded) {
             this.images.loadNext();
@@ -79,10 +100,12 @@ export class Game {
         }
         this.mineState.update();
     }
+    // --------------------------
+    // RENDER
+    // --------------------------
     render() {
         if (!this.images.loaded) {
-            // Optional: draw a loading screen
-            background(200);
+            background(200); // loading screen
             return;
         }
         background(255);

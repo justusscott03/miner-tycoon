@@ -41,3 +41,70 @@ body {
     margin-bottom: 20px;
     padding: 10px;
 }
+
+#prefabGenerator {
+    position: fixed;
+    top: 50px; 
+    left: 15px;  
+    width: 300px;
+    max-height: 90vh;
+    overflow-y: auto; 
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    font-family: sans-serif;
+    z-index: 1000;
+}
+
+#prefabGenerator input,
+#prefabGenerator select,
+#prefabGenerator button {
+    display: block;
+    margin-bottom: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Fixed top navigation */
+#topNav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #222;
+    border-bottom: 2px solid #333;
+    z-index: 2000;
+    display: flex;
+}
+
+#topNav .tab-button {
+    flex: 1;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: #fff;
+    background: #222;
+    border: none;
+    outline: none;
+    transition: background-color 0.2s;
+}
+
+#topNav .tab-button:hover {
+    background: #444;
+}
+
+#topNav .tab-button.active {
+    background: #555;
+    font-weight: bold;
+}
+
+/* Adjust tab contents to not be under nav */
+.tab-content {
+    display: none;
+    padding: 20px;
+    padding-top: 60px; /* space for nav bar */
+}
+
+.tab-content.active {
+    display: block;
+}

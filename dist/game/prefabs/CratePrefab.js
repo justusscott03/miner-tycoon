@@ -1,9 +1,9 @@
 import { color } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { SpriteRenderer } from "../../engine/core/components/SpriteRenderer.js";
-import { TextUI } from "../../engine/core/components/ui/TextUI.js";
+import { SpriteRenderer } from "../../engine/core/ECS/components/SpriteRenderer.js";
+import { TextUI } from "../../engine/core/ECS/components/ui/TextUI.js";
 import { Vector2 } from "../../engine/core/math/Vector2.js";
 import { CrateBehavior } from "../entities/CrateBehavior.js";
-import { Prefab } from "../../engine/core/Prefab.js";
+import { Prefab } from "../../engine/core/ECS/Prefab.js";
 export class CratePrefab extends Prefab {
     constructor() {
         super();

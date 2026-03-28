@@ -1,5 +1,5 @@
-import { TextUI } from "../../engine/core/components/ui/TextUI.js";
-import { MonoBehavior } from "../../engine/core/MonoBehavior.js";
+import { TextUI } from "../../engine/core/ECS/components/ui/TextUI.js";
+import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior.js";
 import { Time } from "../../engine/helpers/TimeManager.js";
 import { MoneyFormatter } from "../helpers/MoneyFormatter.js";
 import { CratePrefab } from "../prefabs/CratePrefab.js";

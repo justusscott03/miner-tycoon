@@ -1,8 +1,8 @@
 import { color } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { SpriteRenderer } from "../../engine/core/components/SpriteRenderer.js";
-import { ProgressBarUI } from "../../engine/core/components/ui/ProgressBarUI.js";
+import { SpriteRenderer } from "../../engine/core/ECS/components/SpriteRenderer.js";
+import { ProgressBarUI } from "../../engine/core/ECS/components/ui/ProgressBarUI.js";
 import { Vector2 } from "../../engine/core/math/Vector2.js";
-import { Prefab } from "../../engine/core/Prefab.js";
+import { Prefab } from "../../engine/core/ECS/Prefab.js";
 import { MinerBehavior } from "../entities/MinerBehavior.js";
 
 export class MinerPrefab extends Prefab {

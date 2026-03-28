@@ -1,3 +1,8 @@
+export type MoneySaveData = {
+    total: number;
+    super: number;
+};
+
 export class MoneyState {
     private static _instance: MoneyState | null = null;
 
@@ -30,7 +35,7 @@ export class MoneyState {
         this.super = 0;
     }
 
-    toJSON() {
+    toJSON(): MoneySaveData {
         return {
             total: this.total,
             super: this.super
