@@ -3,9 +3,9 @@ import { image } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1
 import { Renderer } from "./Renderer.js";
 import { Vector2 } from "../../math/Vector2.js";
 import { ComponentDefinition } from "../main/Component.js";
-import { NumberUI } from "../../../utils/Prefab Generator System/ParamUI Types/NumberUI.js";
-import { Vector2UI } from "../../../utils/Prefab Generator System/ParamUI Types/Vector2UI.js";
-import { StringUI } from "../../../utils/Prefab Generator System/ParamUI Types/StringUI.js";
+import { NumberUI } from "../../../tools/Prefab Generator System/ParamUI Types/NumberUI.js";
+import { Vector2UI } from "../../../tools/Prefab Generator System/ParamUI Types/Vector2UI.js";
+import { StringUI } from "../../../tools/Prefab Generator System/ParamUI Types/StringUI.js";
 
 type SpriteRendererValues = {
     sprite: string;
@@ -15,10 +15,10 @@ type SpriteRendererValues = {
 };
 
 export const SpriteRendererDef: ComponentDefinition<SpriteRendererValues> = {
-    import: "src/engine/core/components/SpriteRenderer.js",
+    import: "src/engine/core/ECS/components/SpriteRenderer.js",
 
     params: {
-        sprite: new StringUI(""),
+        sprite: new StringUI("Sprite Name"),
         width: new NumberUI(0),
         height: new NumberUI(0),
         position: new Vector2UI({ x: 0, y: 0 })
@@ -31,14 +31,6 @@ export class SpriteRenderer extends Renderer {
     width: number = 0;
     height: number = 0;
     spriteOffset: Vector2 = Vector2.zero;
-
-    constructor(spriteName: string, width: number, height: number, spriteOffset: Vector2 = Vector2.zero) {
-        super();
-        this.spriteName = spriteName;
-        this.width = width;
-        this.height = height;
-        this.spriteOffset = spriteOffset;
-    }
 
     initialize(spriteName: string, width: number, height: number, spriteOffset: Vector2 = Vector2.zero) {
         this.spriteName = spriteName;

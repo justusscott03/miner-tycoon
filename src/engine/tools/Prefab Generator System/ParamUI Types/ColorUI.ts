@@ -1,9 +1,18 @@
+import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
 import { ParamUI } from "../ParamUI.js";
+
+let colorUICounter = 0;
 
 export class ColorUI extends ParamUI<string> {
 
+    alpha: number;
+    id: number;
+
     constructor(defaultColor: string) {
-        super(defaultColor); // e.g. "#ffd659"
+        super(defaultColor);
+        this.alpha = 1;
+        this.id = colorUICounter++;
+        //console.log("Created ColorUI with id:", this.id);
     }
 
     render(onChange: (value: string) => void): HTMLElement {
@@ -12,12 +21,20 @@ export class ColorUI extends ParamUI<string> {
         const colorInput = document.createElement("input");
         colorInput.type = "color";
         colorInput.value = this.value;
+        colorInput.classList.add("paramInput");
 
         const textInput = document.createElement("input");
         textInput.type = "text";
         textInput.value = this.value;
-        textInput.style.marginLeft = "5px";
-        textInput.style.width = "80px";
+        textInput.classList.add("paramInput");
+
+        const alphaSlider = document.createElement("input");
+        alphaSlider.type = "range";
+        alphaSlider.min = "0";
+        alphaSlider.max = "1";
+        alphaSlider.step = "0.01";
+        alphaSlider.value = this.alpha.toString();
+        alphaSlider.classList.add("paramInput");
 
         const update = (val: string) => {
             if (!/^#([0-9A-F]{3}){1,2}$/i.test(val)) return;
@@ -30,45 +47,33 @@ export class ColorUI extends ParamUI<string> {
 
         colorInput.oninput = () => update(colorInput.value);
         textInput.oninput = () => update(textInput.value);
+        alphaSlider.oninput = () => {
+            this.alpha = Number(alphaSlider.value);
+            onChange(this.value);
+        };
 
         container.appendChild(colorInput);
         container.appendChild(textInput);
-
+        container.appendChild(alphaSlider);
+        
         return container;
     }
 
     toCode(): string {
-        const { r, g, b } = this.hexToRgb(this.value);
+        const { r, g, b } = ColorHelpers.hexToRGB(this.value);
+        if (this.alpha < 1) {
+            return `color(${r}, ${g}, ${b}, ${this.alpha})`;
+        }
         return `color(${r}, ${g}, ${b})`;
     }
 
     clone(): ColorUI {
-        return new ColorUI(this.value);
+        const cloned = new ColorUI(this.value);
+        cloned.alpha = this.alpha;
+        return cloned;
     }
 
     getImports(): string[] {
         return ["color"]
-    }
-
-    // ----------------------------
-    // Helpers
-    // ----------------------------
-
-    private hexToRgb(hex: string): { r: number; g: number; b: number } {
-        const cleaned = hex.replace("#", "");
-
-        if (cleaned.length === 3) {
-            return {
-                r: parseInt(cleaned[0] + cleaned[0], 16),
-                g: parseInt(cleaned[1] + cleaned[1], 16),
-                b: parseInt(cleaned[2] + cleaned[2], 16)
-            };
-        }
-
-        return {
-            r: parseInt(cleaned.substring(0, 2), 16),
-            g: parseInt(cleaned.substring(2, 4), 16),
-            b: parseInt(cleaned.substring(4, 6), 16)
-        };
     }
 }

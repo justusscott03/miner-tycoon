@@ -42,24 +42,7 @@ body {
     padding: 10px;
 }
 
-#prefabGenerator {
-    position: fixed;
-    top: 50px; 
-    left: 15px;  
-    width: 300px;
-    max-height: 90vh;
-    overflow-y: auto; 
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #ccc;
-    padding: 10px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
-    font-family: sans-serif;
-    z-index: 1000;
-}
-
-#prefabGenerator input,
-#prefabGenerator select,
-#prefabGenerator button {
+.menuSideBarItem {
     display: block;
     margin-bottom: 5px;
     width: 100%;
@@ -76,6 +59,7 @@ body {
     border-bottom: 2px solid #333;
     z-index: 2000;
     display: flex;
+    height: 50px;
 }
 
 #topNav .tab-button {
@@ -100,11 +84,46 @@ body {
 
 /* Adjust tab contents to not be under nav */
 .tab-content {
-    display: none;
+    display: none;   /* hide by default */
+    position: relative;
+    margin-top: 50px;
     padding: 20px;
-    padding-top: 60px; /* space for nav bar */
+    width: 100%;
+    height: 100%;
 }
 
 .tab-content.active {
-    display: block;
+    display: block;  /* show when active */
+}
+
+.menuSideBar {
+    position: fixed;
+    left: 15px;
+    top: 65px;
+    width: 300px;
+    max-height: 90vh;
+    overflow-y: auto; 
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    font-family: sans-serif;
+    z-index: 1000;
+}
+
+#shapeInspector {
+    left: calc(100% - 330px);
+}
+
+.slidecontainer {
+    position: fixed;
+    top: calc(100% - 100px);
+    left: 15px;
+    z-index: 1000;
+}
+
+.paramInput {
+    width: 60px;
+    margin-left: 5px;
+    margin-bottom: 5px;
 }

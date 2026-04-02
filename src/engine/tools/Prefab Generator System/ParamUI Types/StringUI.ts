@@ -6,6 +6,8 @@ export class StringUI extends ParamUI<string> {
         input.type = "text";
         input.value = this.value.toString();
 
+        input.classList.add("paramInput");
+
         input.oninput = () => {
             this.value = String(input.value);
             onChange(this.value);

@@ -3,11 +3,11 @@ import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.
 import { map } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
 import { UIComponent } from "../UIComponent.js";
 import { Vector2 } from "../../../math/Vector2.js";
-import { NumberUI } from "../../../../utils/Prefab Generator System/ParamUI Types/NumberUI.js";
-import { Vector2UI } from "../../../../utils/Prefab Generator System/ParamUI Types/Vector2UI.js";
-import { ColorUI } from "../../../../utils/Prefab Generator System/ParamUI Types/ColorUI.js";
+import { NumberUI } from "../../../../tools/Prefab Generator System/ParamUI Types/NumberUI.js";
+import { Vector2UI } from "../../../../tools/Prefab Generator System/ParamUI Types/Vector2UI.js";
+import { ColorUI } from "../../../../tools/Prefab Generator System/ParamUI Types/ColorUI.js";
 export const ProgressBarUIDef = {
-    import: "src/engine/core/components/SpriteRenderer.js",
+    import: "src/engine/core/ECS/components/ui/ProgressBarUI.js",
     params: {
         fillColor: new ColorUI("#FF0000"),
         backColor: new ColorUI("#646464"),
