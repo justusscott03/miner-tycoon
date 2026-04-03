@@ -2,9 +2,9 @@ import { ImageManager } from "../../../helpers/ImageManager.js";
 import { image } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
 import { Renderer } from "./Renderer.js";
 import { Vector2 } from "../../math/Vector2.js";
-import { NumberUI } from "../../../tools/Prefab Generator System/ParamUI Types/NumberUI.js";
-import { Vector2UI } from "../../../tools/Prefab Generator System/ParamUI Types/Vector2UI.js";
-import { StringUI } from "../../../tools/Prefab Generator System/ParamUI Types/StringUI.js";
+import { NumberUI } from "../../../ui/UIBindings/TypeUIBindings/NumberUI.js";
+import { Vector2UI } from "../../../ui/UIBindings/TypeUIBindings/Vector2UI.js";
+import { StringUI } from "../../../ui/UIBindings/TypeUIBindings/StringUI.js";
 export const SpriteRendererDef = {
     import: "src/engine/core/ECS/components/SpriteRenderer.js",
     params: {

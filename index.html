@@ -30,7 +30,7 @@
         </div>
         <div class="slidecontainer">
             <input type="range" id="myRange" min="0" max="100" value="50">
-            <p>Value: <span id="valueDisplay">50</span></p>
+            <p>Grid size: <span id="valueDisplay">50</span></p>
         </div>
     </div>
 
@@ -46,6 +46,7 @@
             <br>
             <button id="generateButton" class="menuSideBarItem">Generate Code</button>
             <button id="downloadButton" class="menuSideBarItem">Download File</button>
+            <button id="chooseOutputDir" class="menuSideBarItem">Choose Output Directory</button>
             <pre id="output"></pre>
         </div>
     </div>
@@ -67,8 +68,8 @@
     </script>
 
     <script type="module" src="./dist/index.js"></script>
-    <script type="module" src="./dist/engine/tools/Prefab Generator System/PrefabGenerator.js"></script>
-    <script type="module" src="./dist/engine/tools/Shape Editor/ShapeEditor.js"></script>
+    <script type="module" src="./dist/engine/tools/PrefabGenerator.js"></script>
+    <script type="module" src="./dist/engine/tools/ShapeEditor.js"></script>
 
     <script>
         // Tab switching logic

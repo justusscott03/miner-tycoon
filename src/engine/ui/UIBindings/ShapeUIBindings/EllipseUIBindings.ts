@@ -1,36 +1,53 @@
-import { NumberUI } from "../../Prefab Generator System/ParamUI Types/NumberUI.js";
-import { ColorUI } from "../../Prefab Generator System/ParamUI Types/ColorUI.js";
-import { ShapeUIBindings } from "../ShapeUIBindings.js";
+import { NumberUI } from "../TypeUIBindings/NumberUI.js";
+import { ColorUI } from "../TypeUIBindings/ColorUI.js";
+import { BaseParams, ShapeUIBindings } from "../ShapeUIBindings.js";
 import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
-export class RectUIBindings extends ShapeUIBindings {
+
+interface EllipseParams extends BaseParams {
+    w: NumberUI;
+    h: NumberUI;
+}
+
+
+export class EllipseUIBindings extends ShapeUIBindings<EllipseParams> {
     constructor() {
         super();
         this.params = {
             x: new NumberUI(0),
             y: new NumberUI(0),
+
             w: new NumberUI(100),
             h: new NumberUI(100),
-            radius: new NumberUI(0),
+
             color: new ColorUI("#ff0000"),
-            stroke: new ColorUI("#000000")
+            stroke: new ColorUI("#000000"),
+            strokeWeight: new NumberUI(1)
         };
     }
-    toCode() {
-        const { x, y, w, h, radius, color, stroke } = this.params;
+
+    toCode(): string {
+        const { x, y, w, h, color, stroke } = this.params;
+
         const c = ColorHelpers.hexToRGB(color.value);
         const s = ColorHelpers.hexToRGB(stroke.value);
+
         return `fill(${c.r}, ${c.g}, ${c.b}, ${color.alpha});
 stroke(${s.r}, ${s.g}, ${s.b}, ${stroke.alpha});
-rect(${x.value}, ${y.value}, ${w.value}, ${h.value}, ${radius.value});`;
+ellipse(${x.value}, ${y.value}, ${w.value}, ${h.value});`;
     }
-    render(ctx) {
-        const { x, y, w, h, radius, color, stroke } = this.params;
+
+    render(ctx: CanvasRenderingContext2D): void {
+        const { x, y, w, h, color, stroke, strokeWeight } = this.params;
+
         const fillRGB = ColorHelpers.hexToRGB(color.value);
         ctx.fillStyle = `rgba(${fillRGB.r}, ${fillRGB.g}, ${fillRGB.b}, ${color.alpha})`;
+
         const strokeRGB = ColorHelpers.hexToRGB(stroke.value);
         ctx.strokeStyle = `rgba(${strokeRGB.r}, ${strokeRGB.g}, ${strokeRGB.b}, ${stroke.alpha})`;
+        ctx.lineWidth = strokeWeight.value;
+
         ctx.beginPath();
-        ctx.roundRect(x.value, y.value, w.value, h.value, radius.value);
+        ctx.ellipse(x.value, y.value, w.value / 2, h.value / 2, 0, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
         ctx.closePath();

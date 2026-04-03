@@ -1,6 +1,19 @@
-import { ParamUI } from "../Prefab Generator System/ParamUI.js";
+import { ColorUI } from "./TypeUIBindings/ColorUI.js";
+import { NumberUI } from "./TypeUIBindings/NumberUI.js";
+import { ParamUI } from "./ParamUI.js";
 
-export abstract class ShapeUIBindings<TParams extends Record<string, ParamUI<any>>> {
+export interface BaseParams {
+    x: NumberUI;
+    y: NumberUI;
+    color: ColorUI;
+    stroke: ColorUI;
+    strokeWeight: NumberUI;
+
+    [key: string]: ParamUI<any>;
+}
+
+
+export abstract class ShapeUIBindings<TParams extends BaseParams> {
     params!: TParams;
 
     clone(): this {

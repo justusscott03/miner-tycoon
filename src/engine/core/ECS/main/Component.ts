@@ -1,4 +1,4 @@
-import { ParamUI } from "../../../tools/Prefab Generator System/ParamUI.js";
+import { ParamUI } from "../../../ui/UIBindings/ParamUI.js";
 import { Transform } from "../components/Transform.js";
 import { EngineObject } from "./EngineObject.js";
 import { GameObject } from "./GameObject.js";

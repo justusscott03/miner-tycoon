@@ -1,12 +1,19 @@
-import { RectUIBindings } from "./Shape UI Bindings/RectUIBindings.js";
+import { EllipseUIBindings } from "../ui/UIBindings/ShapeUIBindings/EllipseUIBindings.js";
+import { RectUIBindings } from "../ui/UIBindings/ShapeUIBindings/RectUIBindings.js";
+import { TriangleUIBindings } from "../ui/UIBindings/ShapeUIBindings/TriangleUIBindings.js";
+import { PathUIBindings } from "../ui/UIBindings/ShapeUIBindings/PathUIBindings.js";
 var ShapeTypes;
 (function (ShapeTypes) {
     ShapeTypes["Rectangle"] = "rectangle";
-    //Ellipse = "ellipse"
+    ShapeTypes["Ellipse"] = "ellipse";
+    ShapeTypes["Triangle"] = "triangle";
+    ShapeTypes["Path"] = "path";
 })(ShapeTypes || (ShapeTypes = {}));
 const ShapeRegistry = {
     [ShapeTypes.Rectangle]: RectUIBindings,
-    // [ShapeTypes.Ellipse]: EllipseUIBindings
+    [ShapeTypes.Ellipse]: EllipseUIBindings,
+    [ShapeTypes.Triangle]: TriangleUIBindings,
+    [ShapeTypes.Path]: PathUIBindings
 };
 export class ShapeEditor {
     constructor(canvasId, toolbarId, inspectorId) {
@@ -130,6 +137,7 @@ export class ShapeEditor {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             // Draw grid
             this.ctx.strokeStyle = "#59b2f2";
+            this.ctx.lineWidth = 1;
             for (let x = 0; x < this.canvas.width; x += gridSize) {
                 this.ctx.beginPath();
                 this.ctx.moveTo(x, 0);

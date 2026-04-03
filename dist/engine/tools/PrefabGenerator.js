@@ -1,6 +1,15 @@
-import { ComponentRegistry } from "../../config/ComponentRegistry.js";
-import { ImportMap } from "../../config/ImportMap.js";
-import { PathHelpers } from "../../helpers/PathHelpers.js";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { ComponentRegistry } from "../config/ComponentRegistry.js";
+import { ImportMap } from "../config/ImportMap.js";
+import { PathHelpers } from "../helpers/PathHelpers.js";
 const prefabOutputPath = "src/game/prefabs/";
 // ----------------------------
 // PREFAB GENERATOR CLASS
@@ -9,6 +18,7 @@ export class PrefabGenerator {
     constructor(containerId, selectId, classNameId, generateBtnId, downloadBtnId, componentListId, outputId) {
         var _a;
         this.state = { className: "", components: [] };
+        this.outputDirHandle = null;
         // DOM elements
         this.container = document.getElementById(containerId);
         this.select = document.getElementById(selectId);
@@ -38,10 +48,21 @@ export class PrefabGenerator {
             output.textContent = code;
         });
         // Download prefab file
-        downloadBtn.addEventListener("click", () => {
+        downloadBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             const code = this.generatePrefabCode();
-            this.downloadFile(`${this.state.className || "Prefab"}.ts`, code);
-        });
+            const filename = `${this.state.className || "Prefab"}.ts`;
+            yield this.saveToDirectory(filename, code);
+        }));
+        const chooseDirBtn = document.getElementById("chooseOutputDir");
+        chooseDirBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+            try {
+                this.outputDirHandle = yield window.showDirectoryPicker();
+                console.log("Directory selected:", this.outputDirHandle);
+            }
+            catch (err) {
+                console.warn("Directory selection cancelled.");
+            }
+        }));
     }
     addComponent(container) {
         const type = this.select.value;
@@ -120,14 +141,19 @@ ${body}
 }
 `;
     }
-    downloadFile(filename, content) {
-        const blob = new Blob([content], { type: "text/typescript" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
+    saveToDirectory(filename, content) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.outputDirHandle) {
+                alert("Please choose an output directory first.");
+                return;
+            }
+            // Create or overwrite the file
+            const fileHandle = yield this.outputDirHandle.getFileHandle(filename, { create: true });
+            const writable = yield fileHandle.createWritable();
+            yield writable.write(content);
+            yield writable.close();
+            console.log("Saved:", filename);
+        });
     }
     buildImport(symbol, overridePath) {
         const absolutePath = overridePath !== null && overridePath !== void 0 ? overridePath : ImportMap[symbol];

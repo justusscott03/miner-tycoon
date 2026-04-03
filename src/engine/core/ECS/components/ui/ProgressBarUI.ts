@@ -6,9 +6,9 @@ import { UIComponent } from "../UIComponent.js";
 import { Vector2 } from "../../../math/Vector2.js";
 import { ComponentDefinition } from "../../main/Component.js";
 
-import { NumberUI } from "../../../../tools/Prefab Generator System/ParamUI Types/NumberUI.js";
-import { Vector2UI } from "../../../../tools/Prefab Generator System/ParamUI Types/Vector2UI.js";
-import { ColorUI } from "../../../../tools/Prefab Generator System/ParamUI Types/ColorUI.js";
+import { NumberUI } from "../../../../ui/UIBindings/TypeUIBindings/NumberUI.js";
+import { Vector2UI } from "../../../../ui/UIBindings/TypeUIBindings/Vector2UI.js";
+import { ColorUI } from "../../../../ui/UIBindings/TypeUIBindings/ColorUI.js";
 
 type ProgressBarUIValues = {
     fillColor: string;
