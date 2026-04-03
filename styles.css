@@ -111,14 +111,23 @@ body {
     z-index: 1000;
 }
 
+#shapeEditorExportOutput {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f0f0f0;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
 #shapeInspector {
     left: calc(100% - 330px);
+    max-height: 75%;
 }
 
 .slidecontainer {
     position: fixed;
     top: calc(100% - 100px);
-    left: 15px;
+    left: calc(100% - 250px);
     z-index: 1000;
 }
 
@@ -127,3 +136,21 @@ body {
     margin-left: 5px;
     margin-bottom: 5px;
 }
+
+.layerItem {
+    padding: 6px;
+    background: #222;
+    color: white;
+    margin-bottom: 4px;
+    cursor: grab;
+}
+
+.layerItem.selected {
+    background: #888;
+}
+
+#shapeHierarchyPanel {
+    top: calc(100% - 325px);
+    max-height: 275px;
+}
+

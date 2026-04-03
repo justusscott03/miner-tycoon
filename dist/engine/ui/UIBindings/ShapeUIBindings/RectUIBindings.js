@@ -37,4 +37,11 @@ rect(${x.value}, ${y.value}, ${w.value}, ${h.value}, ${radius.value});`;
         ctx.stroke();
         ctx.closePath();
     }
+    hitTest(point) {
+        const { x, y, w, h } = this.params;
+        return (point.x >= x.value &&
+            point.x <= x.value + w.value &&
+            point.y >= y.value &&
+            point.y <= y.value + h.value);
+    }
 }

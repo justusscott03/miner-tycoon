@@ -16,7 +16,7 @@ const ShapeRegistry = {
     [ShapeTypes.Path]: PathUIBindings
 };
 export class ShapeEditor {
-    constructor(canvasId, toolbarId, inspectorId) {
+    constructor(canvasId, toolbarId, inspectorId, hierarchyId, outputId, exportBtnId) {
         this.shapes = [];
         this.selectedShape = null;
         this.currentTool = null;
@@ -24,13 +24,14 @@ export class ShapeEditor {
         this.ctx = this.canvas.getContext("2d");
         this.toolbar = document.getElementById(toolbarId);
         this.inspector = document.getElementById(inspectorId);
+        this.hierarchy = document.getElementById(hierarchyId);
+        this.output = document.getElementById(outputId);
+        this.exportBtn = document.getElementById(exportBtnId);
         this.initToolbar();
         this.initCanvas();
+        this.initExportButton();
         this.renderLoop();
     }
-    // ----------------------------
-    // TOOLBAR
-    // ----------------------------
     initToolbar() {
         Object.values(ShapeTypes).forEach(type => {
             const button = document.createElement("button");
@@ -45,9 +46,6 @@ export class ShapeEditor {
             this.toolbar.appendChild(button);
         });
     }
-    // ----------------------------
-    // CANVAS INPUT
-    // ----------------------------
     initCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
@@ -72,6 +70,7 @@ export class ShapeEditor {
                 this.shapes.push(shape);
                 this.selectShape(shape);
                 this.currentTool = null;
+                this.renderHierarchy();
                 return;
             }
             // Otherwise: select existing shape
@@ -80,29 +79,53 @@ export class ShapeEditor {
                 this.selectShape(clicked);
         });
     }
-    // ----------------------------
-    // SIMPLE HIT TEST (RECT ONLY FOR NOW)
-    // ----------------------------
-    hitTest(shape, mouse) {
-        const p = shape.params;
-        if (p.x && p.y && p.w && p.h) {
-            return (mouse.x >= p.x.value &&
-                mouse.x <= p.x.value + p.w.value &&
-                mouse.y >= p.y.value &&
-                mouse.y <= p.y.value + p.h.value);
-        }
-        return false;
+    initExportButton() {
+        this.exportBtn.addEventListener("click", () => {
+            const code = this.exportCode();
+            this.output.textContent = code;
+        });
     }
-    // ----------------------------
-    // SELECTION
-    // ----------------------------
+    hitTest(shape, mouse) {
+        return shape.hitTest(mouse);
+    }
     selectShape(shape) {
         this.selectedShape = shape;
         this.renderInspector();
+        this.renderHierarchy();
     }
-    // ----------------------------
-    // INSPECTOR UI
-    // ----------------------------
+    renderHierarchy() {
+        this.hierarchy.innerHTML = "<h2>Layers</h2>";
+        [...this.shapes].forEach((shape, i) => {
+            const index = this.shapes.length - 1 - i; // ⭐ reverse
+            shape = this.shapes[index];
+            const item = document.createElement("div");
+            item.className = "layerItem";
+            item.textContent = `${index}: ${shape.constructor.name}`;
+            if (shape === this.selectedShape) {
+                item.classList.add("selected");
+            }
+            item.onclick = () => {
+                this.selectShape(shape);
+            };
+            item.draggable = true;
+            item.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", index.toString());
+            };
+            item.ondragover = (e) => e.preventDefault();
+            item.ondrop = (e) => {
+                e.preventDefault();
+                const from = Number(e.dataTransfer.getData("text/plain"));
+                const to = index;
+                this.moveLayer(from, to);
+            };
+            this.hierarchy.appendChild(item);
+        });
+    }
+    moveLayer(from, to) {
+        const item = this.shapes.splice(from, 1)[0];
+        this.shapes.splice(to, 0, item);
+        this.renderHierarchy();
+    }
     renderInspector() {
         this.inspector.innerHTML = "<h2>Inspector</h2>";
         if (!this.selectedShape)
@@ -121,9 +144,6 @@ export class ShapeEditor {
             this.inspector.appendChild(document.createElement("br"));
         });
     }
-    // ----------------------------
-    // RENDER LOOP
-    // ----------------------------
     renderLoop() {
         const slider = document.getElementById("myRange");
         const output = document.getElementById("valueDisplay");
@@ -156,13 +176,10 @@ export class ShapeEditor {
         };
         loop();
     }
-    // ----------------------------
-    // EXPORT
-    // ----------------------------
     exportCode() {
         return this.shapes.map(s => s.toCode()).join("\n");
     }
 }
 document.addEventListener("DOMContentLoaded", () => {
-    new ShapeEditor("shapeEditorCanvas", "shapeTypeContainer", "shapeInspector");
+    new ShapeEditor("shapeEditorCanvas", "shapeTypeContainer", "shapeInspector", "shapeHierarchyPanel", "shapeEditorExportOutput", "exportButton");
 });

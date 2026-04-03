@@ -3,6 +3,7 @@ import { ListUI } from "../ListUI.js";
 import { Vector2UI } from "../TypeUIBindings/Vector2UI.js";
 import { NumberUI } from "../TypeUIBindings/NumberUI.js";
 import { ColorUI } from "../TypeUIBindings/ColorUI.js";
+import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
 export class PathUIBindings extends ShapeUIBindings {
     constructor() {
         super();
@@ -22,7 +23,7 @@ export class PathUIBindings extends ShapeUIBindings {
         const pts = this.params.points.value;
         let code = "beginShape();\n";
         for (const p of pts) {
-            code += `vertex(${p.value.x}, ${p.value.y});\n`;
+            code += `   vertex(${p.value.x + this.params.x.value}, ${p.value.y + this.params.y.value});\n`;
         }
         code += "endShape();";
         return code;
@@ -40,10 +41,51 @@ export class PathUIBindings extends ShapeUIBindings {
             ctx.lineTo(pts[i].value.x, pts[i].value.y);
         }
         ctx.lineWidth = strokeWeight.value;
-        ctx.strokeStyle = stroke.value;
-        ctx.fillStyle = color.value;
+        const fillRGB = ColorHelpers.hexToRGB(color.value);
+        ctx.fillStyle = `rgba(${fillRGB.r}, ${fillRGB.g}, ${fillRGB.b}, ${color.alpha})`;
+        const strokeRGB = ColorHelpers.hexToRGB(stroke.value);
+        ctx.strokeStyle = `rgba(${strokeRGB.r}, ${strokeRGB.g}, ${strokeRGB.b}, ${stroke.alpha})`;
         ctx.fill();
         ctx.stroke();
         ctx.restore();
+    }
+    hitTest(point) {
+        // Convert local points to world space
+        const pts = this.params.points.value.map(p => ({
+            x: p.value.x + this.params.x.value,
+            y: p.value.y + this.params.y.value
+        }));
+        // 1. Check stroke hit (distance to segments)
+        const distToSegment = (p, a, b) => {
+            const A = p.x - a.x;
+            const B = p.y - a.y;
+            const C = b.x - a.x;
+            const D = b.y - a.y;
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            let t = dot / lenSq;
+            t = Math.max(0, Math.min(1, t));
+            const projX = a.x + t * C;
+            const projY = a.y + t * D;
+            const dx = p.x - projX;
+            const dy = p.y - projY;
+            return Math.sqrt(dx * dx + dy * dy);
+        };
+        for (let i = 0; i < pts.length - 1; i++) {
+            if (distToSegment(point, pts[i], pts[i + 1]) < 6) {
+                return true;
+            }
+        }
+        // 2. Check fill hit (point inside polygon)
+        let inside = false;
+        for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+            const xi = pts[i].x, yi = pts[i].y;
+            const xj = pts[j].x, yj = pts[j].y;
+            const intersect = ((yi > point.y) !== (yj > point.y)) &&
+                (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi);
+            if (intersect)
+                inside = !inside;
+        }
+        return inside;
     }
 }

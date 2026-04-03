@@ -30,6 +30,7 @@ export abstract class ShapeUIBindings<TParams extends BaseParams> {
 
     abstract toCode(): string;
     abstract render(ctx: CanvasRenderingContext2D): void;
+    abstract hitTest(point: { x: number; y: number }): boolean;
 }
 
 

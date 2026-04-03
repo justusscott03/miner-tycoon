@@ -52,4 +52,17 @@ ellipse(${x.value}, ${y.value}, ${w.value}, ${h.value});`;
         ctx.stroke();
         ctx.closePath();
     }
+
+    hitTest(point: { x: number; y: number }): boolean {
+        const { x, y, w, h } = this.params;
+
+        const rx = w.value / 2;
+        const ry = h.value / 2;
+
+        const dx = point.x - x.value;
+        const dy = point.y - y.value;
+
+        return (dx*dx) / (rx*rx) + (dy*dy) / (ry*ry) <= 1;
+    }
+
 }

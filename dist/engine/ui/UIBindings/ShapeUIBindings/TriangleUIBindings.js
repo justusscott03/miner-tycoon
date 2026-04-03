@@ -44,4 +44,17 @@ triangle(${point1.value.x + x.value}, ${point1.value.y + y.value}, ${point2.valu
         ctx.stroke();
         ctx.restore();
     }
+    hitTest(point) {
+        const { x, y, point1, point2, point3 } = this.params;
+        const p = point;
+        const a = { x: point1.value.x + x.value, y: point1.value.y + y.value };
+        const b = { x: point2.value.x + x.value, y: point2.value.y + y.value };
+        const c = { x: point3.value.x + x.value, y: point3.value.y + y.value };
+        const area = (v1, v2, v3) => Math.abs((v1.x * (v2.y - v3.y) + v2.x * (v3.y - v1.y) + v3.x * (v1.y - v2.y)) / 2);
+        const A = area(a, b, c);
+        const A1 = area(p, b, c);
+        const A2 = area(a, p, c);
+        const A3 = area(a, b, p);
+        return Math.abs(A - (A1 + A2 + A3)) < 0.1;
+    }
 }
