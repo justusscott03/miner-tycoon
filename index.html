@@ -21,28 +21,50 @@
     </div>
 
     <div id="shapeEditor" class="tab-content active">
-        <canvas id="shapeEditorCanvas"></canvas>
-        <div class="menuSideBar">
-            <div id="shapeTypeContainer">
-                <h2>Shape Types</h2>
+
+        <div id="shapeEditorLayout">
+
+            <!-- LEFT COLUMN -->
+            <div id="leftColumn">
+                <div id="shapeTypeContainer" class="menuSideBar">
+                    <h2>Shape Types</h2>
+                </div>
+
+                <div id="shapeHierarchyPanel" class="menuSideBar">
+                    <h2>Layers</h2>
+                </div>
             </div>
-            <hr style="margin-top: 20px; margin-bottom: 20px;">
-            <div>
-                <h2>Export</h2>
-                <button id="exportButton" class="menuSideBarItem">Export Shapes</button>
-                <pre id="shapeEditorExportOutput"></pre>
+
+            <!-- CENTER CANVAS -->
+            <div id="canvasContainer">
+                <canvas id="shapeEditorCanvas"></canvas>
+
+                <div id="layerContextMenu" class="contextMenu">
+                    <div data-action="rename">Rename</div>
+                    <div data-action="delete">Delete</div>
+                </div>
             </div>
+
+            <!-- RIGHT COLUMN -->
+            <div id="rightColumn">
+                <div id="shapeInspector" class="menuSideBar">
+                    <h2>Shape Inspector</h2>
+                </div>
+
+                <div id="exportPanel" class="menuSideBar">
+                    <h2>Export</h2>
+                    <button id="exportButton" class="menuSideBarItem">Export Shapes</button>
+                    <pre id="shapeEditorExportOutput"></pre>
+                </div>
+            </div>
+
         </div>
-        <div id="shapeInspector" class="menuSideBar">
-            <h2>Shape Inspector</h2>
-        </div>
-        <div id="shapeHierarchyPanel" class="menuSideBar">
-            <h2>Layers</h2>
-        </div>
+
         <div class="slidecontainer">
-            <input type="range" id="myRange" min="0" max="100" value="50">
+            <input type="range" id="gridSizeSlider" min="0" max="100" value="50">
             <p>Grid size: <span id="valueDisplay">50</span></p>
         </div>
+
     </div>
 
     <div id="prefabBuilder" class="tab-content">

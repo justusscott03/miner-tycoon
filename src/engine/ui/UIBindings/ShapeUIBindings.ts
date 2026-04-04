@@ -15,6 +15,11 @@ export interface BaseParams {
 
 export abstract class ShapeUIBindings<TParams extends BaseParams> {
     params!: TParams;
+    name: string;
+
+    constructor() {
+        this.name = this.constructor.name.replace("UIBindings", "");
+    }
 
     clone(): this {
         const cloned = Object.create(this.constructor.prototype) as this;

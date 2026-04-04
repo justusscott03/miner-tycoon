@@ -2,184 +2,102 @@ import { EllipseUIBindings } from "../ui/UIBindings/ShapeUIBindings/EllipseUIBin
 import { RectUIBindings } from "../ui/UIBindings/ShapeUIBindings/RectUIBindings.js";
 import { TriangleUIBindings } from "../ui/UIBindings/ShapeUIBindings/TriangleUIBindings.js";
 import { PathUIBindings } from "../ui/UIBindings/ShapeUIBindings/PathUIBindings.js";
-var ShapeTypes;
+import { ToolManager } from "./Shape Editor/ToolManager.js";
+import { EditorCanvasManager } from "./Shape Editor/EditorCanvasManager.js";
+import { SelectionManager } from "./Shape Editor/SelectionManager.js";
+import { ShapeFactory } from "./Shape Editor/ShapeFactory.js";
+import { HierarchyPanel } from "./Shape Editor/HierarchyPanel.js";
+import { InspectorPanel } from "./Shape Editor/InspectorPanel.js";
+import { ContextMenu } from "./Shape Editor/ContextMenu.js";
+import { RenderLoop } from "./Shape Editor/RenderLoop.js";
+import { Exporter } from "./Shape Editor/Exporter.js";
+export var ShapeTypes;
 (function (ShapeTypes) {
     ShapeTypes["Rectangle"] = "rectangle";
     ShapeTypes["Ellipse"] = "ellipse";
     ShapeTypes["Triangle"] = "triangle";
     ShapeTypes["Path"] = "path";
 })(ShapeTypes || (ShapeTypes = {}));
-const ShapeRegistry = {
+export const ShapeRegistry = {
     [ShapeTypes.Rectangle]: RectUIBindings,
     [ShapeTypes.Ellipse]: EllipseUIBindings,
     [ShapeTypes.Triangle]: TriangleUIBindings,
     [ShapeTypes.Path]: PathUIBindings
 };
 export class ShapeEditor {
-    constructor(canvasId, toolbarId, inspectorId, hierarchyId, outputId, exportBtnId) {
+    constructor(canvasId, toolbarId, inspectorId, hierarchyId, outputId, exportBtnId, contextMenuId) {
         this.shapes = [];
-        this.selectedShape = null;
-        this.currentTool = null;
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext("2d");
-        this.toolbar = document.getElementById(toolbarId);
-        this.inspector = document.getElementById(inspectorId);
-        this.hierarchy = document.getElementById(hierarchyId);
-        this.output = document.getElementById(outputId);
-        this.exportBtn = document.getElementById(exportBtnId);
-        this.initToolbar();
-        this.initCanvas();
-        this.initExportButton();
-        this.renderLoop();
+        // Canvas + context
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+        // Core systems
+        this.canvasManager = new EditorCanvasManager(canvas);
+        this.toolManager = new ToolManager(document.getElementById(toolbarId));
+        this.selection = new SelectionManager();
+        this.factory = new ShapeFactory();
+        // UI panels
+        this.hierarchy = new HierarchyPanel(document.getElementById(hierarchyId));
+        this.inspector = new InspectorPanel(document.getElementById(inspectorId));
+        this.contextMenu = new ContextMenu(document.getElementById(contextMenuId));
+        this.exporter = new Exporter(document.getElementById(outputId), document.getElementById(exportBtnId), this.shapes);
+        // Render loop
+        this.loop = new RenderLoop(ctx, this.shapes);
+        // Initialize everything
+        this.init();
     }
-    initToolbar() {
-        Object.values(ShapeTypes).forEach(type => {
-            const button = document.createElement("button");
-            button.textContent = type;
-            button.className = "menuSideBarItem";
-            button.onclick = () => {
-                this.currentTool = type;
-                this.toolbar.querySelectorAll("button")
-                    .forEach(b => b.classList.remove("active"));
-                button.classList.add("active");
-            };
-            this.toolbar.appendChild(button);
-        });
-    }
-    initCanvas() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        this.canvas.addEventListener("click", (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            const mouse = {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top
-            };
-            // If tool selected → create new shape
-            if (this.currentTool) {
-                const BindingClass = ShapeRegistry[this.currentTool];
-                if (!BindingClass)
-                    return;
-                // Create a fresh shape with cloned params
-                const shape = new BindingClass().clone();
-                // Set initial position if exists
-                if (shape.params.x)
-                    shape.params.x.value = mouse.x;
-                if (shape.params.y)
-                    shape.params.y.value = mouse.y;
+    init() {
+        this.toolManager.init();
+        // Canvas click → create or select shapes
+        this.canvasManager.onClick(mouse => {
+            // Create new shape
+            const tool = this.toolManager.currentTool;
+            if (tool) {
+                const shape = this.factory.create(tool, mouse.x, mouse.y);
                 this.shapes.push(shape);
-                this.selectShape(shape);
-                this.currentTool = null;
-                this.renderHierarchy();
+                this.selection.select(shape);
+                this.refresh();
+                this.toolManager.currentTool = null;
                 return;
             }
-            // Otherwise: select existing shape
-            const clicked = this.shapes.find(shape => this.hitTest(shape, mouse));
-            if (clicked)
-                this.selectShape(clicked);
-        });
-    }
-    initExportButton() {
-        this.exportBtn.addEventListener("click", () => {
-            const code = this.exportCode();
-            this.output.textContent = code;
-        });
-    }
-    hitTest(shape, mouse) {
-        return shape.hitTest(mouse);
-    }
-    selectShape(shape) {
-        this.selectedShape = shape;
-        this.renderInspector();
-        this.renderHierarchy();
-    }
-    renderHierarchy() {
-        this.hierarchy.innerHTML = "<h2>Layers</h2>";
-        [...this.shapes].forEach((shape, i) => {
-            const index = this.shapes.length - 1 - i; // ⭐ reverse
-            shape = this.shapes[index];
-            const item = document.createElement("div");
-            item.className = "layerItem";
-            item.textContent = `${index}: ${shape.constructor.name}`;
-            if (shape === this.selectedShape) {
-                item.classList.add("selected");
+            // Select existing shape
+            const hit = this.shapes.find(s => s.hitTest(mouse));
+            if (hit) {
+                this.selection.select(hit);
+                this.refresh();
             }
-            item.onclick = () => {
-                this.selectShape(shape);
-            };
-            item.draggable = true;
-            item.ondragstart = (e) => {
-                e.dataTransfer.setData("text/plain", index.toString());
-            };
-            item.ondragover = (e) => e.preventDefault();
-            item.ondrop = (e) => {
-                e.preventDefault();
-                const from = Number(e.dataTransfer.getData("text/plain"));
-                const to = index;
-                this.moveLayer(from, to);
-            };
-            this.hierarchy.appendChild(item);
         });
-    }
-    moveLayer(from, to) {
-        const item = this.shapes.splice(from, 1)[0];
-        this.shapes.splice(to, 0, item);
-        this.renderHierarchy();
-    }
-    renderInspector() {
-        this.inspector.innerHTML = "<h2>Inspector</h2>";
-        if (!this.selectedShape)
-            return;
-        const params = this.selectedShape.params;
-        Object.keys(params).forEach(name => {
-            const ui = params[name];
-            const label = document.createElement("label");
-            label.textContent = name;
-            label.style.marginRight = "5px";
-            const element = ui.render((val) => {
-                ui.value = val;
-            });
-            this.inspector.appendChild(label);
-            this.inspector.appendChild(element);
-            this.inspector.appendChild(document.createElement("br"));
+        setTimeout(() => this.canvasManager.resize(), 0);
+        // Context menu actions
+        this.contextMenu.onAction((action, index) => {
+            if (action === "delete") {
+                this.shapes.splice(index, 1);
+            }
+            if (action === "rename") {
+                const shape = this.shapes[index];
+                const newName = prompt("Rename:", shape.name);
+                if (newName)
+                    shape.name = newName;
+            }
+            this.refresh();
         });
+        this.exporter.init();
+        // Start render loop
+        this.loop.start(document.getElementById("gridSizeSlider"));
+        // Initial UI
+        this.refresh();
     }
-    renderLoop() {
-        const slider = document.getElementById("myRange");
-        const output = document.getElementById("valueDisplay");
-        let gridSize = 40;
-        output.textContent = slider.value;
-        slider.oninput = () => {
-            output.textContent = slider.value;
-            gridSize = parseInt(slider.value);
-        };
-        const loop = () => {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            // Draw grid
-            this.ctx.strokeStyle = "#59b2f2";
-            this.ctx.lineWidth = 1;
-            for (let x = 0; x < this.canvas.width; x += gridSize) {
-                this.ctx.beginPath();
-                this.ctx.moveTo(x, 0);
-                this.ctx.lineTo(x, this.canvas.height);
-                this.ctx.stroke();
-            }
-            for (let y = 0; y < this.canvas.height; y += gridSize) {
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, y);
-                this.ctx.lineTo(this.canvas.width, y);
-                this.ctx.stroke();
-            }
-            // Render shapes
-            this.shapes.forEach(shape => shape.render(this.ctx));
-            requestAnimationFrame(loop);
-        };
-        loop();
-    }
-    exportCode() {
-        return this.shapes.map(s => s.toCode()).join("\n");
+    refresh() {
+        this.hierarchy.render(this.shapes, this.selection.selected, shape => {
+            this.selection.select(shape);
+            this.refresh();
+        }, (from, to) => {
+            const item = this.shapes.splice(from, 1)[0];
+            this.shapes.splice(to, 0, item);
+            this.refresh();
+        }, (x, y, shape, index) => this.contextMenu.show(x, y, index));
+        this.inspector.render(this.selection.selected);
     }
 }
 document.addEventListener("DOMContentLoaded", () => {
-    new ShapeEditor("shapeEditorCanvas", "shapeTypeContainer", "shapeInspector", "shapeHierarchyPanel", "shapeEditorExportOutput", "exportButton");
+    new ShapeEditor("shapeEditorCanvas", "shapeTypeContainer", "shapeInspector", "shapeHierarchyPanel", "shapeEditorExportOutput", "exportButton", "layerContextMenu");
 });

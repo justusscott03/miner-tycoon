@@ -1,4 +1,7 @@
 export class ShapeUIBindings {
+    constructor() {
+        this.name = this.constructor.name.replace("UIBindings", "");
+    }
     clone() {
         const cloned = Object.create(this.constructor.prototype);
         const newParams = {};

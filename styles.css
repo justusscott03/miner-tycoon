@@ -1,12 +1,19 @@
+/* --------------------------------------------------
+   GLOBAL + TYPOGRAPHY
+-------------------------------------------------- */
 body {
-    margin: 0px;
+    margin: 0;
     overflow: hidden;
+    font-family: sans-serif;
 }
 
 .fredoka {
     font-family: "Fredoka", sans-serif;
 }
 
+/* --------------------------------------------------
+   SAVE PAGE (unchanged)
+-------------------------------------------------- */
 #savePage {
     display: none;
     position: absolute;
@@ -42,24 +49,19 @@ body {
     padding: 10px;
 }
 
-.menuSideBarItem {
-    display: block;
-    margin-bottom: 5px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Fixed top navigation */
+/* --------------------------------------------------
+   TOP NAV
+-------------------------------------------------- */
 #topNav {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #222;
-    border-bottom: 2px solid #333;
-    z-index: 2000;
-    display: flex;
     height: 50px;
+    background: #222;
+    border-bottom: 2px solid #333;
+    display: flex;
+    z-index: 2000;
 }
 
 #topNav .tab-button {
@@ -82,75 +84,152 @@ body {
     font-weight: bold;
 }
 
-/* Adjust tab contents to not be under nav */
+/* --------------------------------------------------
+   TAB CONTENT
+-------------------------------------------------- */
 .tab-content {
-    display: none;   /* hide by default */
-    position: relative;
+    display: none;
     margin-top: 50px;
-    padding: 20px;
+    height: calc(100vh - 50px);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* --------------------------------------------------
+   SHAPE EDITOR LAYOUT
+-------------------------------------------------- */
+#shapeEditor {
+    display: flex;
+    height: calc(100vh - 50px);
+    overflow: hidden;
+}
+
+#shapeEditorLayout {
+    display: flex;
+    width: 100%;
+    height: 100%; /* FIXED */
+}
+
+/* --------------------------------------------------
+   LEFT COLUMN (Shape Types + Layers)
+-------------------------------------------------- */
+#leftColumn {
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+}
+
+#shapeTypeContainer {
+    flex: 1;
+    overflow-y: auto;
+}
+
+#shapeHierarchyPanel {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* --------------------------------------------------
+   CENTER CANVAS
+-------------------------------------------------- */
+#canvasContainer {
+    flex: 1;
+    position: relative;
+    background: #ffffff;
+}
+
+#shapeEditorCanvas {
     width: 100%;
     height: 100%;
 }
 
-.tab-content.active {
-    display: block;  /* show when active */
-}
-
-.menuSideBar {
-    position: fixed;
-    left: 15px;
-    top: 65px;
+/* --------------------------------------------------
+   RIGHT COLUMN (Inspector + Export)
+-------------------------------------------------- */
+#rightColumn {
     width: 300px;
-    max-height: 90vh;
-    overflow-y: auto; 
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #ccc;
-    padding: 10px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
-    font-family: sans-serif;
-    z-index: 1000;
-}
-
-#shapeEditorExportOutput {
-    max-height: 200px;
-    overflow-y: auto;
-    background: #f0f0f0;
-    padding: 10px;
-    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
 }
 
 #shapeInspector {
-    left: calc(100% - 330px);
-    max-height: 75%;
+    flex: 1;
+    overflow-y: auto;
 }
 
-.slidecontainer {
-    position: fixed;
-    top: calc(100% - 100px);
-    left: calc(100% - 250px);
-    z-index: 1000;
+#exportPanel {
+    flex: 1;
+    overflow-y: auto;
 }
 
-.paramInput {
-    width: 80%;
-    margin-left: 5px;
+/* --------------------------------------------------
+   SHARED SIDEBAR STYLE
+-------------------------------------------------- */
+.menuSideBar {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.menuSideBarItem {
+    display: block;
     margin-bottom: 5px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
+/* --------------------------------------------------
+   LAYER ITEMS
+-------------------------------------------------- */
 .layerItem {
     padding: 6px;
-    background: #222;
+    background: #444;
     color: white;
     margin-bottom: 4px;
-    cursor: grab;
+    cursor: pointer;
 }
 
 .layerItem.selected {
     background: #888;
 }
 
-#shapeHierarchyPanel {
-    top: calc(100% - 325px);
-    max-height: 275px;
+/* --------------------------------------------------
+   CONTEXT MENU
+-------------------------------------------------- */
+.contextMenu {
+    position: absolute;
+    background: #222;
+    border: 1px solid #444;
+    padding: 4px 0;
+    display: none;
+    z-index: 9999;
+    min-width: 120px;
 }
 
+.contextMenu div {
+    padding: 6px 12px;
+    cursor: pointer;
+    color: white;
+}
+
+.contextMenu div:hover {
+    background: #444;
+}
+
+/* --------------------------------------------------
+   SLIDER
+-------------------------------------------------- */
+.slidecontainer {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.paramInput {
+    width: 90%;
+    margin-bottom: 10px;
+    margin-left: 5px;
+}
