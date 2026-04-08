@@ -13,6 +13,7 @@ import { InspectorPanel } from "./Shape Editor/InspectorPanel.js";
 import { ContextMenu } from "./Shape Editor/ContextMenu.js";
 import { RenderLoop } from "./Shape Editor/RenderLoop.js";
 import { Exporter } from "./Shape Editor/Exporter.js";
+import { TransformGizmo } from "./TransformGizmo.js";
 
 export enum ShapeTypes {
     Rectangle = "rectangle",
@@ -42,6 +43,8 @@ export class ShapeEditor {
     exporter: Exporter;
 
     loop: RenderLoop;
+    gizmo: TransformGizmo;
+    
 
     constructor(
         canvasId: string,
@@ -72,9 +75,10 @@ export class ShapeEditor {
             this.shapes
         );
 
+        this.gizmo = new TransformGizmo(canvas);
 
         // Render loop
-        this.loop = new RenderLoop(ctx, this.shapes);
+        this.loop = new RenderLoop(ctx, this.shapes, this.selection, this.gizmo);
 
         // Initialize everything
         this.init();
@@ -123,6 +127,21 @@ export class ShapeEditor {
 
         // Start render loop
         this.loop.start(document.getElementById("gridSizeSlider") as HTMLInputElement);
+
+        this.canvasManager.onMouseDown((mouse) => {
+            if (this.selection.selected) {
+                const used = this.gizmo.onMouseDown(mouse, this.selection.selected);
+                if (used) return;
+            }
+        });
+
+        this.canvasManager.onMouseMove(mouse => {
+            if (this.selection.selected) {
+                this.gizmo.onMouseMove(mouse, this.selection.selected);
+            }
+        });
+
+        this.canvasManager.onMouseUp(() => this.gizmo.onMouseUp());
 
         // Initial UI
         this.refresh();

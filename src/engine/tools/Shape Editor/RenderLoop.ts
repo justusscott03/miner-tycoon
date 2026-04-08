@@ -1,9 +1,13 @@
 import { ShapeUIBindings } from "../../ui/UIBindings/ShapeUIBindings.js";
+import { SelectionManager } from "./SelectionManager.js";
+import { TransformGizmo } from "../TransformGizmo.js";
 
 export class RenderLoop {
     constructor(
         private ctx: CanvasRenderingContext2D,
-        private shapes: ShapeUIBindings<any>[]
+        private shapes: ShapeUIBindings<any>[],
+        private selection: SelectionManager,
+        private gizmo: TransformGizmo
     ) {}
 
     start(gridSizeSlider: HTMLInputElement) {
@@ -45,6 +49,11 @@ export class RenderLoop {
 
             // Draw shapes
             this.shapes.forEach(shape => shape.render(ctx));
+
+            // ⭐ Draw gizmo on top
+            if (this.selection.selected) {
+                this.gizmo.draw(ctx, this.selection.selected);
+            }
 
             requestAnimationFrame(loop);
         };
