@@ -4,7 +4,7 @@ import { fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.
 import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
 import { textAlign, textSize, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
 
-import { StorehouseState } from "../state/StorehouseState";
+import { StorehouseState } from "../state/StorehouseState.js";
 
 export class StorehouseRenderer {
     state: StorehouseState;

@@ -4,7 +4,7 @@ import { fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.
 import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
 import { pushMatrix, popMatrix, translate, scale } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/transformation.js";
 
-import { UpgradePageState } from "../state/UpgradePageState";
+import { UpgradePageState } from "../state/UpgradePageState.js";
 
 export class UpgradePageRenderer {
     state: UpgradePageState;

@@ -11,6 +11,7 @@ import { InspectorPanel } from "./Shape Editor/InspectorPanel.js";
 import { ContextMenu } from "./Shape Editor/ContextMenu.js";
 import { RenderLoop } from "./Shape Editor/RenderLoop.js";
 import { Exporter } from "./Shape Editor/Exporter.js";
+import { TransformGizmo } from "./TransformGizmo.js";
 export var ShapeTypes;
 (function (ShapeTypes) {
     ShapeTypes["Rectangle"] = "rectangle";
@@ -40,8 +41,9 @@ export class ShapeEditor {
         this.inspector = new InspectorPanel(document.getElementById(inspectorId));
         this.contextMenu = new ContextMenu(document.getElementById(contextMenuId));
         this.exporter = new Exporter(document.getElementById(outputId), document.getElementById(exportBtnId), this.shapes);
+        this.gizmo = new TransformGizmo(canvas);
         // Render loop
-        this.loop = new RenderLoop(ctx, this.shapes);
+        this.loop = new RenderLoop(ctx, this.shapes, this.selection, this.gizmo);
         // Initialize everything
         this.init();
     }
@@ -83,6 +85,19 @@ export class ShapeEditor {
         this.exporter.init();
         // Start render loop
         this.loop.start(document.getElementById("gridSizeSlider"));
+        this.canvasManager.onMouseDown((mouse) => {
+            if (this.selection.selected) {
+                const used = this.gizmo.onMouseDown(mouse, this.selection.selected);
+                if (used)
+                    return;
+            }
+        });
+        this.canvasManager.onMouseMove(mouse => {
+            if (this.selection.selected) {
+                this.gizmo.onMouseMove(mouse, this.selection.selected);
+            }
+        });
+        this.canvasManager.onMouseUp(() => this.gizmo.onMouseUp());
         // Initial UI
         this.refresh();
     }

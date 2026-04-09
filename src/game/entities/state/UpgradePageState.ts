@@ -1,4 +1,4 @@
-import { UpgradeableState } from "./UpgradeableState";
+import { UpgradeableState } from "./UpgradeableState.js";
 import { lerp } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
 
 export class UpgradePageState {

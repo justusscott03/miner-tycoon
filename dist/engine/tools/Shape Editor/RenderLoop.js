@@ -1,7 +1,9 @@
 export class RenderLoop {
-    constructor(ctx, shapes) {
+    constructor(ctx, shapes, selection, gizmo) {
         this.ctx = ctx;
         this.shapes = shapes;
+        this.selection = selection;
+        this.gizmo = gizmo;
     }
     start(gridSizeSlider) {
         let gridSize = Number(gridSizeSlider.value);
@@ -35,6 +37,10 @@ export class RenderLoop {
             }
             // Draw shapes
             this.shapes.forEach(shape => shape.render(ctx));
+            // ⭐ Draw gizmo on top
+            if (this.selection.selected) {
+                this.gizmo.draw(ctx, this.selection.selected);
+            }
             requestAnimationFrame(loop);
         };
         loop();

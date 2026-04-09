@@ -1,4 +1,4 @@
-import { Component } from "../../main/Component";
+import { Component } from "../../main/Component.js";
 export class Collider2D extends Component {
     constructor() {
         super(...arguments);

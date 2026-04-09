@@ -1,7 +1,7 @@
-"use strict";
 // import { MoneyFormatter } from "../../helpers/MoneyFormatter.js";
 // import { CrateState } from "../state/CrateState.js";
 // import { Renderer } from "../../../engine/core/components/Renderer.js";
+export {};
 // import { fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
 // import { textAlign, textSize, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
 // export class CrateRenderer extends Renderer {
