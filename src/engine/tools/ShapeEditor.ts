@@ -22,7 +22,7 @@ export enum ShapeTypes {
     Path = "path"
 }
 
-export const ShapeRegistry = {
+export const ShapeRegistry: { [key in ShapeTypes]: new () => ShapeUIBindings<any> } = {
     [ShapeTypes.Rectangle]: RectUIBindings,
     [ShapeTypes.Ellipse]: EllipseUIBindings,
     [ShapeTypes.Triangle]: TriangleUIBindings,
@@ -44,7 +44,6 @@ export class ShapeEditor {
 
     loop: RenderLoop;
     gizmo: TransformGizmo;
-    
 
     constructor(
         canvasId: string,

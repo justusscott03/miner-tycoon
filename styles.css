@@ -91,6 +91,7 @@ body {
     display: none;
     margin-top: 50px;
     height: calc(100vh - 50px);
+    width: 100%;
 }
 
 .tab-content.active {
