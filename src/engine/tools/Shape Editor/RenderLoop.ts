@@ -1,11 +1,13 @@
-import { ShapeUIBindings } from "../../ui/UIBindings/ShapeUIBindings.js";
+import { BaseLayer } from "./Layers/BaseLayer.js";
+import { Layer } from "./Layers/Layer.js";
+import { GroupLayer } from "./Layers/GroupLayer.js";
 import { SelectionManager } from "./SelectionManager.js";
-import { TransformGizmo } from "../TransformGizmo.js";
+import { TransformGizmo } from "./TransformGizmo.js";
 
 export class RenderLoop {
     constructor(
         private ctx: CanvasRenderingContext2D,
-        private shapes: ShapeUIBindings<any>[],
+        private layers: BaseLayer[],
         private selection: SelectionManager,
         private gizmo: TransformGizmo
     ) {}
@@ -15,13 +17,10 @@ export class RenderLoop {
 
         gridSizeSlider.addEventListener("input", () => {
             gridSize = Number(gridSizeSlider.value);
-            if (isNaN(gridSize) || gridSize <= 0) {
-                gridSize = 50;
-            }
+            if (isNaN(gridSize) || gridSize <= 0) gridSize = 50;
+
             const valueDisplay = document.getElementById("valueDisplay");
-            if (valueDisplay) {
-                valueDisplay.textContent = gridSize.toString();
-            }
+            if (valueDisplay) valueDisplay.textContent = gridSize.toString();
         });
 
         const loop = () => {
@@ -47,10 +46,10 @@ export class RenderLoop {
                 ctx.stroke();
             }
 
-            // Draw shapes
-            this.shapes.forEach(shape => shape.render(ctx));
+            // Draw layers recursively
+            this.layers.forEach(layer => this.drawNode(layer));
 
-            // ⭐ Draw gizmo on top
+            // Draw gizmo on selected layer
             if (this.selection.selected) {
                 this.gizmo.draw(ctx, this.selection.selected);
             }
@@ -59,5 +58,18 @@ export class RenderLoop {
         };
 
         loop();
+    }
+
+    private drawNode(node: BaseLayer) {
+        if (!node.visible) return;
+
+        if (node instanceof Layer) {
+            // Leaf layer
+            node.shape.render(this.ctx);
+        } else if (node.isGroup()) {
+            // Group layer
+            const group = node as GroupLayer;
+            group.children.forEach(child => this.drawNode(child));
+        }
     }
 }

@@ -1,7 +1,8 @@
+import { Layer } from "./Layers/Layer.js";
 export class RenderLoop {
-    constructor(ctx, shapes, selection, gizmo) {
+    constructor(ctx, layers, selection, gizmo) {
         this.ctx = ctx;
-        this.shapes = shapes;
+        this.layers = layers;
         this.selection = selection;
         this.gizmo = gizmo;
     }
@@ -9,13 +10,11 @@ export class RenderLoop {
         let gridSize = Number(gridSizeSlider.value);
         gridSizeSlider.addEventListener("input", () => {
             gridSize = Number(gridSizeSlider.value);
-            if (isNaN(gridSize) || gridSize <= 0) {
+            if (isNaN(gridSize) || gridSize <= 0)
                 gridSize = 50;
-            }
             const valueDisplay = document.getElementById("valueDisplay");
-            if (valueDisplay) {
+            if (valueDisplay)
                 valueDisplay.textContent = gridSize.toString();
-            }
         });
         const loop = () => {
             const { ctx } = this;
@@ -35,14 +34,27 @@ export class RenderLoop {
                 ctx.lineTo(ctx.canvas.width, y);
                 ctx.stroke();
             }
-            // Draw shapes
-            this.shapes.forEach(shape => shape.render(ctx));
-            // ⭐ Draw gizmo on top
+            // Draw layers recursively
+            this.layers.forEach(layer => this.drawNode(layer));
+            // Draw gizmo on selected layer
             if (this.selection.selected) {
                 this.gizmo.draw(ctx, this.selection.selected);
             }
             requestAnimationFrame(loop);
         };
         loop();
+    }
+    drawNode(node) {
+        if (!node.visible)
+            return;
+        if (node instanceof Layer) {
+            // Leaf layer
+            node.shape.render(this.ctx);
+        }
+        else if (node.isGroup()) {
+            // Group layer
+            const group = node;
+            group.children.forEach(child => this.drawNode(child));
+        }
     }
 }

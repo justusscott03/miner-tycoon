@@ -1,13 +1,25 @@
-import { ShapeUIBindings } from "../../ui/UIBindings/ShapeUIBindings.js";
+import { BaseLayer } from "./Layers/BaseLayer.js";
+import { Layer } from "./Layers/Layer.js";
+import { GroupLayer } from "./Layers/GroupLayer.js";
 
 export class SelectionManager {
-    selected: ShapeUIBindings<any> | null = null;
+    selected: BaseLayer | null = null;
 
-    select(shape: ShapeUIBindings<any>) {
-        this.selected = shape;
+    select(layer: BaseLayer) {
+        this.selected = layer;
     }
 
     clear() {
         this.selected = null;
+    }
+
+    // Convenience helper: returns the shape if a leaf layer is selected
+    get selectedShape() {
+        return this.selected instanceof Layer ? this.selected.shape : null;
+    }
+
+    // Optional helper: is the selected item a group?
+    get isGroupSelected() {
+        return this.selected instanceof GroupLayer;
     }
 }

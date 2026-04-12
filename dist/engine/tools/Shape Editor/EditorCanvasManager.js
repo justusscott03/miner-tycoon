@@ -1,18 +1,18 @@
 export class EditorCanvasManager {
     constructor(canvas) {
         this.canvas = canvas;
+        this.isMouseDown = false;
         this.ctx = canvas.getContext("2d");
-        this.resize();
-        // Resize when layout changes
+        requestAnimationFrame(() => this.resize());
         window.addEventListener("resize", () => this.resize());
     }
     resize() {
-        // Match canvas internal resolution to its displayed size
         const rect = this.canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0)
+            return;
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
     }
-    // Utility to convert mouse event → canvas coordinates
     getMousePos(e) {
         const rect = this.canvas.getBoundingClientRect();
         return {
@@ -22,20 +22,34 @@ export class EditorCanvasManager {
     }
     onClick(handler) {
         this.canvas.addEventListener("click", e => {
+            e.preventDefault();
+            handler(this.getMousePos(e));
+        });
+    }
+    onRightClick(handler) {
+        this.canvas.addEventListener("contextmenu", e => {
+            e.preventDefault();
             handler(this.getMousePos(e));
         });
     }
     onMouseDown(handler) {
         this.canvas.addEventListener("mousedown", e => {
+            e.preventDefault();
+            this.isMouseDown = true;
             handler(this.getMousePos(e));
         });
     }
     onMouseMove(handler) {
         this.canvas.addEventListener("mousemove", e => {
+            e.preventDefault();
             handler(this.getMousePos(e));
         });
     }
     onMouseUp(handler) {
-        window.addEventListener("mouseup", handler);
+        window.addEventListener("mouseup", e => {
+            e.preventDefault();
+            this.isMouseDown = false;
+            handler();
+        });
     }
 }

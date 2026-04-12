@@ -44,4 +44,13 @@ ellipse(${x.value}, ${y.value}, ${w.value}, ${h.value});`;
         const dy = point.y - y.value;
         return (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry) <= 1;
     }
+    getBounds() {
+        const { x, y, w, h } = this.params;
+        return {
+            left: x.value - w.value / 2,
+            top: y.value - h.value / 2,
+            right: x.value + w.value / 2,
+            bottom: y.value + h.value / 2
+        };
+    }
 }

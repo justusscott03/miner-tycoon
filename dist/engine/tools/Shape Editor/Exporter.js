@@ -1,8 +1,9 @@
+import { Layer } from "./Layers/Layer.js";
 export class Exporter {
-    constructor(output, button, shapes) {
+    constructor(output, button, layers) {
         this.output = output;
         this.button = button;
-        this.shapes = shapes;
+        this.layers = layers;
     }
     init() {
         this.button.addEventListener("click", () => {
@@ -11,6 +12,9 @@ export class Exporter {
         });
     }
     exportCode() {
-        return this.shapes.map(s => s.toCode()).join("\n");
+        return this.layers
+            .filter(l => l instanceof Layer)
+            .map(l => l.shape.toCode())
+            .join("\n");
     }
 }

@@ -44,4 +44,13 @@ rect(${x.value}, ${y.value}, ${w.value}, ${h.value}, ${radius.value});`;
             point.y >= y.value &&
             point.y <= y.value + h.value);
     }
+    getBounds() {
+        const { x, y, w, h } = this.params;
+        return {
+            left: x.value,
+            top: y.value,
+            right: x.value + w.value,
+            bottom: y.value + h.value
+        };
+    }
 }

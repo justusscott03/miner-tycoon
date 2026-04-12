@@ -88,4 +88,20 @@ export class PathUIBindings extends ShapeUIBindings {
         }
         return inside;
     }
+    getBounds() {
+        const pts = this.params.points.value;
+        if (pts.length === 0) {
+            return { left: 0, top: 0, right: 0, bottom: 0 };
+        }
+        let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+        for (const p of pts) {
+            const px = p.value.x + this.params.x.value;
+            const py = p.value.y + this.params.y.value;
+            left = Math.min(left, px);
+            top = Math.min(top, py);
+            right = Math.max(right, px);
+            bottom = Math.max(bottom, py);
+        }
+        return { left, top, right, bottom };
+    }
 }

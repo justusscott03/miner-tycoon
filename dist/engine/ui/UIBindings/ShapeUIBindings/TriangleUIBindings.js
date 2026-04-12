@@ -57,4 +57,17 @@ triangle(${point1.value.x + x.value}, ${point1.value.y + y.value}, ${point2.valu
         const A3 = area(a, b, p);
         return Math.abs(A - (A1 + A2 + A3)) < 0.1;
     }
+    getBounds() {
+        const { x, y, point1, point2, point3 } = this.params;
+        const points = [
+            { x: point1.value.x + x.value, y: point1.value.y + y.value },
+            { x: point2.value.x + x.value, y: point2.value.y + y.value },
+            { x: point3.value.x + x.value, y: point3.value.y + y.value }
+        ];
+        const left = Math.min(...points.map(p => p.x));
+        const right = Math.max(...points.map(p => p.x));
+        const top = Math.min(...points.map(p => p.y));
+        const bottom = Math.max(...points.map(p => p.y));
+        return { left, top, right, bottom };
+    }
 }

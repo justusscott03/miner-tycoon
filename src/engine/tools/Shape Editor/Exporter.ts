@@ -1,10 +1,11 @@
-import { ShapeUIBindings } from "../../ui/UIBindings/ShapeUIBindings.js";
+import { BaseLayer } from "./Layers/BaseLayer.js";
+import { Layer } from "./Layers/Layer.js";
 
 export class Exporter {
     constructor(
         private output: HTMLPreElement,
         private button: HTMLButtonElement,
-        private shapes: ShapeUIBindings<any>[]
+        private layers: BaseLayer[]
     ) {}
 
     init() {
@@ -15,6 +16,9 @@ export class Exporter {
     }
 
     exportCode(): string {
-        return this.shapes.map(s => s.toCode()).join("\n");
+        return this.layers
+            .filter(l => l instanceof Layer)
+            .map(l => (l as Layer).shape.toCode())
+            .join("\n");
     }
 }

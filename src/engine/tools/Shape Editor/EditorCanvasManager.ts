@@ -1,22 +1,22 @@
 export class EditorCanvasManager {
     ctx: CanvasRenderingContext2D;
+    isMouseDown = false;
 
     constructor(public canvas: HTMLCanvasElement) {
         this.ctx = canvas.getContext("2d")!;
-        this.resize();
+        requestAnimationFrame(() => this.resize());
 
-        // Resize when layout changes
         window.addEventListener("resize", () => this.resize());
     }
 
     resize() {
-        // Match canvas internal resolution to its displayed size
         const rect = this.canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
     }
 
-    // Utility to convert mouse event → canvas coordinates
     getMousePos(e: MouseEvent) {
         const rect = this.canvas.getBoundingClientRect();
         return {
@@ -27,23 +27,38 @@ export class EditorCanvasManager {
 
     onClick(handler: (mouse: { x: number; y: number }) => void) {
         this.canvas.addEventListener("click", e => {
+            e.preventDefault();
+            handler(this.getMousePos(e));
+        });
+    }
+
+    onRightClick(handler: (mouse: { x: number; y: number }) => void) {
+        this.canvas.addEventListener("contextmenu", e => {
+            e.preventDefault();
             handler(this.getMousePos(e));
         });
     }
 
     onMouseDown(handler: (mouse: { x: number; y: number }) => void) {
         this.canvas.addEventListener("mousedown", e => {
+            e.preventDefault();
+            this.isMouseDown = true;
             handler(this.getMousePos(e));
         });
     }
 
     onMouseMove(handler: (mouse: { x: number; y: number }) => void) {
         this.canvas.addEventListener("mousemove", e => {
+            e.preventDefault();
             handler(this.getMousePos(e));
         });
     }
 
     onMouseUp(handler: () => void) {
-        window.addEventListener("mouseup", handler);
+        window.addEventListener("mouseup", e => {
+            e.preventDefault();
+            this.isMouseDown = false;
+            handler();
+        });
     }
 }
