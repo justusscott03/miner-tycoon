@@ -53,4 +53,14 @@ ellipse(${x.value}, ${y.value}, ${w.value}, ${h.value});`;
             bottom: y.value + h.value / 2
         };
     }
+    scaleFromBounds(oldB, newB) {
+        const newWidth = newB.right - newB.left;
+        const newHeight = newB.bottom - newB.top;
+        const cx = newB.left + newWidth / 2;
+        const cy = newB.top + newHeight / 2;
+        this.params.x.value = cx;
+        this.params.y.value = cy;
+        this.params.w.value = newWidth;
+        this.params.h.value = newHeight;
+    }
 }

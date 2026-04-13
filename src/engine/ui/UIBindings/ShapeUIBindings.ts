@@ -1,6 +1,7 @@
 import { ColorUI } from "./TypeUIBindings/ColorUI.js";
 import { NumberUI } from "./TypeUIBindings/NumberUI.js";
 import { ParamUI } from "./ParamUI.js";
+import { Bounds } from "../../tools/Shape Editor/Layers/BaseLayer.js";
 
 export interface BaseParams {
     x: NumberUI;
@@ -36,7 +37,10 @@ export abstract class ShapeUIBindings<TParams extends BaseParams> {
     abstract toCode(): string;
     abstract render(ctx: CanvasRenderingContext2D): void;
     abstract hitTest(point: { x: number; y: number }): boolean;
-    abstract getBounds(): { left: number; top: number; right: number; bottom: number };
+    abstract getBounds(): Bounds;
+    abstract scaleFromBounds(oldB: Bounds, newB: Bounds, frozen: any): void;
+
+    freezeLocalGeometry(): any {}
 }
 
 

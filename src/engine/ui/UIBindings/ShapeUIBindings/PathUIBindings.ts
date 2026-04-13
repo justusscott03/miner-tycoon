@@ -4,6 +4,7 @@ import { Vector2UI } from "../TypeUIBindings/Vector2UI.js";
 import { NumberUI } from "../TypeUIBindings/NumberUI.js";
 import { ColorUI } from "../TypeUIBindings/ColorUI.js";
 import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
+import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer.js";
 
 interface PathParams extends BaseParams {
     points: ListUI<Vector2UI>;
@@ -138,6 +139,32 @@ export class PathUIBindings extends ShapeUIBindings<PathParams> {
         }
 
         return { left, top, right, bottom };
+    }
+
+    freezeLocalGeometry(): any {
+        return {
+            offsetX: this.params.x.value,
+            offsetY: this.params.y.value,
+            points: this.params.points.value.map(p => ({ x: p.value.x, y: p.value.y }))
+        };
+    }
+
+    scaleFromBounds(oldB: Bounds, newB: Bounds, frozen: any): void {
+        const sx = (newB.right - newB.left) / (oldB.right - oldB.left);
+        const sy = (newB.bottom - newB.top) / (oldB.bottom - oldB.top);
+
+        const { offsetX, offsetY, points } = frozen;
+
+        this.params.points.value.forEach((p, i) => {
+            const worldX = points[i].x + offsetX;
+            const worldY = points[i].y + offsetY;
+
+            const scaledX = newB.left + (worldX - oldB.left) * sx;
+            const scaledY = newB.top + (worldY - oldB.top) * sy;
+
+            p.value.x = scaledX - offsetX;
+            p.value.y = scaledY - offsetY;
+        });
     }
 
 }

@@ -2,6 +2,7 @@ import { NumberUI } from "../TypeUIBindings/NumberUI.js";
 import { ColorUI } from "../TypeUIBindings/ColorUI.js";
 import { BaseParams, ShapeUIBindings } from "../ShapeUIBindings.js";
 import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
+import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer.js";
 
 interface RectParams extends BaseParams {
     w: NumberUI;
@@ -62,7 +63,7 @@ rect(${x.value}, ${y.value}, ${w.value}, ${h.value}, ${radius.value});`;
         );
     }
 
-    getBounds(): { left: number; top: number; right: number; bottom: number; } {
+    getBounds(): Bounds {
         const { x, y, w, h } = this.params;
         return {
             left: x.value,
@@ -70,5 +71,12 @@ rect(${x.value}, ${y.value}, ${w.value}, ${h.value}, ${radius.value});`;
             right: x.value + w.value,
             bottom: y.value + h.value
         };
+    }
+
+    scaleFromBounds(oldB: Bounds, newB: Bounds): void {
+        this.params.x.value = newB.left;
+        this.params.y.value = newB.top;
+        this.params.w.value = newB.right - newB.left;
+        this.params.h.value = newB.bottom - newB.top;
     }
 }

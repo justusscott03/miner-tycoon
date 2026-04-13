@@ -31,4 +31,32 @@ export class GroupLayer extends BaseLayer {
         }
         return { left, top, right, bottom };
     }
+    freezeLocalGeometry() {
+        return this.children.map(child => ({
+            child,
+            frozen: child.freezeLocalGeometry()
+        }));
+    }
+    scaleFromBounds(oldB, newB, frozenLocal) {
+        const sx = (newB.right - newB.left) / (oldB.right - oldB.left);
+        const sy = (newB.bottom - newB.top) / (oldB.bottom - oldB.top);
+        frozenLocal.forEach((entry) => {
+            const child = entry.child;
+            const frozen = entry.frozen;
+            const cb = child.getBounds();
+            const childOld = {
+                left: cb.left,
+                top: cb.top,
+                right: cb.right,
+                bottom: cb.bottom
+            };
+            const newChild = {
+                left: newB.left + (childOld.left - oldB.left) * sx,
+                top: newB.top + (childOld.top - oldB.top) * sy,
+                right: newB.left + (childOld.right - oldB.left) * sx,
+                bottom: newB.top + (childOld.bottom - oldB.top) * sy
+            };
+            child.scaleFromBounds(childOld, newChild, frozen);
+        });
+    }
 }

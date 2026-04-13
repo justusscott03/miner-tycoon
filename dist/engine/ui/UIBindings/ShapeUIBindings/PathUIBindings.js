@@ -104,4 +104,24 @@ export class PathUIBindings extends ShapeUIBindings {
         }
         return { left, top, right, bottom };
     }
+    freezeLocalGeometry() {
+        return {
+            offsetX: this.params.x.value,
+            offsetY: this.params.y.value,
+            points: this.params.points.value.map(p => ({ x: p.value.x, y: p.value.y }))
+        };
+    }
+    scaleFromBounds(oldB, newB, frozen) {
+        const sx = (newB.right - newB.left) / (oldB.right - oldB.left);
+        const sy = (newB.bottom - newB.top) / (oldB.bottom - oldB.top);
+        const { offsetX, offsetY, points } = frozen;
+        this.params.points.value.forEach((p, i) => {
+            const worldX = points[i].x + offsetX;
+            const worldY = points[i].y + offsetY;
+            const scaledX = newB.left + (worldX - oldB.left) * sx;
+            const scaledY = newB.top + (worldY - oldB.top) * sy;
+            p.value.x = scaledX - offsetX;
+            p.value.y = scaledY - offsetY;
+        });
+    }
 }

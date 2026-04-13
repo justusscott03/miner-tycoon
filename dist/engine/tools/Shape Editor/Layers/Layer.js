@@ -8,4 +8,10 @@ export class Layer extends BaseLayer {
     getBounds() {
         return this.shape.getBounds();
     }
+    freezeLocalGeometry() {
+        return this.shape.freezeLocalGeometry();
+    }
+    scaleFromBounds(oldB, newB, frozenLocal) {
+        this.shape.scaleFromBounds(oldB, newB, frozenLocal);
+    }
 }

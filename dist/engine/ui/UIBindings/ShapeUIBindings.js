@@ -11,4 +11,5 @@ export class ShapeUIBindings {
         cloned.params = newParams;
         return cloned;
     }
+    freezeLocalGeometry() { }
 }

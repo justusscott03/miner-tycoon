@@ -53,4 +53,10 @@ rect(${x.value}, ${y.value}, ${w.value}, ${h.value}, ${radius.value});`;
             bottom: y.value + h.value
         };
     }
+    scaleFromBounds(oldB, newB) {
+        this.params.x.value = newB.left;
+        this.params.y.value = newB.top;
+        this.params.w.value = newB.right - newB.left;
+        this.params.h.value = newB.bottom - newB.top;
+    }
 }

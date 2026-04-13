@@ -2,6 +2,7 @@ import { NumberUI } from "../TypeUIBindings/NumberUI.js";
 import { ColorUI } from "../TypeUIBindings/ColorUI.js";
 import { BaseParams, ShapeUIBindings } from "../ShapeUIBindings.js";
 import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
+import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer.js";
 
 interface EllipseParams extends BaseParams {
     w: NumberUI;
@@ -65,7 +66,7 @@ ellipse(${x.value}, ${y.value}, ${w.value}, ${h.value});`;
         return (dx*dx) / (rx*rx) + (dy*dy) / (ry*ry) <= 1;
     }
 
-    getBounds() {
+    getBounds(): Bounds {
         const { x, y, w, h } = this.params;
 
         return {
@@ -76,4 +77,16 @@ ellipse(${x.value}, ${y.value}, ${w.value}, ${h.value});`;
         };
     }
 
+    scaleFromBounds(oldB: Bounds, newB: Bounds): void {
+        const newWidth = newB.right - newB.left;
+        const newHeight = newB.bottom - newB.top;
+
+        const cx = newB.left + newWidth / 2;
+        const cy = newB.top + newHeight / 2;
+
+        this.params.x.value = cx;
+        this.params.y.value = cy;
+        this.params.w.value = newWidth;
+        this.params.h.value = newHeight;
+    }
 }

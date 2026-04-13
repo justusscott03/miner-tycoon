@@ -70,4 +70,29 @@ triangle(${point1.value.x + x.value}, ${point1.value.y + y.value}, ${point2.valu
         const bottom = Math.max(...points.map(p => p.y));
         return { left, top, right, bottom };
     }
+    freezeLocalGeometry() {
+        return {
+            offsetX: this.params.x.value,
+            offsetY: this.params.y.value,
+            points: [
+                { x: this.params.point1.value.x, y: this.params.point1.value.y },
+                { x: this.params.point2.value.x, y: this.params.point2.value.y },
+                { x: this.params.point3.value.x, y: this.params.point3.value.y }
+            ]
+        };
+    }
+    scaleFromBounds(oldB, newB, frozen) {
+        const sx = (newB.right - newB.left) / (oldB.right - oldB.left);
+        const sy = (newB.bottom - newB.top) / (oldB.bottom - oldB.top);
+        const { offsetX, offsetY, points } = frozen;
+        const params = [this.params.point1, this.params.point2, this.params.point3];
+        params.forEach((param, i) => {
+            const worldX = points[i].x + offsetX;
+            const worldY = points[i].y + offsetY;
+            const scaledX = newB.left + (worldX - oldB.left) * sx;
+            const scaledY = newB.top + (worldY - oldB.top) * sy;
+            param.value.x = scaledX - offsetX;
+            param.value.y = scaledY - offsetY;
+        });
+    }
 }

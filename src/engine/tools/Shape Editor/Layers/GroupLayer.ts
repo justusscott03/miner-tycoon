@@ -1,4 +1,4 @@
-import { BaseLayer } from "./BaseLayer.js";
+import { BaseLayer, Bounds } from "./BaseLayer.js";
 
 export class GroupLayer extends BaseLayer {
     children: BaseLayer[] = [];
@@ -23,7 +23,7 @@ export class GroupLayer extends BaseLayer {
         }
     }
 
-    getBounds() {
+    getBounds(): Bounds {
         if (this.children.length === 0) {
             return { left: 0, top: 0, right: 0, bottom: 0 };
         }
@@ -41,4 +41,37 @@ export class GroupLayer extends BaseLayer {
         return { left, top, right, bottom };
     }
 
+    freezeLocalGeometry() {
+        return this.children.map(child => ({
+            child,
+            frozen: child.freezeLocalGeometry()
+        }));
+    }
+
+    scaleFromBounds(oldB: Bounds, newB: Bounds, frozenLocal: any) {
+        const sx = (newB.right - newB.left) / (oldB.right - oldB.left);
+        const sy = (newB.bottom - newB.top) / (oldB.bottom - oldB.top);
+
+        frozenLocal.forEach((entry: { child: BaseLayer; frozen: any }) => {
+            const child = entry.child;
+            const frozen = entry.frozen;
+
+            const cb = child.getBounds();
+            const childOld: Bounds = {
+                left: cb.left,
+                top: cb.top,
+                right: cb.right,
+                bottom: cb.bottom
+            };
+
+            const newChild: Bounds = {
+                left: newB.left + (childOld.left - oldB.left) * sx,
+                top:  newB.top  + (childOld.top  - oldB.top)  * sy,
+                right: newB.left + (childOld.right - oldB.left) * sx,
+                bottom: newB.top + (childOld.bottom - oldB.top) * sy
+            };
+
+            child.scaleFromBounds(childOld, newChild, frozen);
+        });
+    }
 }
