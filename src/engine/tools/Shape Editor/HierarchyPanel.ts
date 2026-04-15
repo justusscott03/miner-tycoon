@@ -4,8 +4,8 @@ import { GroupLayer } from "./Layers/GroupLayer.js";
 
 export class HierarchyPanel {
     private _layers: BaseLayer[] = [];
-    private _selected: BaseLayer | null = null;
-    private _onSelect!: (layer: BaseLayer) => void;
+    private _selected: BaseLayer[] = [];
+    private _onSelect!: (layer: BaseLayer, shift: boolean) => void;
     private _onMove!: (draggedId: string, targetId: string | null) => void;
     private _onContext!: (x: number, y: number, layer: BaseLayer) => void;
 
@@ -13,8 +13,8 @@ export class HierarchyPanel {
 
     render(
         layers: BaseLayer[],
-        selected: BaseLayer | null,
-        onSelect: (layer: BaseLayer) => void,
+        selected: BaseLayer[],
+        onSelect: (layer: BaseLayer, shift: boolean) => void,
         onMove: (draggedId: string, targetId: string | null) => void,
         onContext: (x: number, y: number, layer: BaseLayer) => void
     ) {
@@ -68,10 +68,13 @@ export class HierarchyPanel {
         item.appendChild(label);
 
         // Highlight selected
-        if (node === this._selected) item.classList.add("selected");
+        if (this._selected.includes(node)) item.classList.add("selected");
 
         // Click to select
-        item.onclick = () => this._onSelect(node);
+        item.onclick = (e) => {
+            const shift = e.shiftKey;
+            this._onSelect(node, shift);
+        };
 
         // Right-click
         item.oncontextmenu = e => {

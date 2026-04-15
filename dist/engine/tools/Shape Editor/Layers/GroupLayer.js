@@ -31,25 +31,22 @@ export class GroupLayer extends BaseLayer {
         }
         return { left, top, right, bottom };
     }
+    // ⭐ FIXED: store each child's original bounds
     freezeLocalGeometry() {
         return this.children.map(child => ({
             child,
-            frozen: child.freezeLocalGeometry()
+            frozen: child.freezeLocalGeometry(),
+            childBounds: child.getBounds() // ← original bounds snapshot
         }));
     }
+    // ⭐ FIXED: use frozen childBounds instead of live getBounds()
     scaleFromBounds(oldB, newB, frozenLocal) {
         const sx = (newB.right - newB.left) / (oldB.right - oldB.left);
         const sy = (newB.bottom - newB.top) / (oldB.bottom - oldB.top);
         frozenLocal.forEach((entry) => {
             const child = entry.child;
             const frozen = entry.frozen;
-            const cb = child.getBounds();
-            const childOld = {
-                left: cb.left,
-                top: cb.top,
-                right: cb.right,
-                bottom: cb.bottom
-            };
+            const childOld = entry.childBounds; // ← use frozen bounds
             const newChild = {
                 left: newB.left + (childOld.left - oldB.left) * sx,
                 top: newB.top + (childOld.top - oldB.top) * sy,

@@ -2,7 +2,7 @@ export class HierarchyPanel {
     constructor(container) {
         this.container = container;
         this._layers = [];
-        this._selected = null;
+        this._selected = [];
     }
     render(layers, selected, onSelect, onMove, onContext) {
         this._layers = layers;
@@ -47,10 +47,13 @@ export class HierarchyPanel {
         label.textContent = node.name;
         item.appendChild(label);
         // Highlight selected
-        if (node === this._selected)
+        if (this._selected.includes(node))
             item.classList.add("selected");
         // Click to select
-        item.onclick = () => this._onSelect(node);
+        item.onclick = (e) => {
+            const shift = e.shiftKey;
+            this._onSelect(node, shift);
+        };
         // Right-click
         item.oncontextmenu = e => {
             e.preventDefault();

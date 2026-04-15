@@ -30,6 +30,7 @@ export const ShapeRegistry = {
 export class ShapeEditor {
     constructor(canvasId, toolbarId, inspectorId, hierarchyId, outputId, exportBtnId, contextMenuId) {
         this.layers = [];
+        this.isDraggingGizmo = false;
         const canvas = document.getElementById(canvasId);
         const ctx = canvas.getContext("2d");
         this.canvasManager = new EditorCanvasManager(canvas);
@@ -47,13 +48,17 @@ export class ShapeEditor {
     init() {
         this.toolManager.init();
         // Canvas click → create or select layers
-        this.canvasManager.onClick(mouse => {
+        this.canvasManager.onClick((mouse, e) => {
+            if (this.isDraggingGizmo) {
+                this.isDraggingGizmo = false;
+                return; // ← ignore click after drag
+            }
             const tool = this.toolManager.currentTool;
             // CREATE NEW LAYER
             if (tool !== "select") {
                 const layer = this.factory.create(tool, mouse.x, mouse.y);
                 this.layers.push(layer);
-                this.selection.select(layer);
+                this.selection.selectOne(layer);
                 this.refresh();
                 this.toolManager.currentTool = "select";
                 return;
@@ -61,7 +66,16 @@ export class ShapeEditor {
             // SELECT EXISTING LAYER
             const hit = this.findLayerAtPoint(mouse);
             if (hit) {
-                this.selection.select(hit);
+                if (e.shiftKey) {
+                    this.selection.toggle(hit);
+                }
+                else {
+                    this.selection.selectOne(hit);
+                }
+                this.refresh();
+            }
+            else {
+                this.selection.clear();
                 this.refresh();
             }
         });
@@ -90,8 +104,10 @@ export class ShapeEditor {
             const shape = this.selection.selected;
             if (shape) {
                 const used = this.gizmo.onMouseDown(mouse, shape);
-                if (used)
+                if (used) {
+                    this.isDraggingGizmo = true;
                     return;
+                }
             }
         });
         this.canvasManager.onMouseMove(mouse => {
@@ -99,18 +115,24 @@ export class ShapeEditor {
             if (shape)
                 this.gizmo.onMouseMove(mouse, shape);
         });
-        this.canvasManager.onMouseUp(() => this.gizmo.onMouseUp());
+        this.canvasManager.onMouseUp(() => {
+            this.gizmo.onMouseUp();
+            //this.isDraggingGizmo = false;
+        });
         this.refresh();
     }
     refresh() {
-        this.hierarchy.render(this.layers, this.selection.selected, layer => {
-            this.selection.select(layer);
+        this.hierarchy.render(this.layers, this.selection.selectedLayers, (layer, shift) => {
+            if (shift)
+                this.selection.toggle(layer);
+            else
+                this.selection.selectOne(layer);
             this.refresh();
         }, (draggedId, targetId) => {
             this.moveLayer(draggedId, targetId);
             this.refresh();
         }, (x, y, layer) => this.contextMenu.show(x, y, layer.id));
-        this.inspector.render(this.selection.selected);
+        this.inspector.render(this.selection.selectedLayers);
     }
     // --- Layer helpers -------------------------------------------------------
     findLayerAtPoint(mouse) {
@@ -158,8 +180,9 @@ export class ShapeEditor {
             if (index !== -1)
                 this.layers.splice(index, 1);
         }
-        if (this.selection.selected === layer)
+        if (this.selection.selectedLayers.includes(layer)) {
             this.selection.clear();
+        }
     }
     moveLayer(draggedId, targetId) {
         var _a;
@@ -190,8 +213,10 @@ export class ShapeEditor {
         const parentArray = parent instanceof GroupLayer ? parent.children : this.layers;
         const index = parentArray.indexOf(layer);
         parentArray.splice(index, 1, group);
-        group.add(layer);
-        this.selection.select(group);
+        for (const child of this.selection.selectedLayers) {
+            group.add(child);
+        }
+        this.selection.selectOne(group);
     }
 }
 document.addEventListener("DOMContentLoaded", () => {

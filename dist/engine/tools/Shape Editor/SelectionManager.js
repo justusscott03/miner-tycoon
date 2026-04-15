@@ -1,14 +1,43 @@
 import { Layer } from "./Layers/Layer.js";
 import { GroupLayer } from "./Layers/GroupLayer.js";
+import { SelectionLayer } from "./Layers/SelectionLayer.js";
 export class SelectionManager {
     constructor() {
-        this.selected = null;
+        this.selectedLayers = [];
+        this.selected = null; // single layer OR SelectionLayer
     }
-    select(layer) {
-        this.selected = layer;
+    // Select exactly one layer (normal click)
+    selectOne(layer) {
+        this.selectedLayers = [layer];
+        this.rebuildSelectionLayer();
     }
+    // Toggle selection (shift-click)
+    toggle(layer) {
+        const i = this.selectedLayers.indexOf(layer);
+        if (i === -1) {
+            this.selectedLayers.push(layer);
+        }
+        else {
+            this.selectedLayers.splice(i, 1);
+        }
+        this.rebuildSelectionLayer();
+    }
+    // Clear selection (click empty space)
     clear() {
+        this.selectedLayers = [];
         this.selected = null;
+    }
+    // Build the "selected" object used by the gizmo
+    rebuildSelectionLayer() {
+        if (this.selectedLayers.length === 0) {
+            this.selected = null;
+        }
+        else if (this.selectedLayers.length === 1) {
+            this.selected = this.selectedLayers[0];
+        }
+        else {
+            this.selected = new SelectionLayer([...this.selectedLayers]);
+        }
     }
     // Convenience helper: returns the shape if a leaf layer is selected
     get selectedShape() {

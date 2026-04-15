@@ -49,6 +49,8 @@ export class ShapeEditor {
     loop: RenderLoop;
     gizmo: TransformGizmo;
 
+    private isDraggingGizmo = false;
+
     constructor(
         canvasId: string,
         toolbarId: string,
@@ -87,14 +89,19 @@ export class ShapeEditor {
         this.toolManager.init();
 
         // Canvas click → create or select layers
-        this.canvasManager.onClick(mouse => {
+        this.canvasManager.onClick((mouse, e) => {
+            if (this.isDraggingGizmo) {
+                this.isDraggingGizmo = false;
+                return; // ← ignore click after drag
+            }
+
             const tool = this.toolManager.currentTool;
 
             // CREATE NEW LAYER
             if (tool !== "select") {
                 const layer = this.factory.create(tool as ShapeTypes, mouse.x, mouse.y);
                 this.layers.push(layer);
-                this.selection.select(layer);
+                this.selection.selectOne(layer);
                 this.refresh();
                 this.toolManager.currentTool = "select";
                 return;
@@ -103,7 +110,15 @@ export class ShapeEditor {
             // SELECT EXISTING LAYER
             const hit = this.findLayerAtPoint(mouse);
             if (hit) {
-                this.selection.select(hit);
+                if (e.shiftKey) {
+                    this.selection.toggle(hit);
+                } else {
+                    this.selection.selectOne(hit);
+                }
+                this.refresh();
+            }
+            else {
+                this.selection.clear();
                 this.refresh();
             }
         });
@@ -138,7 +153,10 @@ export class ShapeEditor {
             const shape = this.selection.selected;
             if (shape) {
                 const used = this.gizmo.onMouseDown(mouse, shape);
-                if (used) return;
+                if (used) {
+                    this.isDraggingGizmo = true;
+                    return;
+                }
             }
         });
 
@@ -147,7 +165,10 @@ export class ShapeEditor {
             if (shape) this.gizmo.onMouseMove(mouse, shape);
         });
 
-        this.canvasManager.onMouseUp(() => this.gizmo.onMouseUp());
+        this.canvasManager.onMouseUp(() => {
+            this.gizmo.onMouseUp();
+            //this.isDraggingGizmo = false;
+        });
 
         this.refresh();
     }
@@ -155,9 +176,10 @@ export class ShapeEditor {
     refresh() {
         this.hierarchy.render(
             this.layers,
-            this.selection.selected,
-            layer => {
-                this.selection.select(layer);
+            this.selection.selectedLayers,
+            (layer, shift) => {
+                if (shift) this.selection.toggle(layer);
+                else this.selection.selectOne(layer);
                 this.refresh();
             },
             (draggedId, targetId) => {
@@ -167,7 +189,7 @@ export class ShapeEditor {
             (x, y, layer) => this.contextMenu.show(x, y, layer.id)
         );
 
-        this.inspector.render(this.selection.selected);
+        this.inspector.render(this.selection.selectedLayers);
     }
 
     // --- Layer helpers -------------------------------------------------------
@@ -217,7 +239,9 @@ export class ShapeEditor {
             if (index !== -1) this.layers.splice(index, 1);
         }
 
-        if (this.selection.selected === layer) this.selection.clear();
+        if (this.selection.selectedLayers.includes(layer)) {
+            this.selection.clear();
+        }
     }
 
     moveLayer(draggedId: string, targetId: string | null) {
@@ -258,9 +282,11 @@ export class ShapeEditor {
         const index = parentArray.indexOf(layer);
         parentArray.splice(index, 1, group);
 
-        group.add(layer);
+        for (const child of this.selection.selectedLayers) {
+            group.add(child);
+        }
+        this.selection.selectOne(group);
 
-        this.selection.select(group);
     }
 }
 

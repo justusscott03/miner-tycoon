@@ -2,10 +2,20 @@ export class InspectorPanel {
     constructor(container) {
         this.container = container;
     }
-    render(layer) {
+    render(layers) {
         this.container.innerHTML = "<h2>Inspector</h2>";
-        if (!layer)
+        if (layers.length === 0) {
             return;
+        }
+        // MULTI-SELECT
+        if (layers.length > 1) {
+            const info = document.createElement("div");
+            info.textContent = `${layers.length} layers selected`;
+            this.container.appendChild(info);
+            return;
+        }
+        // SINGLE LAYER
+        const layer = layers[0];
         // Layer name
         const nameLabel = document.createElement("label");
         nameLabel.textContent = "Name:";

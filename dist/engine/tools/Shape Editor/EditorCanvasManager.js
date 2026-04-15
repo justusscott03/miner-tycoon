@@ -23,7 +23,7 @@ export class EditorCanvasManager {
     onClick(handler) {
         this.canvas.addEventListener("click", e => {
             e.preventDefault();
-            handler(this.getMousePos(e));
+            handler(this.getMousePos(e), e);
         });
     }
     onRightClick(handler) {

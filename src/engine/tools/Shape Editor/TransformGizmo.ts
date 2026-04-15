@@ -33,7 +33,7 @@ export class TransformGizmo {
         handles.forEach(h => ctx.fillRect(h.x, h.y, handleSize, handleSize));
     }
 
-    onMouseDown(mouse: { x: number; y: number }, layer: BaseLayer) {
+    onMouseDown(mouse: { x: number; y: number }, layer: BaseLayer): boolean {
         const b = layer.getBounds();
         const x = b.left;
         const y = b.top;

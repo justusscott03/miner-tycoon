@@ -41,34 +41,30 @@ export class GroupLayer extends BaseLayer {
         return { left, top, right, bottom };
     }
 
+    // ⭐ FIXED: store each child's original bounds
     freezeLocalGeometry() {
         return this.children.map(child => ({
             child,
-            frozen: child.freezeLocalGeometry()
+            frozen: child.freezeLocalGeometry(),
+            childBounds: child.getBounds() // ← original bounds snapshot
         }));
     }
 
+    // ⭐ FIXED: use frozen childBounds instead of live getBounds()
     scaleFromBounds(oldB: Bounds, newB: Bounds, frozenLocal: any) {
         const sx = (newB.right - newB.left) / (oldB.right - oldB.left);
         const sy = (newB.bottom - newB.top) / (oldB.bottom - oldB.top);
 
-        frozenLocal.forEach((entry: { child: BaseLayer; frozen: any }) => {
+        frozenLocal.forEach((entry: { child: BaseLayer; frozen: any; childBounds: Bounds }) => {
             const child = entry.child;
             const frozen = entry.frozen;
-
-            const cb = child.getBounds();
-            const childOld: Bounds = {
-                left: cb.left,
-                top: cb.top,
-                right: cb.right,
-                bottom: cb.bottom
-            };
+            const childOld = entry.childBounds; // ← use frozen bounds
 
             const newChild: Bounds = {
-                left: newB.left + (childOld.left - oldB.left) * sx,
-                top:  newB.top  + (childOld.top  - oldB.top)  * sy,
-                right: newB.left + (childOld.right - oldB.left) * sx,
-                bottom: newB.top + (childOld.bottom - oldB.top) * sy
+                left:   newB.left + (childOld.left   - oldB.left) * sx,
+                top:    newB.top  + (childOld.top    - oldB.top)  * sy,
+                right:  newB.left + (childOld.right  - oldB.left) * sx,
+                bottom: newB.top  + (childOld.bottom - oldB.top)  * sy
             };
 
             child.scaleFromBounds(childOld, newChild, frozen);

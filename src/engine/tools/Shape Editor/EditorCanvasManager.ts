@@ -25,10 +25,10 @@ export class EditorCanvasManager {
         };
     }
 
-    onClick(handler: (mouse: { x: number; y: number }) => void) {
+    onClick(handler: (mouse: { x: number; y: number }, e: MouseEvent) => void) {
         this.canvas.addEventListener("click", e => {
             e.preventDefault();
-            handler(this.getMousePos(e));
+            handler(this.getMousePos(e), e);
         });
     }
 

@@ -5,9 +5,23 @@ import { BaseLayer } from "./Layers/BaseLayer.js";
 export class InspectorPanel {
     constructor(private container: HTMLElement) {}
 
-    render(layer: BaseLayer | null) {
+    render(layers: BaseLayer[]) {
         this.container.innerHTML = "<h2>Inspector</h2>";
-        if (!layer) return;
+
+        if (layers.length === 0) {
+            return;
+        }
+
+        // MULTI-SELECT
+        if (layers.length > 1) {
+            const info = document.createElement("div");
+            info.textContent = `${layers.length} layers selected`;
+            this.container.appendChild(info);
+            return;
+        }
+
+        // SINGLE LAYER
+        const layer = layers[0];
 
         // Layer name
         const nameLabel = document.createElement("label");
