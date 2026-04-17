@@ -13,6 +13,12 @@ export class SelectionManager {
         this.rebuildSelectionLayer();
     }
 
+    // Select many layers at once (marquee, ctrl+A, etc.)
+    selectMany(layers: BaseLayer[]) {
+        this.selectedLayers = [...layers];
+        this.rebuildSelectionLayer();
+    }
+
     // Toggle selection (shift-click)
     toggle(layer: BaseLayer) {
         const i = this.selectedLayers.indexOf(layer);
@@ -22,6 +28,15 @@ export class SelectionManager {
             this.selectedLayers.splice(i, 1);
         }
         this.rebuildSelectionLayer();
+    }
+
+    // Remove a single layer from selection
+    remove(layer: BaseLayer) {
+        const i = this.selectedLayers.indexOf(layer);
+        if (i !== -1) {
+            this.selectedLayers.splice(i, 1);
+            this.rebuildSelectionLayer();
+        }
     }
 
     // Clear selection (click empty space)
@@ -49,5 +64,18 @@ export class SelectionManager {
     // Optional helper: is the selected item a group?
     get isGroupSelected() {
         return this.selected instanceof GroupLayer;
+    }
+
+    // ⭐ NEW: is multi-select active?
+    get hasMultiple() {
+        return this.selectedLayers.length > 1;
+    }
+
+    // ⭐ NEW: exactly one selected AND it's a group
+    get isSingleGroupSelected() {
+        return (
+            this.selectedLayers.length === 1 &&
+            this.selectedLayers[0] instanceof GroupLayer
+        );
     }
 }

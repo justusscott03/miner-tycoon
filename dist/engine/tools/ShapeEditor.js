@@ -84,16 +84,30 @@ export class ShapeEditor {
             const layer = this.findLayerById(layerId);
             if (!layer)
                 return;
+            // ⭐ NEW: multi-delete
             if (action === "delete") {
-                this.deleteLayer(layer);
+                if (this.selection.selectedLayers.length > 1) {
+                    this.deleteSelected();
+                }
+                else {
+                    this.deleteLayer(layer);
+                    this.selection.clear();
+                    this.refresh();
+                }
             }
+            // ⭐ NEW: rename (unchanged)
             if (action === "rename") {
                 const newName = prompt("Rename:", layer.name);
                 if (newName)
                     layer.name = newName;
             }
+            // ⭐ NEW: group multiple
             if (action === "group") {
-                this.groupLayer(layer);
+                this.groupSelected();
+            }
+            // ⭐ NEW: ungroup
+            if (action === "ungroup") {
+                this.ungroupSelected();
             }
             this.refresh();
         });
@@ -131,7 +145,7 @@ export class ShapeEditor {
         }, (draggedId, targetId) => {
             this.moveLayer(draggedId, targetId);
             this.refresh();
-        }, (x, y, layer) => this.contextMenu.show(x, y, layer.id));
+        }, (x, y, layer) => this.contextMenu.show(x, y, layer.id, this.selection.selectedLayers.length, layer instanceof GroupLayer));
         this.inspector.render(this.selection.selectedLayers);
     }
     // --- Layer helpers -------------------------------------------------------
@@ -206,17 +220,54 @@ export class ShapeEditor {
         parentArray.splice(index, 0, dragged);
         dragged.parent = (_a = target.parent) !== null && _a !== void 0 ? _a : null;
     }
-    groupLayer(layer) {
-        const parent = layer.parent;
+    // ⭐ NEW: delete all selected layers
+    deleteSelected() {
+        for (const layer of [...this.selection.selectedLayers]) {
+            this.deleteLayer(layer);
+        }
+        this.selection.clear();
+        this.refresh();
+    }
+    // ⭐ NEW: group all selected layers
+    groupSelected() {
+        const layers = this.selection.selectedLayers;
+        if (layers.length <= 1)
+            return;
+        const parent = layers[0].parent;
+        const parentArray = parent instanceof GroupLayer ? parent.children : this.layers;
+        const index = parentArray.indexOf(layers[0]);
         const group = new GroupLayer("Group");
         group.parent = parent !== null && parent !== void 0 ? parent : null;
-        const parentArray = parent instanceof GroupLayer ? parent.children : this.layers;
-        const index = parentArray.indexOf(layer);
+        // Replace first selected layer with the group
         parentArray.splice(index, 1, group);
-        for (const child of this.selection.selectedLayers) {
-            group.add(child);
+        // Move all selected layers into the group
+        for (const layer of layers) {
+            const i = parentArray.indexOf(layer);
+            if (i !== -1)
+                parentArray.splice(i, 1);
+            group.add(layer);
         }
         this.selection.selectOne(group);
+        this.refresh();
+    }
+    // ⭐ NEW: ungroup a selected group
+    ungroupSelected() {
+        if (!this.selection.isSingleGroupSelected)
+            return;
+        const group = this.selection.selectedLayers[0];
+        const parent = group.parent;
+        const parentArray = parent instanceof GroupLayer ? parent.children : this.layers;
+        let index = parentArray.indexOf(group);
+        // Remove group
+        parentArray.splice(index, 1);
+        // Insert children in its place
+        for (const child of [...group.children]) {
+            group.remove(child);
+            parentArray.splice(index++, 0, child);
+            child.parent = parent !== null && parent !== void 0 ? parent : null;
+        }
+        this.selection.selectMany([...group.children]);
+        this.refresh();
     }
 }
 document.addEventListener("DOMContentLoaded", () => {

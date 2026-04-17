@@ -1,3 +1,4 @@
+import { GroupLayer } from "./Layers/GroupLayer.js";
 export class HierarchyPanel {
     constructor(container) {
         this.container = container;
@@ -54,19 +55,28 @@ export class HierarchyPanel {
             const shift = e.shiftKey;
             this._onSelect(node, shift);
         };
-        // Right-click
+        // Right-click (now passes selection info)
         item.oncontextmenu = e => {
             e.preventDefault();
-            this._onContext(e.clientX, e.clientY, node);
+            this._onContext(e.clientX, e.clientY, node, this._selected.length, node instanceof GroupLayer);
         };
         // Drag-and-drop
         item.draggable = true;
-        item.ondragstart = e => e.dataTransfer.setData("layerId", node.id);
+        item.ondragstart = e => {
+            // If dragging a selected layer, drag ALL selected layers
+            const ids = this._selected.includes(node)
+                ? this._selected.map(l => l.id)
+                : [node.id];
+            e.dataTransfer.setData("layerIds", JSON.stringify(ids));
+        };
         item.ondragover = e => e.preventDefault();
         item.ondrop = e => {
             e.preventDefault();
-            const draggedId = e.dataTransfer.getData("layerId");
-            this._onMove(draggedId, node.id);
+            const ids = JSON.parse(e.dataTransfer.getData("layerIds"));
+            // Move each dragged layer above the drop target
+            ids.forEach(id => {
+                this._onMove(id, node.id);
+            });
         };
         this.container.appendChild(item);
         // Render children if expanded

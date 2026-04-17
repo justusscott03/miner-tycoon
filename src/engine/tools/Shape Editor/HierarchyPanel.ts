@@ -1,5 +1,4 @@
 import { BaseLayer } from "./Layers/BaseLayer.js";
-import { Layer } from "./Layers/Layer.js";
 import { GroupLayer } from "./Layers/GroupLayer.js";
 
 export class HierarchyPanel {
@@ -7,7 +6,7 @@ export class HierarchyPanel {
     private _selected: BaseLayer[] = [];
     private _onSelect!: (layer: BaseLayer, shift: boolean) => void;
     private _onMove!: (draggedId: string, targetId: string | null) => void;
-    private _onContext!: (x: number, y: number, layer: BaseLayer) => void;
+    private _onContext!: (x: number, y: number, layer: BaseLayer, selectionCount: number, isGroup: boolean) => void;
 
     constructor(private container: HTMLElement) {}
 
@@ -16,7 +15,7 @@ export class HierarchyPanel {
         selected: BaseLayer[],
         onSelect: (layer: BaseLayer, shift: boolean) => void,
         onMove: (draggedId: string, targetId: string | null) => void,
-        onContext: (x: number, y: number, layer: BaseLayer) => void
+        onContext: (x: number, y: number, layer: BaseLayer, selectionCount: number, isGroup: boolean) => void
     ) {
         this._layers = layers;
         this._selected = selected;
@@ -76,20 +75,40 @@ export class HierarchyPanel {
             this._onSelect(node, shift);
         };
 
-        // Right-click
+        // Right-click (now passes selection info)
         item.oncontextmenu = e => {
             e.preventDefault();
-            this._onContext(e.clientX, e.clientY, node);
+            this._onContext(
+                e.clientX,
+                e.clientY,
+                node,
+                this._selected.length,
+                node instanceof GroupLayer
+            );
         };
 
         // Drag-and-drop
         item.draggable = true;
-        item.ondragstart = e => e.dataTransfer!.setData("layerId", node.id);
+
+        item.ondragstart = e => {
+            // If dragging a selected layer, drag ALL selected layers
+            const ids = this._selected.includes(node)
+                ? this._selected.map(l => l.id)
+                : [node.id];
+
+            e.dataTransfer!.setData("layerIds", JSON.stringify(ids));
+        };
+
         item.ondragover = e => e.preventDefault();
+
         item.ondrop = e => {
             e.preventDefault();
-            const draggedId = e.dataTransfer!.getData("layerId");
-            this._onMove(draggedId, node.id);
+            const ids = JSON.parse(e.dataTransfer!.getData("layerIds")) as string[];
+
+            // Move each dragged layer above the drop target
+            ids.forEach(id => {
+                this._onMove(id, node.id);
+            });
         };
 
         this.container.appendChild(item);
