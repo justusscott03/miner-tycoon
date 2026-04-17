@@ -1,4 +1,4 @@
-import { BaseLayer, Bounds } from "./BaseLayer.js";
+import { BaseLayer, Bounds } from "./BaseLayer";
 
 export class GroupLayer extends BaseLayer {
     children: BaseLayer[] = [];

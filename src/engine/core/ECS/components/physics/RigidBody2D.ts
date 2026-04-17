@@ -1,6 +1,6 @@
-import { Component } from "../../main/Component.js";
-import { Time } from "../../../../helpers/TimeManager.js";
-import { Physics2D } from "../../../../config/Physics2D.js"; // We'll define this next
+import { Component } from "../../main/Component";
+import { Time } from "../../../../helpers/TimeManager";
+import { Physics2D } from "../../../../config/Physics2D"; // We'll define this next
 
 export class RigidBody2D extends Component {
     linearVelocity = { x: 0, y: 0 };

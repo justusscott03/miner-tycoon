@@ -1,4 +1,4 @@
-import { BaseLayer, Bounds } from "./Layers/BaseLayer.js";
+import { BaseLayer, Bounds } from "./Layers/BaseLayer";
 
 export class TransformGizmo {
     private dragging = false;

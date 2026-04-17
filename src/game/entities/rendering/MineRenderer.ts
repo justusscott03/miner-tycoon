@@ -1,23 +1,23 @@
-// src/rendering/MineRenderer.js
+// src/rendering/MineRenderer
 
-import { pushMatrix, translate, popMatrix } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/transformation.js";
-import { fill, noStroke, strokeWeight, stroke } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { image, rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { beginShape, vertex, endShape } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/complexShapes.js";
-import { textAlign, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
+import { pushMatrix, translate, popMatrix } from "../../../engine/lib/transformation";
+import { fill, noStroke, strokeWeight, stroke } from "../../../engine/lib/colors";
+import { image, rect } from "../../../engine/lib/shapes";
+import { beginShape, vertex, endShape } from "../../../engine/lib/complexShapes";
+import { textAlign, text } from "../../../engine/lib/text";
 
-import { ShaftRenderer } from "./ShaftRenderer.js";
-import { ElevatorRenderer } from "./ElevatorRenderer.js";
-import { StorehouseRenderer } from "./StorehouseRenderer.js";
-import { WarehouseRenderer } from "./WarehouseRenderer.js";
-import { CarrierRenderer } from "./CarrierRenderer.js";
+import { ShaftRenderer } from "./ShaftRenderer";
+import { ElevatorRenderer } from "./ElevatorRenderer";
+import { StorehouseRenderer } from "./StorehouseRenderer";
+import { WarehouseRenderer } from "./WarehouseRenderer";
+import { CarrierRenderer } from "./CarrierRenderer";
 
-import { ImageManager } from "../../../engine/helpers/ImageManager.js";
-import { MoneyState } from "../../state/MoneyState.js";
+import { ImageManager } from "../../../engine/helpers/ImageManager";
+import { MoneyState } from "../../state/MoneyState";
 
-import { MineState } from "../state/MineState.js";
-import { CanvasManager } from "../../../engine/helpers/CanvasManager.js";
-import { UserInput } from "../../../engine/ui/UserInput.js";
+import { MineState } from "../state/MineState";
+import { CanvasManager } from "../../../engine/helpers/CanvasManager";
+import { UserInput } from "../../../engine/ui/UserInput";
 
 export class MineRenderer {
     state: MineState;

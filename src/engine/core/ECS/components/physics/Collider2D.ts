@@ -1,4 +1,4 @@
-import { Component } from "../../main/Component.js";
+import { Component } from "../../main/Component";
 
 export class Collider2D extends Component {
     isTrigger = false;

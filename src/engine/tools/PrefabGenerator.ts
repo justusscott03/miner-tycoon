@@ -1,8 +1,8 @@
-import { ComponentRegistry } from "../config/ComponentRegistry.js";
-import { ImportMap } from "../config/ImportMap.js";
-import { ComponentDefinition } from "../core/ECS/main/Component.js";
-import { PathHelpers } from "../helpers/PathHelpers.js";
-import { ParamUI } from "../ui/UIBindings/ParamUI.js";
+import { ComponentRegistry } from "../config/ComponentRegistry";
+import { ImportMap } from "../config/ImportMap";
+import { ComponentDefinition } from "../core/ECS/main/Component";
+import { PathHelpers } from "../helpers/PathHelpers";
+import { ParamUI } from "../ui/UIBindings/ParamUI";
 
 const prefabOutputPath = "src/game/prefabs/";
 

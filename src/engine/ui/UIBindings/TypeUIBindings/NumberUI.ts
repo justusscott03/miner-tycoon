@@ -1,4 +1,4 @@
-import { ParamUI } from "../ParamUI.js";
+import { ParamUI } from "../ParamUI";
 
 export class NumberUI extends ParamUI<number> {
     render(onChange: (value: number) => void): HTMLElement {

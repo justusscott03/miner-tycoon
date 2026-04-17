@@ -1,15 +1,15 @@
-// src/rendering/ElevatorRenderer.js
+// src/rendering/ElevatorRenderer
 
-import { pushMatrix, translate, scale, popMatrix } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/transformation.js";
-import { noStroke, fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { rect, image } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { textAlign, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
-import { map } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
+import { pushMatrix, translate, scale, popMatrix } from "../../../engine/lib/transformation";
+import { noStroke, fill } from "../../../engine/lib/colors";
+import { rect, image } from "../../../engine/lib/shapes";
+import { textAlign, text } from "../../../engine/lib/text";
+import { map } from "../../../engine/lib/math";
 
-import { ImageManager } from "../../../engine/helpers/ImageManager.js";
+import { ImageManager } from "../../../engine/helpers/ImageManager";
 
-import { ElevatorStates } from "../../config/ElevatorStates.js";
-import { ElevatorState } from "../state/ElevatorState.js";
+import { ElevatorStates } from "../../config/ElevatorStates";
+import { ElevatorState } from "../state/ElevatorState";
 
 export class ElevatorRenderer {
     state: ElevatorState;

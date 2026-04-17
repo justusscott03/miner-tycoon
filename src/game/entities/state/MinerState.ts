@@ -1,8 +1,8 @@
 // src/engine/MinerState.ts
 
-import type { CrateState } from "./CrateState.js";
-import { MinerStates } from "../../config/MinerStates.js";
-import { Time } from "../../../engine/helpers/TimeManager.js";
+import type { CrateState } from "./CrateState";
+import { MinerStates } from "../../config/MinerStates";
+import { Time } from "../../../engine/helpers/TimeManager";
 
 export interface MinerSaveData {
     x: number;

@@ -1,9 +1,9 @@
 // src/engine/CarrierState.ts
 
-import { Time } from "../../../engine/helpers/TimeManager.js";
-import { CarrierStates } from "../../config/CarrierStates.js";
-import type { StorehouseState } from "./StorehouseState.js";
-import type { WarehouseState } from "./WarehouseState.js";
+import { Time } from "../../../engine/helpers/TimeManager";
+import { CarrierStates } from "../../config/CarrierStates";
+import type { StorehouseState } from "./StorehouseState";
+import type { WarehouseState } from "./WarehouseState";
 
 export interface CarrierSaveData {
     x: number;

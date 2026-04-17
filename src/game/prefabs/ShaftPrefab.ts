@@ -1,12 +1,11 @@
-import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior.js";
-import { MinerPrefab } from "../prefabs/MinerPrefab.js";
-import { CratePrefab } from "../prefabs/CratePrefab.js";
-import { TextUI } from "../../engine/core/ECS/components/ui/TextUI.js";
-import { MinerStates } from "../config/MinerStates.js";
-import { MinerBehavior } from "../entities/MinerBehavior.js";
-import { CrateBehavior } from "../entities/CrateBehavior.js";
-import { Prefab } from "../../engine/core/ECS/Prefab.js";
-import { SpriteRenderer } from "../../engine/core/ECS/components/SpriteRenderer.js";
+import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior";
+import { MinerPrefab } from "../prefabs/MinerPrefab";
+import { CratePrefab } from "../prefabs/CratePrefab";
+import { TextUI } from "../../engine/core/ECS/components/ui/TextUI";
+import { MinerBehavior } from "../entities/MinerBehavior";
+import { CrateBehavior } from "../entities/CrateBehavior";
+import { Prefab } from "../../engine/core/ECS/Prefab";
+import { SpriteRenderer } from "../../engine/core/ECS/components/SpriteRenderer";
 
 export interface ShaftSaveData {
     x: number;

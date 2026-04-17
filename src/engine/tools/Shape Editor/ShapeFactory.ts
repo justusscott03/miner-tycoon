@@ -1,5 +1,5 @@
-import { ShapeRegistry, ShapeTypes } from "../ShapeEditor.js";
-import { Layer } from "./Layers/Layer.js";
+import { ShapeRegistry, ShapeTypes } from "../ShapeEditor";
+import { Layer } from "./Layers/Layer";
 
 export class ShapeFactory {
     create(type: ShapeTypes, x: number, y: number): Layer {

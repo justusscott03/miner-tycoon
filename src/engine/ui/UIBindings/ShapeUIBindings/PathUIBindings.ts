@@ -1,10 +1,10 @@
-import { ShapeUIBindings, BaseParams } from "../ShapeUIBindings.js";
-import { ListUI } from "../ListUI.js";
-import { Vector2UI } from "../TypeUIBindings/Vector2UI.js";
-import { NumberUI } from "../TypeUIBindings/NumberUI.js";
-import { ColorUI } from "../TypeUIBindings/ColorUI.js";
-import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
-import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer.js";
+import { ShapeUIBindings, BaseParams } from "../ShapeUIBindings";
+import { ListUI } from "../ListUI";
+import { Vector2UI } from "../TypeUIBindings/Vector2UI";
+import { NumberUI } from "../TypeUIBindings/NumberUI";
+import { ColorUI } from "../TypeUIBindings/ColorUI";
+import { ColorHelpers } from "../../../helpers/ColorHelpers";
+import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer";
 
 interface PathParams extends BaseParams {
     points: ListUI<Vector2UI>;

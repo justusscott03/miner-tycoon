@@ -1,10 +1,10 @@
 // src/rendering/CarrierRenderer.js
 
-import { pushMatrix, translate, scale, popMatrix } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/transformation.js";
-import { fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { textAlign, textSize, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
-import { round, map } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
+import { pushMatrix, translate, scale, popMatrix } from "../../../engine/lib/transformation";
+import { fill } from "../../../engine/lib/colors";
+import { rect } from "../../../engine/lib/shapes";
+import { textAlign, textSize, text } from "../../../engine/lib/text";
+import { round, map } from "../../../engine/lib/math";
 
 import { CarrierStates } from "../../config/CarrierStates.js";
 import { CarrierState } from "../state/CarrierState.js";

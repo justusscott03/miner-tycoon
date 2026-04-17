@@ -1,7 +1,7 @@
-import { ColorUI } from "./TypeUIBindings/ColorUI.js";
-import { NumberUI } from "./TypeUIBindings/NumberUI.js";
-import { ParamUI } from "./ParamUI.js";
-import { Bounds } from "../../tools/Shape Editor/Layers/BaseLayer.js";
+import { ColorUI } from "./TypeUIBindings/ColorUI";
+import { NumberUI } from "./TypeUIBindings/NumberUI";
+import { ParamUI } from "./ParamUI";
+import { Bounds } from "../../tools/Shape Editor/Layers/BaseLayer";
 
 export interface BaseParams {
     x: NumberUI;

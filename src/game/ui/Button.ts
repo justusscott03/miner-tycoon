@@ -1,11 +1,11 @@
-import { noStroke, fill, strokeWeight, stroke, color } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { pushMatrix, translate, scale, popMatrix } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/transformation.js";
-import { image } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { textSize, textAlign, outlinedText, textFont } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
-import { lerp } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
+import { fill, strokeWeight, stroke, color } from "../../engine/lib/colors";
+import { pushMatrix, translate, scale, popMatrix } from "../../engine/lib/transformation";
+import { image } from "../../engine/lib/shapes";
+import { textSize, textAlign, outlinedText, textFont } from "../../engine/lib/text";
+import { lerp } from "../../engine/lib/math";
 
-import { ImageManager } from "../../engine/helpers/ImageManager.js";
-import { UserInput } from "../../engine/ui/UserInput.js";
+import { ImageManager } from "../../engine/helpers/ImageManager";
+import { UserInput } from "../../engine/ui/UserInput";
 
 export interface ButtonData {
     x: number;

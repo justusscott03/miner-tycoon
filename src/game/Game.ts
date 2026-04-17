@@ -1,15 +1,15 @@
-import { ScreenManager } from "../engine/helpers/ScreenManager.js";
-import { ImageManager } from "../engine/helpers/ImageManager.js";
-import { Database } from "../engine/helpers/Database.js";
-import { MoneySaveData, MoneyState } from "./state/MoneyState.js";
+import { ScreenManager } from "../engine/helpers/ScreenManager";
+import { ImageManager } from "../engine/helpers/ImageManager";
+import { Database } from "../engine/helpers/Database";
+import { MoneySaveData, MoneyState } from "./state/MoneyState";
 
-import { MineSaveData, MineState } from "./entities/state/MineState.js";
-import { MineRenderer } from "./entities/rendering/MineRenderer.js";
+import { MineSaveData, MineState } from "./entities/state/MineState";
+import { MineRenderer } from "./entities/rendering/MineRenderer";
 
-import { Button } from "./ui/Button.js";
+import { Button } from "./ui/Button";
 
-import { background } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { CanvasManager } from "../engine/helpers/CanvasManager.js";
+import { background } from "../engine/lib/colors";
+import { CanvasManager } from "../engine/helpers/CanvasManager";
 
 type GameSaveData = {
     id: string;

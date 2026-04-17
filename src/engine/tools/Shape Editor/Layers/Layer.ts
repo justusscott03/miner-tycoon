@@ -1,5 +1,5 @@
-import { ShapeUIBindings } from "../../../ui/UIBindings/ShapeUIBindings.js";
-import { BaseLayer, Bounds } from "./BaseLayer.js";
+import { ShapeUIBindings } from "../../../ui/UIBindings/ShapeUIBindings";
+import { BaseLayer, Bounds } from "./BaseLayer";
 
 export class Layer extends BaseLayer {
     constructor(name: string, public shape: ShapeUIBindings<any>) {

@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch"
+    "build": "webpack",
+    "dev": "webpack serve",
+    "watch": "webpack --watch"
   },
   "devDependencies": {
     "ts-loader": "^9.5.7",
@@ -25,5 +26,10 @@
   "bugs": {
     "url": "https://github.com/justusscott03/miner-tycoon/issues"
   },
-  "homepage": "https://github.com/justusscott03/miner-tycoon#readme"
+  "homepage": "https://github.com/justusscott03/miner-tycoon#readme",
+
+  "sideEffects": [
+    "src/engine/tools/PrefabGenerator.ts",
+    "src/engine/tools/ShapeEditor.ts"
+  ]
 }

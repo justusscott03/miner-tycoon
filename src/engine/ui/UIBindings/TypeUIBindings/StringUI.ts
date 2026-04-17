@@ -1,4 +1,4 @@
-import { ParamUI } from "../ParamUI.js";
+import { ParamUI } from "../ParamUI";
 
 export class StringUI extends ParamUI<string> {
     render(onChange: (value: string) => void): HTMLElement {

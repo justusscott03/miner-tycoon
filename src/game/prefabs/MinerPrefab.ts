@@ -1,4 +1,4 @@
-import { color } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
+import { color } from "../../engine/lib/colors";
 import { SpriteRenderer } from "../../engine/core/ECS/components/SpriteRenderer";
 import { ProgressBarUI } from "../../engine/core/ECS/components/ui/ProgressBarUI";
 import { Vector2 } from "../../engine/core/math/Vector2";

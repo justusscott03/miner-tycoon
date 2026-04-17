@@ -1,8 +1,8 @@
-import { BaseLayer } from "./Layers/BaseLayer.js";
-import { Layer } from "./Layers/Layer.js";
-import { GroupLayer } from "./Layers/GroupLayer.js";
-import { SelectionManager } from "./SelectionManager.js";
-import { TransformGizmo } from "./TransformGizmo.js";
+import { BaseLayer } from "./Layers/BaseLayer";
+import { Layer } from "./Layers/Layer";
+import { GroupLayer } from "./Layers/GroupLayer";
+import { SelectionManager } from "./SelectionManager";
+import { TransformGizmo } from "./TransformGizmo";
 
 export class RenderLoop {
     constructor(

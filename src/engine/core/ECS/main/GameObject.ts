@@ -1,6 +1,6 @@
-import { Component } from "./Component.js";
-import { Transform } from "../components/Transform.js";
-import { EngineObject } from "./EngineObject.js";
+import { Component } from "./Component";
+import { Transform } from "../components/Transform";
+import { EngineObject } from "./EngineObject";
 
 export class GameObject extends EngineObject {
     components: Component[] = [];

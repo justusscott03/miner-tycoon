@@ -1,10 +1,10 @@
-// src/rendering/StorehouseRenderer.js
+// src/rendering/StorehouseRenderer
 
-import { fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { textAlign, textSize, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
+import { fill } from "../../../engine/lib/colors";
+import { rect } from "../../../engine/lib/shapes";
+import { textAlign, textSize, text } from "../../../engine/lib/text";
 
-import { StorehouseState } from "../state/StorehouseState.js";
+import { StorehouseState } from "../state/StorehouseState";
 
 export class StorehouseRenderer {
     state: StorehouseState;

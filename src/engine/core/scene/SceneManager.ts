@@ -1,4 +1,4 @@
-import { Scene } from "./Scene.js";
+import { Scene } from "./Scene";
 
 export class SceneManager {
     private static _activeScene: Scene | null = null;

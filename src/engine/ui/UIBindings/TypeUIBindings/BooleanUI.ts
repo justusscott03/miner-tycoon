@@ -1,4 +1,4 @@
-import { ParamUI } from "../ParamUI.js";
+import { ParamUI } from "../ParamUI";
 
 export class BooleanUI extends ParamUI<boolean> {
     render(onChange: (value: boolean) => void): HTMLElement {

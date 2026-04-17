@@ -1,4 +1,4 @@
-import { ParamUI } from "./ParamUI.js";
+import { ParamUI } from "./ParamUI";
 
 export class ListUI<T extends ParamUI<any>> extends ParamUI<T[]> {
     constructor(defaultItems: T[] = []) {

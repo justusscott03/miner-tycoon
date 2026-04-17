@@ -1,4 +1,4 @@
-import { Behavior } from "./Behavior.js";
+import { Behavior } from "./Behavior";
 
 export class MonoBehavior extends Behavior {
     Awake(): void {}

@@ -1,10 +1,10 @@
-// src/ui/UpgradePageRenderer.js
+// src/ui/UpgradePageRenderer
 
-import { fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { pushMatrix, popMatrix, translate, scale } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/transformation.js";
+import { fill } from "../../../engine/lib/colors";
+import { rect } from "../../../engine/lib/shapes";
+import { pushMatrix, popMatrix, translate, scale } from "../../../engine/lib/transformation";
 
-import { UpgradePageState } from "../state/UpgradePageState.js";
+import { UpgradePageState } from "../state/UpgradePageState";
 
 export class UpgradePageRenderer {
     state: UpgradePageState;

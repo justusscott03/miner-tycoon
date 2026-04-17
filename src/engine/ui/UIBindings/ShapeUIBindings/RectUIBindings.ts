@@ -1,8 +1,8 @@
-import { NumberUI } from "../TypeUIBindings/NumberUI.js";
-import { ColorUI } from "../TypeUIBindings/ColorUI.js";
-import { BaseParams, ShapeUIBindings } from "../ShapeUIBindings.js";
-import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
-import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer.js";
+import { NumberUI } from "../TypeUIBindings/NumberUI";
+import { ColorUI } from "../TypeUIBindings/ColorUI";
+import { BaseParams, ShapeUIBindings } from "../ShapeUIBindings";
+import { ColorHelpers } from "../../../helpers/ColorHelpers";
+import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer";
 
 interface RectParams extends BaseParams {
     w: NumberUI;

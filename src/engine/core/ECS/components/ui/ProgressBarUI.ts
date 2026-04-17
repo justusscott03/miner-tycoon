@@ -1,14 +1,14 @@
-import { fill, noStroke } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { map } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
+import { fill, noStroke } from "../../../../lib/colors";
+import { rect } from "../../../../lib/shapes";
+import { map } from "../../../../lib/math";
 
-import { UIComponent } from "../UIComponent.js";
-import { Vector2 } from "../../../math/Vector2.js";
-import { ComponentDefinition } from "../../main/Component.js";
+import { UIComponent } from "../UIComponent";
+import { Vector2 } from "../../../math/Vector2";
+import { ComponentDefinition } from "../../main/Component";
 
-import { NumberUI } from "../../../../ui/UIBindings/TypeUIBindings/NumberUI.js";
-import { Vector2UI } from "../../../../ui/UIBindings/TypeUIBindings/Vector2UI.js";
-import { ColorUI } from "../../../../ui/UIBindings/TypeUIBindings/ColorUI.js";
+import { NumberUI } from "../../../../ui/UIBindings/TypeUIBindings/NumberUI";
+import { Vector2UI } from "../../../../ui/UIBindings/TypeUIBindings/Vector2UI";
+import { ColorUI } from "../../../../ui/UIBindings/TypeUIBindings/ColorUI";
 
 type ProgressBarUIValues = {
     fillColor: string;
@@ -19,7 +19,7 @@ type ProgressBarUIValues = {
 };
 
 export const ProgressBarUIDef: ComponentDefinition<ProgressBarUIValues> = {
-    import: "src/engine/core/ECS/components/ui/ProgressBarUI.js",
+    import: "src/engine/core/ECS/components/ui/ProgressBarUI",
 
     params: {
         fillColor: new ColorUI("#FF0000"),

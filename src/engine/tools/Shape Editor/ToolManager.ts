@@ -1,4 +1,4 @@
-import { ShapeTypes } from "../ShapeEditor.js";
+import { ShapeTypes } from "../ShapeEditor";
 
 export type ToolType = "select" | ShapeTypes;
 

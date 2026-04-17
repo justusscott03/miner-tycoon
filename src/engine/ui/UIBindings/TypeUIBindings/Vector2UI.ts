@@ -1,4 +1,4 @@
-import { ParamUI } from "../ParamUI.js";
+import { ParamUI } from "../ParamUI";
 
 export class Vector2UI extends ParamUI<{ x: number; y: number }> {
     render(onChange: (value: { x: number; y: number }) => void): HTMLElement {

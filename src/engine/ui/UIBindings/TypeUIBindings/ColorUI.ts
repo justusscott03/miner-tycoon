@@ -1,5 +1,5 @@
-import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
-import { ParamUI } from "../ParamUI.js";
+import { ColorHelpers } from "../../../helpers/ColorHelpers";
+import { ParamUI } from "../ParamUI";
 
 let colorUICounter = 0;
 

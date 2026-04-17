@@ -19,7 +19,7 @@ function roundRect (x: number, y: number, width: number, height: number, radius:
     ctx.stroke();
 }
 
-function rect (x: number, y: number, w: number, h: number, radius: number) {
+function rect (x: number, y: number, w: number, h: number, radius: number = 0) {
     let xPos = 0, yPos = 0, width = 0, height = 0;
 
     if (pjsSettings.curRectMode === "CORNER") {

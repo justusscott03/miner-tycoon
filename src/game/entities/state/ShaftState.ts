@@ -1,9 +1,9 @@
 // src/engine/ShaftState.ts
 
-import { CrateState } from "./CrateState.js";
-import { MinerState } from "./MinerState.js";
-import { MinerStates } from "../../config/MinerStates.js";
-import { UpgradeableState } from "./UpgradeableState.js";
+import { CrateState } from "./CrateState";
+import { MinerState } from "./MinerState";
+import { MinerStates } from "../../config/MinerStates";
+import { UpgradeableState } from "./UpgradeableState";
 
 export interface ShaftSaveData {
     x: number;

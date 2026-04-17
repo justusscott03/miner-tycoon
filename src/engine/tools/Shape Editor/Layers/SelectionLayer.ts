@@ -1,5 +1,5 @@
-import { GroupLayer } from "./GroupLayer.js";
-import { BaseLayer } from "./BaseLayer.js";
+import { GroupLayer } from "./GroupLayer";
+import { BaseLayer } from "./BaseLayer";
 
 export class SelectionLayer extends GroupLayer {
     constructor(layers: BaseLayer[]) {

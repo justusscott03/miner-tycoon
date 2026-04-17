@@ -1,5 +1,5 @@
-import { Component } from "../main/Component.js";
-import { Vector2 } from "../../math/Vector2.js";
+import { Component } from "../main/Component";
+import { Vector2 } from "../../math/Vector2";
 
 export class Transform extends Component {
     position: Vector2 = new Vector2(0, 0);      // local position

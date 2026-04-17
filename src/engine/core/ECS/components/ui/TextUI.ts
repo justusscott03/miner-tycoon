@@ -1,15 +1,15 @@
-import { UIComponent } from "../UIComponent.js";
-import { fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { textAlign, textSize, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
+import { UIComponent } from "../UIComponent";
+import { fill } from "../../../../lib/colors";
+import { textAlign, textSize, text, HorizontalAlign } from "../../../../lib/text";
 import { Vector2 } from "../../../math/Vector2.js";
 
 export class TextUI extends UIComponent {
     content = "";
     fontSize = 20;
     color = "#000000";
-    align = "LEFT"; // LEFT, CENTER, RIGHT
+    align: HorizontalAlign = "LEFT"; // LEFT, CENTER, RIGHT
 
-    initialize(content: string, fontSize: number, color: string, align: string, screenSpace: boolean = true, relativePositon: Vector2 = Vector2.zero) {
+    initialize(content: string, fontSize: number, color: string, align: HorizontalAlign, screenSpace: boolean = true, relativePositon: Vector2 = Vector2.zero) {
         this.content = content;
         this.fontSize = fontSize;
         this.color = color;

@@ -1,15 +1,15 @@
-// src/rendering/ShaftRenderer.js
+// src/rendering/ShaftRenderer
 
-import { fill, stroke } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { textAlign, text } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/text.js";
+import { fill, stroke } from "../../../engine/lib/colors";
+import { rect } from "../../../engine/lib/shapes";
+import { textAlign, text } from "../../../engine/lib/text";
 
-import { MinerRenderer } from "./MinerRenderer.js";
-//import { CrateRenderer } from "./CrateRenderer.js";
-import { UpgradeableRenderer } from "./UpgradeableRenderer.js";
+import { MinerRenderer } from "./MinerRenderer";
+//import { CrateRenderer } from "./CrateRenderer";
+import { UpgradeableRenderer } from "./UpgradeableRenderer";
 
-import { ShaftState } from "../state/ShaftState.js";
-import { CanvasManager } from "../../../engine/helpers/CanvasManager.js";
+import { ShaftState } from "../state/ShaftState";
+import { CanvasManager } from "../../../engine/helpers/CanvasManager";
 
 export class ShaftRenderer extends UpgradeableRenderer {
     protected state: ShaftState;

@@ -1,15 +1,15 @@
-// src/rendering/MinerRenderer.js
+// src/rendering/MinerRenderer
 
-import { pushMatrix, translate, scale, popMatrix } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/transformation.js";
-import { noStroke, fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { image, rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { map } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/math.js";
+import { pushMatrix, translate, scale, popMatrix } from "../../../engine/lib/transformation";
+import { noStroke, fill } from "../../../engine/lib/colors";
+import { image, rect } from "../../../engine/lib/shapes";
+import { map } from "../../../engine/lib/math";
 
-import { ImageManager } from "../../../engine/helpers/ImageManager.js";
-import { MinerStates } from "../../config/MinerStates.js";
+import { ImageManager } from "../../../engine/helpers/ImageManager";
+import { MinerStates } from "../../config/MinerStates";
 
-import { MinerState } from "../state/MinerState.js";
-import { Renderer } from "../../../engine/core/ECS/components/Renderer.js";
+import { MinerState } from "../state/MinerState";
+import { Renderer } from "../../../engine/core/ECS/components/Renderer";
 
 export class MinerRenderer extends Renderer {
     state!: MinerState;

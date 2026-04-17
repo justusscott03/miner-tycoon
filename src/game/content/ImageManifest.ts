@@ -1,9 +1,9 @@
-import { background, fill, strokeWeight, stroke, noStroke, gradient, color } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { get } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/other.js";
-import { rect, ellipse, quad } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { beginShape, vertex, endShape } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/complexShapes.js";
-import { ImageManager } from "../../engine/helpers/ImageManager.js";
-import { CanvasManager } from "../../engine/helpers/CanvasManager.js";
+import { background, fill, strokeWeight, stroke, noStroke, gradient, color } from "../../engine/lib/colors";
+import { get } from "../../engine/lib/other";
+import { rect, ellipse, quad } from "../../engine/lib/shapes";
+import { beginShape, vertex, endShape } from "../../engine/lib/complexShapes";
+import { ImageManager } from "../../engine/helpers/ImageManager";
+import { CanvasManager } from "../../engine/helpers/CanvasManager";
 
 export class ImageManifest {
     static registerImages() {

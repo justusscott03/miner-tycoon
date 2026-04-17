@@ -1,10 +1,10 @@
 // src/engine/MineState.ts
 
-import { ShaftState } from "./ShaftState.js";
-import { ElevatorState } from "./ElevatorState.js";
-import { StorehouseState } from "./StorehouseState.js";
-import { WarehouseState } from "./WarehouseState.js";
-import { CarrierState } from "./CarrierState.js";
+import { ShaftState } from "./ShaftState";
+import { ElevatorState } from "./ElevatorState";
+import { StorehouseState } from "./StorehouseState";
+import { WarehouseState } from "./WarehouseState";
+import { CarrierState } from "./CarrierState";
 
 export interface MineSaveData {
     y: number;

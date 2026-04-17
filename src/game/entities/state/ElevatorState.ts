@@ -1,9 +1,9 @@
 // src/engine/ElevatorState.ts
 
-import { Time } from "../../../engine/helpers/TimeManager.js";
-import { ElevatorStates } from "../../config/ElevatorStates.js";
-import type { CrateState } from "./CrateState.js";
-import type { StorehouseState } from "./StorehouseState.js";
+import { Time } from "../../../engine/helpers/TimeManager";
+import { ElevatorStates } from "../../config/ElevatorStates";
+import type { CrateState } from "./CrateState";
+import type { StorehouseState } from "./StorehouseState";
 
 export interface ElevatorSaveData {
     x: number;

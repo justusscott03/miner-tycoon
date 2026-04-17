@@ -1,7 +1,7 @@
-import { BaseLayer } from "./Layers/BaseLayer.js";
-import { Layer } from "./Layers/Layer.js";
-import { GroupLayer } from "./Layers/GroupLayer.js";
-import { SelectionLayer } from "./Layers/SelectionLayer.js";
+import { BaseLayer } from "./Layers/BaseLayer";
+import { Layer } from "./Layers/Layer";
+import { GroupLayer } from "./Layers/GroupLayer";
+import { SelectionLayer } from "./Layers/SelectionLayer";
 
 export class SelectionManager {
     selectedLayers: BaseLayer[] = [];

@@ -34,8 +34,8 @@ function updateText() {
     ctx.font = `${pjsSettings.globalStyle} ${pjsSettings.globalWeight} ${pjsSettings.globalSize}px ${pjsSettings.globalFont}`;
 }
 
-type HorizontalAlign = "LEFT" | "CENTER" | "RIGHT";
-type VerticalAlign = "BASELINE" | "CENTER" | "BOTTOM";
+export type HorizontalAlign = "LEFT" | "CENTER" | "RIGHT";
+export type VerticalAlign = "BASELINE" | "CENTER" | "BOTTOM";
 
 function textAlign(ALIGN: HorizontalAlign, YALIGN: VerticalAlign = "BASELINE") {
     const h = ALIGN === "LEFT" ? "start"

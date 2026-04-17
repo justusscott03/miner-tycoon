@@ -1,9 +1,9 @@
 // src/engine/UpgradeableState.ts
 
-import { entityBoostLevels } from "../../config/EntityBoostLevels.js";
-import { UpgradePageState } from "./UpgradePageState.js";
+import { entityBoostLevels } from "../../config/EntityBoostLevels";
+import { UpgradePageState } from "./UpgradePageState";
 
-import { ButtonData } from "../../ui/Button.js";
+import { ButtonData } from "../../ui/Button";
 
 export class UpgradeableState {
     level = 1;

@@ -1,23 +1,23 @@
-import { EllipseUIBindings } from "../ui/UIBindings/ShapeUIBindings/EllipseUIBindings.js";
-import { RectUIBindings } from "../ui/UIBindings/ShapeUIBindings/RectUIBindings.js";
-import { ShapeUIBindings } from "../ui/UIBindings/ShapeUIBindings.js";
-import { TriangleUIBindings } from "../ui/UIBindings/ShapeUIBindings/TriangleUIBindings.js";
-import { PathUIBindings } from "../ui/UIBindings/ShapeUIBindings/PathUIBindings.js";
+import { EllipseUIBindings } from "../ui/UIBindings/ShapeUIBindings/EllipseUIBindings";
+import { RectUIBindings } from "../ui/UIBindings/ShapeUIBindings/RectUIBindings";
+import { ShapeUIBindings } from "../ui/UIBindings/ShapeUIBindings";
+import { TriangleUIBindings } from "../ui/UIBindings/ShapeUIBindings/TriangleUIBindings";
+import { PathUIBindings } from "../ui/UIBindings/ShapeUIBindings/PathUIBindings";
 
-import { BaseLayer } from "./Shape Editor/Layers/BaseLayer.js";
-import { Layer } from "./Shape Editor/Layers/Layer.js";
-import { GroupLayer } from "./Shape Editor/Layers/GroupLayer.js";
+import { BaseLayer } from "./Shape Editor/Layers/BaseLayer";
+import { Layer } from "./Shape Editor/Layers/Layer";
+import { GroupLayer } from "./Shape Editor/Layers/GroupLayer";
 
-import { ToolManager } from "./Shape Editor/ToolManager.js";
-import { EditorCanvasManager } from "./Shape Editor/EditorCanvasManager.js";
-import { SelectionManager } from "./Shape Editor/SelectionManager.js";
-import { ShapeFactory } from "./Shape Editor/ShapeFactory.js";
-import { HierarchyPanel } from "./Shape Editor/HierarchyPanel.js";
-import { InspectorPanel } from "./Shape Editor/InspectorPanel.js";
-import { ContextMenu } from "./Shape Editor/ContextMenu.js";
-import { RenderLoop } from "./Shape Editor/RenderLoop.js";
-import { Exporter } from "./Shape Editor/Exporter.js";
-import { TransformGizmo } from "./Shape Editor/TransformGizmo.js";
+import { ToolManager } from "./Shape Editor/ToolManager";
+import { EditorCanvasManager } from "./Shape Editor/EditorCanvasManager";
+import { SelectionManager } from "./Shape Editor/SelectionManager";
+import { ShapeFactory } from "./Shape Editor/ShapeFactory";
+import { HierarchyPanel } from "./Shape Editor/HierarchyPanel";
+import { InspectorPanel } from "./Shape Editor/InspectorPanel";
+import { ContextMenu } from "./Shape Editor/ContextMenu";
+import { RenderLoop } from "./Shape Editor/RenderLoop";
+import { Exporter } from "./Shape Editor/Exporter";
+import { TransformGizmo } from "./Shape Editor/TransformGizmo";
 
 export enum ShapeTypes {
     Rectangle = "rectangle",

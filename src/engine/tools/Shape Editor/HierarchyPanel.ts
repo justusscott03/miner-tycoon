@@ -1,5 +1,5 @@
-import { BaseLayer } from "./Layers/BaseLayer.js";
-import { GroupLayer } from "./Layers/GroupLayer.js";
+import { BaseLayer } from "./Layers/BaseLayer";
+import { GroupLayer } from "./Layers/GroupLayer";
 
 export class HierarchyPanel {
     private _layers: BaseLayer[] = [];

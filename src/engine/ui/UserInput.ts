@@ -1,5 +1,5 @@
-import { CanvasManager } from "../helpers/CanvasManager.js";
-import { ScreenManager } from "../helpers/ScreenManager.js";
+import { CanvasManager } from "../helpers/CanvasManager";
+import { ScreenManager } from "../helpers/ScreenManager";
 
 export class UserInput {
     private static _instance: UserInput | null = null;

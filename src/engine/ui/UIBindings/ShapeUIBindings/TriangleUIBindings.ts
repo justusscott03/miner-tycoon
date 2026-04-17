@@ -1,9 +1,9 @@
-import { NumberUI } from "../TypeUIBindings/NumberUI.js";
-import { ColorUI } from "../TypeUIBindings/ColorUI.js";
-import { BaseParams, ShapeUIBindings } from "../ShapeUIBindings.js";
-import { ColorHelpers } from "../../../helpers/ColorHelpers.js";
-import { Vector2UI } from "../TypeUIBindings/Vector2UI.js";
-import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer.js";
+import { NumberUI } from "../TypeUIBindings/NumberUI";
+import { ColorUI } from "../TypeUIBindings/ColorUI";
+import { BaseParams, ShapeUIBindings } from "../ShapeUIBindings";
+import { ColorHelpers } from "../../../helpers/ColorHelpers";
+import { Vector2UI } from "../TypeUIBindings/Vector2UI";
+import { Bounds } from "../../../tools/Shape Editor/Layers/BaseLayer";
 
 interface TriangleParams extends BaseParams {
     point1: Vector2UI;

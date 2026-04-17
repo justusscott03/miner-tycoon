@@ -1,9 +1,9 @@
-// src/rendering/WarehouseRenderer.js
+// src/rendering/WarehouseRenderer
 
-import { fill } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { rect } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
+import { fill } from "../../../engine/lib/colors";
+import { rect } from "../../../engine/lib/shapes";
 
-import { WarehouseState } from "../state/WarehouseState.js";
+import { WarehouseState } from "../state/WarehouseState";
 
 export class WarehouseRenderer {
     private state: WarehouseState;

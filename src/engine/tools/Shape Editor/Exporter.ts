@@ -1,5 +1,5 @@
-import { BaseLayer } from "./Layers/BaseLayer.js";
-import { Layer } from "./Layers/Layer.js";
+import { BaseLayer } from "./Layers/BaseLayer";
+import { Layer } from "./Layers/Layer";
 
 export class Exporter {
     constructor(
