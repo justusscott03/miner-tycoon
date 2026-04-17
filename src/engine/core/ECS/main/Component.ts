@@ -1,7 +1,7 @@
-import { ParamUI } from "../../../ui/UIBindings/ParamUI.js";
-import { Transform } from "../components/Transform.js";
-import { EngineObject } from "./EngineObject.js";
-import { GameObject } from "./GameObject.js";
+import { ParamUI } from "../../../ui/UIBindings/ParamUI";
+import { Transform } from "../components/Transform";
+import { EngineObject } from "./EngineObject";
+import { GameObject } from "./GameObject";
 
 export type ComponentDefinition<TValues> = {
     import: string;

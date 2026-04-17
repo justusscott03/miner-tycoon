@@ -1,11 +1,10 @@
-import { background } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/colors.js";
-import { ImageManifest } from "../game/content/ImageManifest.js";
-import { SceneManager } from "./core/scene/SceneManager.js";
-import { CanvasManager } from "./helpers/CanvasManager.js";
-import { ImageManager } from "./helpers/ImageManager.js";
-import { ScreenManager } from "./helpers/ScreenManager.js";
-import { Time } from "./helpers/TimeManager.js";
-import { UserInput } from "./ui/UserInput.js";
+import { ImageManifest } from "../game/content/ImageManifest";
+import { SceneManager } from "./core/scene/SceneManager";
+import { CanvasManager } from "./helpers/CanvasManager";
+import { ImageManager } from "./helpers/ImageManager";
+import { ScreenManager } from "./helpers/ScreenManager";
+import { Time } from "./helpers/TimeManager";
+import { UserInput } from "./ui/UserInput";
 
 export class Engine {
     static start() {

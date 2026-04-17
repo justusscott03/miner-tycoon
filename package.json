@@ -7,6 +7,23 @@
     "watch": "tsc --watch"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
-  }
+    "ts-loader": "^9.5.7",
+    "typescript": "^5.0.0",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.2",
+    "webpack-dev-server": "^5.2.3"
+  },
+  "description": "",
+  "main": "webpack.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justusscott03/miner-tycoon.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/justusscott03/miner-tycoon/issues"
+  },
+  "homepage": "https://github.com/justusscott03/miner-tycoon#readme"
 }

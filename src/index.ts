@@ -1,6 +1,6 @@
-import { SceneManager } from "./engine/core/scene/SceneManager.js";
-import { Engine } from "./engine/Engine.js";
-import { TestScene } from "./game/TestScene.js";
+import { SceneManager } from "./engine/core/scene/SceneManager";
+import { Engine } from "./engine/Engine";
+import { TestScene } from "./game/TestScene";
 
 SceneManager.loadScene(new TestScene());
 Engine.start();

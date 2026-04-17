@@ -1,5 +1,5 @@
-import { Scene } from "../engine/core/scene/Scene.js";
-import { MinerPrefab } from "./prefabs/MinerPrefab.js";
+import { Scene } from "../engine/core/scene/Scene";
+import { MinerPrefab } from "./prefabs/MinerPrefab";
 
 export class TestScene extends Scene {
     constructor() {

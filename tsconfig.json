@@ -1,19 +1,18 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "module": "node16",
-    "moduleResolution": "node16",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "rootDir": "./src",
-    "outDir": "./dist",
 
     "strict": true,
     "esModuleInterop": true,
-    "allowJs": true,
+    "allowJs": false,
+    "noEmit": true,
 
     "lib": ["es2017", "dom"],
     "typeRoots": ["./types", "./node_modules/@types"],
     "resolveJsonModule": true
   },
-
   "include": ["src/**/*", "types/**/*"]
 }

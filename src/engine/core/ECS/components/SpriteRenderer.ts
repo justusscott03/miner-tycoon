@@ -1,11 +1,11 @@
-import { ImageManager } from "../../../helpers/ImageManager.js";
-import { image } from "https://cdn.jsdelivr.net/gh/justusscott03/PJSLibrary@v1.1.2/shapes.js";
-import { Renderer } from "./Renderer.js";
-import { Vector2 } from "../../math/Vector2.js";
-import { ComponentDefinition } from "../main/Component.js";
-import { NumberUI } from "../../../ui/UIBindings/TypeUIBindings/NumberUI.js";
-import { Vector2UI } from "../../../ui/UIBindings/TypeUIBindings/Vector2UI.js";
-import { StringUI } from "../../../ui/UIBindings/TypeUIBindings/StringUI.js";
+import { ImageManager } from "../../../helpers/ImageManager";
+import { image } from "../../../lib/shapes";
+import { Renderer } from "./Renderer";
+import { Vector2 } from "../../math/Vector2";
+import { ComponentDefinition } from "../main/Component";
+import { NumberUI } from "../../../ui/UIBindings/TypeUIBindings/NumberUI";
+import { Vector2UI } from "../../../ui/UIBindings/TypeUIBindings/Vector2UI";
+import { StringUI } from "../../../ui/UIBindings/TypeUIBindings/StringUI";
 
 type SpriteRendererValues = {
     sprite: string;
