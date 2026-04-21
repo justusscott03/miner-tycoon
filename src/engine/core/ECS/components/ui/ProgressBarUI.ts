@@ -4,21 +4,13 @@ import { map } from "../../../../lib/math";
 
 import { UIComponent } from "../UIComponent";
 import { Vector2 } from "../../../math/Vector2";
-import { ComponentDefinition } from "../../main/Component";
+import { ComponentDefinition, InferValues } from "../../main/Component";
 
 import { NumberUI } from "../../../../ui/UIBindings/TypeUIBindings/NumberUI";
 import { Vector2UI } from "../../../../ui/UIBindings/TypeUIBindings/Vector2UI";
 import { ColorUI } from "../../../../ui/UIBindings/TypeUIBindings/ColorUI";
 
-type ProgressBarUIValues = {
-    fillColor: string;
-    backColor: string;
-    max: number;
-    w: number;
-    relativePosition: { x: number, y: number };
-};
-
-export const ProgressBarUIDef: ComponentDefinition<ProgressBarUIValues> = {
+export const ProgressBarUIDef = {
     import: "src/engine/core/ECS/components/ui/ProgressBarUI",
 
     params: {
@@ -26,9 +18,12 @@ export const ProgressBarUIDef: ComponentDefinition<ProgressBarUIValues> = {
         backColor: new ColorUI("#646464"),
         max: new NumberUI(100),
         w: new NumberUI(100),
+        h: new NumberUI(40),
         relativePosition: new Vector2UI({ x: 0, y: 0 })
     }
-};
+} as const;
+
+export type ProgressBarUIValues = InferValues<typeof ProgressBarUIDef>;
 
 export class ProgressBarUI extends UIComponent {
     fillColor: string = "#FF0000";
@@ -37,14 +32,10 @@ export class ProgressBarUI extends UIComponent {
     max: number = 100;
     w: number = 100;
     h: number = 40;
+    relativePosition: Vector2 = Vector2.zero;
 
-    initialize(fillColor: string, backColor: string, max: number, w: number = 100, h: number = 40, relativePosition: Vector2 = Vector2.zero): void {
-        this.fillColor = fillColor;
-        this.backColor = backColor;
-        this.max = max;
-        this.w = w;
-        this.h = h;
-        this.relativePosition = relativePosition;
+    initialize(values: ProgressBarUIValues): void {
+        Object.assign(this, values);
     }
 
     RenderUI(): void {

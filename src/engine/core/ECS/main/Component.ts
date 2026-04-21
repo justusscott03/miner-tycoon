@@ -3,9 +3,13 @@ import { Transform } from "../components/Transform";
 import { EngineObject } from "./EngineObject";
 import { GameObject } from "./GameObject";
 
-export type ComponentDefinition<TValues> = {
+export type ComponentDefinition<TParams extends Record<string, ParamUI<any>>> = {
     import: string;
-    params: { [K in keyof TValues]: ParamUI<TValues[K]> };
+    params: TParams;
+};
+
+export type InferValues<TDef extends ComponentDefinition<any>> = {
+    [K in keyof TDef["params"]]: TDef["params"][K] extends ParamUI<infer V> ? V : never;
 };
 
 export class Component extends EngineObject {

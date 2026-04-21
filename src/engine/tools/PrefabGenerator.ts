@@ -100,9 +100,14 @@ export class PrefabGenerator {
         if (!definition) return;
 
         // Initialize values from UI defaults
-        const values: Record<string, ParamUI<any>> = {};
-        for (const [key, ui] of Object.entries(definition.params)) {
-            values[key] = ui.clone(); // 🔥 THIS FIXES EVERYTHING
+        const values = {} as Record<
+            keyof typeof definition.params,
+            ParamUI<any>
+        >;
+
+        for (const key of Object.keys(definition.params) as Array<keyof typeof definition.params>) {
+            const ui = definition.params[key];
+            values[key] = ui.clone();
         }
 
         this.state.components.push({ type, definition, values });
@@ -171,11 +176,11 @@ export class PrefabGenerator {
 
             body += `        const ${varName} = this.AddComponent(${comp.type});\n`;
 
-            const paramValues = Object.keys(comp.definition.params)
-                .map(key => comp.values[key].toCode())
-                .join(", ");
+            const paramObject = Object.entries(comp.definition.params)
+                .map(([key]) => `            ${key}: ${comp.values[key].toCode()}`)
+                .join(",\n");
 
-            body += `        ${varName}.initialize(${paramValues});\n\n`;
+            body += `        ${varName}.initialize({\n${paramObject}\n        });\n\n`;
         });
 
         return `${[...imports].join("\n")}

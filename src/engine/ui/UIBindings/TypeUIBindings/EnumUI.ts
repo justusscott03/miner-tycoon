@@ -1,30 +1,24 @@
 import { ParamUI } from "../ParamUI";
 
-export class EnumUI<T extends Record<string, string | number>> extends ParamUI<T[keyof T]> {
-    private enumObj: T;
+export class EnumUI<T extends string | number> extends ParamUI<T> {
+    private options: T[];
 
-    constructor(enumObj: T, defaultValue: T[keyof T]) {
+    constructor(options: T[], defaultValue: T) {
         super(defaultValue);
-        this.enumObj = enumObj;
+        this.options = options;
     }
 
-    render(onChange: (value: T[keyof T]) => void): HTMLElement {
+    render(onChange: (value: T) => void): HTMLElement {
         const container = document.createElement("div");
-
         const select = document.createElement("select");
         select.classList.add("paramInput");
 
-        // Extract enum keys (filter out reverse numeric mappings)
-        const keys = Object.keys(this.enumObj).filter(
-            k => isNaN(Number(k)) // ignore numeric reverse mappings
-        );
-
-        keys.forEach(key => {
+        this.options.forEach(opt => {
             const option = document.createElement("option");
-            option.value = key;
-            option.textContent = key;
+            option.value = String(opt);
+            option.textContent = String(opt);
 
-            if (this.enumObj[key] === this.value) {
+            if (opt === this.value) {
                 option.selected = true;
             }
 
@@ -32,9 +26,9 @@ export class EnumUI<T extends Record<string, string | number>> extends ParamUI<T
         });
 
         select.onchange = () => {
-            const selectedKey = select.value as keyof T;
-            this.value = this.enumObj[selectedKey];
-            onChange(this.value);
+            const selected = select.value as T;
+            this.value = selected;
+            onChange(selected);
         };
 
         container.appendChild(select);
@@ -42,15 +36,10 @@ export class EnumUI<T extends Record<string, string | number>> extends ParamUI<T
     }
 
     toCode(): string {
-        // Produces: MyEnum.SomeValue
-        const key = Object.keys(this.enumObj).find(
-            k => this.enumObj[k] === this.value
-        );
-
-        return key ? `${this.enumObj.constructor.name}.${key}` : "undefined";
+        return JSON.stringify(this.value);
     }
 
     clone() {
-        return new EnumUI(this.enumObj, this.value);
+        return new EnumUI(this.options, this.value);
     }
 }

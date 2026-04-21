@@ -34,19 +34,10 @@ function updateText() {
     ctx.font = `${pjsSettings.globalStyle} ${pjsSettings.globalWeight} ${pjsSettings.globalSize}px ${pjsSettings.globalFont}`;
 }
 
-enum HorizontalAlign {
-    LEFT = "LEFT",
-    CENTER = "CENTER",
-    RIGHT = "RIGHT"
-}
+type HorizontalAlign = "LEFT" | "CENTER" | "RIGHT";
+type VerticalAlign = "BASELINE" | "CENTER" | "BOTTOM";
 
-enum VerticalAlign {
-    BASELINE = "BASELINE",
-    CENTER = "CENTER",
-    BOTTOM = "BOTTOM"
-}
-
-function textAlign(ALIGN: HorizontalAlign, YALIGN: VerticalAlign = VerticalAlign.BASELINE) {
+function textAlign(ALIGN: HorizontalAlign, YALIGN: VerticalAlign = "BASELINE") {
     const h = ALIGN === "LEFT" ? "start"
             : ALIGN === "CENTER" ? "center"
             : "end";
