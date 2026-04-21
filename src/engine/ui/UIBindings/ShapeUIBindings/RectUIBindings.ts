@@ -31,11 +31,11 @@ export class RectUIBindings extends ShapeUIBindings<RectParams> {
         const c = ColorHelpers.hexToRGB(color.value);
         const s = ColorHelpers.hexToRGB(stroke.value);
 
-        return `fill(${c.r}, ${c.g}, ${c.b}, ${color.alpha});
-stroke(${s.r}, ${s.g}, ${s.b}, ${stroke.alpha});
+        return `fill(${c.r}, ${c.g}, ${c.b}, ${Math.round(color.alpha * 255)});
+stroke(${s.r}, ${s.g}, ${s.b}, ${Math.round(stroke.alpha * 255)});
 rect(${x.value}, ${y.value}, ${w.value}, ${h.value}, ${radius.value});`;
     }
-
+    
     render(ctx: CanvasRenderingContext2D): void {
         const { x, y, w, h, radius, color, stroke, strokeWeight } = this.params;
 

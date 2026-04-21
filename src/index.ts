@@ -4,7 +4,7 @@ import { TestScene } from "./game/TestScene";
 
 window.addEventListener("load", () => {
     console.log("Game initialized!");
-    SceneManager.loadScene(new TestScene());
     Engine.start();
+    SceneManager.loadScene(new TestScene());
 });
 

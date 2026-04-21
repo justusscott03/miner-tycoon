@@ -1,6 +1,6 @@
 import { CanvasManager } from "../helpers/CanvasManager";
 
-const ctx = CanvasManager.ctx;
+const ctx = CanvasManager.getCtx();
 
 function get(x: number = 0, y: number = 0, w: number = CanvasManager.width, h: number = CanvasManager.height): HTMLCanvasElement {
 

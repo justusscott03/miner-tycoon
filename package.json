@@ -1,10 +1,9 @@
 {
   "name": "miner-tycoon",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "build": "webpack",
-    "dev": "webpack serve",
+    "plump": "webpack serve --config webpack.config.cjs",
     "watch": "webpack --watch"
   },
   "devDependencies": {

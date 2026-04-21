@@ -78,7 +78,7 @@ export class ShapeEditor {
             this.layers
         );
 
-        this.gizmo = new TransformGizmo(canvas);
+        this.gizmo = new TransformGizmo();
 
         this.loop = new RenderLoop(ctx, this.layers, this.selection, this.gizmo);
 

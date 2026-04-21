@@ -7,7 +7,7 @@ export class TransformGizmo {
     private startBounds: Bounds | null = null;
     private frozenLocal: any = null;
 
-    constructor(private canvas: HTMLCanvasElement) {}
+    constructor() {}
 
     draw(ctx: CanvasRenderingContext2D, layer: BaseLayer) {
         const b = layer.getBounds();
@@ -16,7 +16,7 @@ export class TransformGizmo {
         const width = b.right - b.left;
         const height = b.bottom - b.top;
 
-        ctx.strokeStyle = "#000000";
+        ctx.strokeStyle = "#4aa3ff";
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
 

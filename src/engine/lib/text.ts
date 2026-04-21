@@ -3,7 +3,7 @@ import { fill } from "./colors";
 import { sin, cos } from "./trigonometry";
 import { CanvasManager } from "../helpers/CanvasManager";
 
-const ctx = CanvasManager.ctx;
+const ctx = CanvasManager.getCtx();
 
 function textFont (font: string) {
     pjsSettings.globalFont = font;

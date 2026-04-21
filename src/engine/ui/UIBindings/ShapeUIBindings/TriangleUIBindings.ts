@@ -34,8 +34,8 @@ export class TriangleUIBindings extends ShapeUIBindings<TriangleParams> {
         const c = ColorHelpers.hexToRGB(color.value);
         const s = ColorHelpers.hexToRGB(stroke.value);
 
-        return `fill(${c.r}, ${c.g}, ${c.b}, ${color.alpha});
-stroke(${s.r}, ${s.g}, ${s.b}, ${stroke.alpha});
+        return `fill(${c.r}, ${c.g}, ${c.b}, ${Math.round(color.alpha * 255)});
+stroke(${s.r}, ${s.g}, ${s.b}, ${Math.round(stroke.alpha * 255)});
 triangle(${point1.value.x + x.value}, ${point1.value.y + y.value}, ${point2.value.x + x.value}, ${point2.value.y + y.value}, ${point3.value.x + x.value}, ${point3.value.y + y.value});
 `.trim();
     }

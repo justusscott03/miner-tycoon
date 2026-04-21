@@ -1,6 +1,6 @@
 import { CanvasManager } from "../helpers/CanvasManager";
 
-const ctx = CanvasManager.ctx;
+const ctx = CanvasManager.getCtx();
 
 function pushMatrix () {
     ctx.save();

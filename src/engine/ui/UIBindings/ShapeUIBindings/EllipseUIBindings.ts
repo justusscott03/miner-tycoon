@@ -33,7 +33,7 @@ export class EllipseUIBindings extends ShapeUIBindings<EllipseParams> {
         const s = ColorHelpers.hexToRGB(stroke.value);
 
         return `fill(${c.r}, ${c.g}, ${c.b}, ${Math.round(color.alpha * 255)});
-stroke(${s.r}, ${s.g}, ${s.b}, ${stroke.alpha});
+stroke(${s.r}, ${s.g}, ${s.b}, ${Math.round(stroke.alpha * 255)});
 ellipse(${x.value}, ${y.value}, ${w.value}, ${h.value});`;
     }
 

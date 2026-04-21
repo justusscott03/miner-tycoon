@@ -1,7 +1,7 @@
 import { pjsSettings } from "./pjsSettings";
 import { CanvasManager } from "../helpers/CanvasManager";
 
-const ctx: CanvasRenderingContext2D = CanvasManager.ctx;
+const ctx: CanvasRenderingContext2D = CanvasManager.getCtx();
 
 function beginShape () {
     pjsSettings.requiresFirstVertex = true;

@@ -817,30 +817,59 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 // src/engine/CanvasManager.ts
 class CanvasManager {
+    // Lazy getter for canvas
+    static getCanvas() {
+        if (!this.canvas) {
+            const found = document.getElementById("canvas");
+            if (!found) {
+                throw new Error("CanvasManager: Canvas element #canvas not found in DOM");
+            }
+            this.canvas = found;
+            this.width = found.width;
+            this.height = found.height;
+        }
+        return this.canvas;
+    }
+    // Lazy getter for ctx
+    static getCtx() {
+        if (!this.ctx) {
+            const context = this.getCanvas().getContext("2d");
+            if (!context) {
+                throw new Error("CanvasManager: 2D context not supported");
+            }
+            this.ctx = context;
+        }
+        return this.ctx;
+    }
+    // Optional explicit initialization
     static init(canvasId) {
         const canvas = document.getElementById(canvasId);
-        if (!canvas)
-            throw new Error(`Canvas #${canvasId} not found`);
+        if (!canvas) {
+            throw new Error(`CanvasManager: Canvas #${canvasId} not found`);
+        }
         const ctx = canvas.getContext("2d");
-        if (!ctx)
-            throw new Error("2D context not supported");
+        if (!ctx) {
+            throw new Error("CanvasManager: 2D context not supported");
+        }
         this.canvas = canvas;
         this.ctx = ctx;
         this.width = canvas.width;
         this.height = canvas.height;
+        console.log(`Canvas initialized: ${canvasId} (${this.width}x${this.height})`);
     }
+    // Resize logic
     static resize(originalWidth, originalHeight, newWidth, newHeight) {
-        // Set the internal resolution (actual drawing buffer)
-        this.canvas.width = originalWidth;
-        this.canvas.height = originalHeight;
-        // Update CanvasManager's stored values
+        const canvas = this.getCanvas();
+        canvas.width = originalWidth;
+        canvas.height = originalHeight;
         this.width = originalWidth;
         this.height = originalHeight;
-        // Apply CSS scaling for display size
-        this.canvas.style.width = `${newWidth}px`;
-        this.canvas.style.height = `${newHeight}px`;
+        canvas.style.width = `${newWidth}px`;
+        canvas.style.height = `${newHeight}px`;
     }
 }
+CanvasManager.width = 0;
+CanvasManager.height = 0;
 
 
 /***/ },
@@ -1107,9 +1136,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./math */ "./src/engine/lib/math.ts");
 
 
-const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.ctx;
+const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.getCtx();
 function toHex(num) {
-    let chars = "0123456789ABCDEF";
+    const chars = "0123456789ABCDEF";
     return chars[(num - (num % 16)) / 16] + chars[num % 16];
 }
 function color(r, g, b, a = 255) {
@@ -1260,7 +1289,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helpers/CanvasManager */ "./src/engine/helpers/CanvasManager.ts");
 
 
-const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_1__.CanvasManager.ctx;
+const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_1__.CanvasManager.getCtx();
 function beginShape() {
     _pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.requiresFirstVertex = true;
     ctx.beginPath();
@@ -1502,7 +1531,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../helpers/CanvasManager */ "./src/engine/helpers/CanvasManager.ts");
 
-const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.ctx;
+const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.getCtx();
 function get(x = 0, y = 0, w = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.width, h = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.height) {
     //if (arguments.length === 0 || arguments.length === 4) {
     const imgData = ctx.getImageData(x, y, w, h);
@@ -2465,11 +2494,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-_engine_core_scene_SceneManager__WEBPACK_IMPORTED_MODULE_0__.SceneManager.loadScene(new _game_TestScene__WEBPACK_IMPORTED_MODULE_2__.TestScene());
-_engine_Engine__WEBPACK_IMPORTED_MODULE_1__.Engine.start();
+window.addEventListener("load", () => {
+    console.log("Game initialized!");
+    _engine_Engine__WEBPACK_IMPORTED_MODULE_1__.Engine.start();
+    _engine_core_scene_SceneManager__WEBPACK_IMPORTED_MODULE_0__.SceneManager.loadScene(new _game_TestScene__WEBPACK_IMPORTED_MODULE_2__.TestScene());
+});
 
 })();
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.js.map
+//# sourceMappingURL=game.js.map
