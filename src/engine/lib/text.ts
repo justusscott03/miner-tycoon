@@ -34,10 +34,19 @@ function updateText() {
     ctx.font = `${pjsSettings.globalStyle} ${pjsSettings.globalWeight} ${pjsSettings.globalSize}px ${pjsSettings.globalFont}`;
 }
 
-export type HorizontalAlign = "LEFT" | "CENTER" | "RIGHT";
-export type VerticalAlign = "BASELINE" | "CENTER" | "BOTTOM";
+enum HorizontalAlign {
+    LEFT = "LEFT",
+    CENTER = "CENTER",
+    RIGHT = "RIGHT"
+}
 
-function textAlign(ALIGN: HorizontalAlign, YALIGN: VerticalAlign = "BASELINE") {
+enum VerticalAlign {
+    BASELINE = "BASELINE",
+    CENTER = "CENTER",
+    BOTTOM = "BOTTOM"
+}
+
+function textAlign(ALIGN: HorizontalAlign, YALIGN: VerticalAlign = VerticalAlign.BASELINE) {
     const h = ALIGN === "LEFT" ? "start"
             : ALIGN === "CENTER" ? "center"
             : "end";
@@ -64,4 +73,4 @@ function outlinedText (message: string, x: number, y: number, weight: number, ma
     text(message, x, y);
 }
 
-export { textFont, textSize, textWeight, textStyle, textAlign, text, outlinedText };
+export { textFont, textSize, textWeight, textStyle, textAlign, text, outlinedText, HorizontalAlign, VerticalAlign };

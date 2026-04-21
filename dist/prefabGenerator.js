@@ -1,5 +1,4 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/engine/config/ComponentRegistry.ts"
@@ -8,18 +7,14 @@
   \************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ComponentRegistry: () => (/* binding */ ComponentRegistry)
 /* harmony export */ });
-/* harmony import */ var _core_ECS_components_SpriteRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/ECS/components/SpriteRenderer */ "./src/engine/core/ECS/components/SpriteRenderer.ts");
-/* harmony import */ var _core_ECS_components_ui_ProgressBarUI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/ECS/components/ui/ProgressBarUI */ "./src/engine/core/ECS/components/ui/ProgressBarUI.ts");
+/* harmony import */ var _core_ECS_ComponentScanner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/ECS/ComponentScanner */ "./src/engine/core/ECS/ComponentScanner.ts");
 
-
-const ComponentRegistry = {
-    SpriteRenderer: _core_ECS_components_SpriteRenderer__WEBPACK_IMPORTED_MODULE_0__.SpriteRendererDef,
-    ProgressBarUI: _core_ECS_components_ui_ProgressBarUI__WEBPACK_IMPORTED_MODULE_1__.ProgressBarUIDef
-};
+const ComponentRegistry = (0,_core_ECS_ComponentScanner__WEBPACK_IMPORTED_MODULE_0__.autoScanComponents)();
 
 
 /***/ },
@@ -30,6 +25,7 @@ const ComponentRegistry = {
   \****************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ImportMap: () => (/* binding */ ImportMap)
@@ -43,12 +39,63 @@ const ImportMap = {
 
 /***/ },
 
+/***/ "./src/engine/config/Physics2D.ts"
+/*!****************************************!*\
+  !*** ./src/engine/config/Physics2D.ts ***!
+  \****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Physics2D: () => (/* binding */ Physics2D)
+/* harmony export */ });
+class Physics2D {
+}
+Physics2D.gravity = { x: 0, y: 500 }; // pixels per second squared
+
+
+/***/ },
+
+/***/ "./src/engine/core/ECS/ComponentScanner.ts"
+/*!*************************************************!*\
+  !*** ./src/engine/core/ECS/ComponentScanner.ts ***!
+  \*************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   autoScanComponents: () => (/* binding */ autoScanComponents)
+/* harmony export */ });
+function autoScanComponents() {
+    const registry = {};
+    // Webpack magic: import all .ts files in components folder
+    const context = __webpack_require__("./src/engine/core/ECS/components sync recursive \\.ts$");
+    context.keys().forEach((key) => {
+        const module = context(key);
+        for (const exportName in module) {
+            const value = module[exportName];
+            // Detect ComponentDefinition objects
+            if (value && typeof value === "object" && "params" in value && "import" in value) {
+                const name = exportName.replace("Def", "");
+                registry[name] = value;
+            }
+        }
+    });
+    return registry;
+}
+
+
+/***/ },
+
 /***/ "./src/engine/core/ECS/components/Renderer.ts"
 /*!****************************************************!*\
   !*** ./src/engine/core/ECS/components/Renderer.ts ***!
   \****************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Renderer: () => (/* binding */ Renderer)
@@ -68,6 +115,7 @@ class Renderer extends _main_Component__WEBPACK_IMPORTED_MODULE_0__.Component {
   \**********************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   SpriteRenderer: () => (/* binding */ SpriteRenderer),
@@ -123,12 +171,70 @@ class SpriteRenderer extends _Renderer__WEBPACK_IMPORTED_MODULE_2__.Renderer {
 
 /***/ },
 
+/***/ "./src/engine/core/ECS/components/Transform.ts"
+/*!*****************************************************!*\
+  !*** ./src/engine/core/ECS/components/Transform.ts ***!
+  \*****************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Transform: () => (/* binding */ Transform)
+/* harmony export */ });
+/* harmony import */ var _main_Component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../main/Component */ "./src/engine/core/ECS/main/Component.ts");
+/* harmony import */ var _math_Vector2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../math/Vector2 */ "./src/engine/core/math/Vector2.ts");
+
+
+class Transform extends _main_Component__WEBPACK_IMPORTED_MODULE_0__.Component {
+    constructor() {
+        super();
+        this.position = new _math_Vector2__WEBPACK_IMPORTED_MODULE_1__.Vector2(0, 0); // local position
+        this.scale = new _math_Vector2__WEBPACK_IMPORTED_MODULE_1__.Vector2(1, 1); // local scale
+        this.rotation = 0; // local rotation (radians)
+        this.parent = null; // parent transform
+    }
+    // -------------------------
+    // World-space getters
+    // -------------------------
+    get worldPosition() {
+        if (!this.parent)
+            return this.position.clone();
+        return this.parent.worldPosition.add(this.position);
+    }
+    get worldScale() {
+        if (!this.parent)
+            return this.scale.clone();
+        return this.parent.worldScale.multiply(this.scale);
+    }
+    get worldRotation() {
+        if (!this.parent)
+            return this.rotation;
+        return this.parent.worldRotation + this.rotation;
+    }
+    // -------------------------
+    // Apply to Canvas context
+    // -------------------------
+    applyToContext(ctx) {
+        const pos = this.worldPosition;
+        const scale = this.worldScale;
+        const rot = this.worldRotation;
+        ctx.translate(pos.x, pos.y);
+        ctx.rotate(rot);
+        ctx.scale(scale.x, scale.y);
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/engine/core/ECS/components/UIComponent.ts"
 /*!*******************************************************!*\
   !*** ./src/engine/core/ECS/components/UIComponent.ts ***!
   \*******************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   UIComponent: () => (/* binding */ UIComponent)
@@ -150,12 +256,85 @@ class UIComponent extends _main_Component__WEBPACK_IMPORTED_MODULE_0__.Component
 
 /***/ },
 
+/***/ "./src/engine/core/ECS/components/physics/Collider2D.ts"
+/*!**************************************************************!*\
+  !*** ./src/engine/core/ECS/components/physics/Collider2D.ts ***!
+  \**************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Collider2D: () => (/* binding */ Collider2D)
+/* harmony export */ });
+/* harmony import */ var _main_Component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../main/Component */ "./src/engine/core/ECS/main/Component.ts");
+
+class Collider2D extends _main_Component__WEBPACK_IMPORTED_MODULE_0__.Component {
+    constructor() {
+        super(...arguments);
+        this.isTrigger = false;
+    }
+    // Override in specific collider types
+    get bounds() {
+        return {
+            x: this.transform.position.x,
+            y: this.transform.position.y,
+            width: 0,
+            height: 0
+        };
+    }
+}
+
+
+/***/ },
+
+/***/ "./src/engine/core/ECS/components/physics/RigidBody2D.ts"
+/*!***************************************************************!*\
+  !*** ./src/engine/core/ECS/components/physics/RigidBody2D.ts ***!
+  \***************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   RigidBody2D: () => (/* binding */ RigidBody2D)
+/* harmony export */ });
+/* harmony import */ var _main_Component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../main/Component */ "./src/engine/core/ECS/main/Component.ts");
+/* harmony import */ var _helpers_TimeManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../helpers/TimeManager */ "./src/engine/helpers/TimeManager.ts");
+/* harmony import */ var _config_Physics2D__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../config/Physics2D */ "./src/engine/config/Physics2D.ts");
+
+
+ // We'll define this next
+class RigidBody2D extends _main_Component__WEBPACK_IMPORTED_MODULE_0__.Component {
+    constructor() {
+        super(...arguments);
+        this.linearVelocity = { x: 0, y: 0 };
+        this.useGravity = true;
+        this.gravityScale = 1;
+        this.mass = 1;
+    }
+    physicsStep() {
+        // Apply gravity
+        if (this.useGravity) {
+            this.linearVelocity.y += _config_Physics2D__WEBPACK_IMPORTED_MODULE_2__.Physics2D.gravity.y * this.gravityScale * _helpers_TimeManager__WEBPACK_IMPORTED_MODULE_1__.Time.fixedDeltaTime;
+            this.linearVelocity.x += _config_Physics2D__WEBPACK_IMPORTED_MODULE_2__.Physics2D.gravity.x * this.gravityScale * _helpers_TimeManager__WEBPACK_IMPORTED_MODULE_1__.Time.fixedDeltaTime;
+        }
+        // Integrate velocity → position
+        this.transform.position.x += this.linearVelocity.x * _helpers_TimeManager__WEBPACK_IMPORTED_MODULE_1__.Time.fixedDeltaTime;
+        this.transform.position.y += this.linearVelocity.y * _helpers_TimeManager__WEBPACK_IMPORTED_MODULE_1__.Time.fixedDeltaTime;
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/engine/core/ECS/components/ui/ProgressBarUI.ts"
 /*!************************************************************!*\
   !*** ./src/engine/core/ECS/components/ui/ProgressBarUI.ts ***!
   \************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ProgressBarUI: () => (/* binding */ ProgressBarUI),
@@ -219,12 +398,87 @@ class ProgressBarUI extends _UIComponent__WEBPACK_IMPORTED_MODULE_3__.UIComponen
 
 /***/ },
 
+/***/ "./src/engine/core/ECS/components/ui/TextUI.ts"
+/*!*****************************************************!*\
+  !*** ./src/engine/core/ECS/components/ui/TextUI.ts ***!
+  \*****************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TextUI: () => (/* binding */ TextUI),
+/* harmony export */   TextUIDef: () => (/* binding */ TextUIDef)
+/* harmony export */ });
+/* harmony import */ var _UIComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../UIComponent */ "./src/engine/core/ECS/components/UIComponent.ts");
+/* harmony import */ var _lib_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../lib/colors */ "./src/engine/lib/colors.ts");
+/* harmony import */ var _lib_text__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../lib/text */ "./src/engine/lib/text.ts");
+/* harmony import */ var _math_Vector2__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../math/Vector2 */ "./src/engine/core/math/Vector2.ts");
+/* harmony import */ var _ui_UIBindings_TypeUIBindings_ColorUI__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../ui/UIBindings/TypeUIBindings/ColorUI */ "./src/engine/ui/UIBindings/TypeUIBindings/ColorUI.ts");
+/* harmony import */ var _ui_UIBindings_TypeUIBindings_NumberUI__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../ui/UIBindings/TypeUIBindings/NumberUI */ "./src/engine/ui/UIBindings/TypeUIBindings/NumberUI.ts");
+/* harmony import */ var _ui_UIBindings_TypeUIBindings_Vector2UI__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../ui/UIBindings/TypeUIBindings/Vector2UI */ "./src/engine/ui/UIBindings/TypeUIBindings/Vector2UI.ts");
+/* harmony import */ var _ui_UIBindings_TypeUIBindings_StringUI__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../ui/UIBindings/TypeUIBindings/StringUI */ "./src/engine/ui/UIBindings/TypeUIBindings/StringUI.ts");
+/* harmony import */ var _ui_UIBindings_TypeUIBindings_BooleanUI__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../ui/UIBindings/TypeUIBindings/BooleanUI */ "./src/engine/ui/UIBindings/TypeUIBindings/BooleanUI.ts");
+/* harmony import */ var _ui_UIBindings_TypeUIBindings_EnumUI__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../ui/UIBindings/TypeUIBindings/EnumUI */ "./src/engine/ui/UIBindings/TypeUIBindings/EnumUI.ts");
+
+
+
+
+
+
+
+
+
+
+const TextUIDef = {
+    import: "src/engine/core/ECS/components/ui/TextUI",
+    params: {
+        content: new _ui_UIBindings_TypeUIBindings_StringUI__WEBPACK_IMPORTED_MODULE_7__.StringUI(""),
+        fontSize: new _ui_UIBindings_TypeUIBindings_NumberUI__WEBPACK_IMPORTED_MODULE_5__.NumberUI(20),
+        color: new _ui_UIBindings_TypeUIBindings_ColorUI__WEBPACK_IMPORTED_MODULE_4__.ColorUI("#000000"),
+        align: new _ui_UIBindings_TypeUIBindings_EnumUI__WEBPACK_IMPORTED_MODULE_9__.EnumUI(_lib_text__WEBPACK_IMPORTED_MODULE_2__.HorizontalAlign, _lib_text__WEBPACK_IMPORTED_MODULE_2__.HorizontalAlign.LEFT),
+        screenSpace: new _ui_UIBindings_TypeUIBindings_BooleanUI__WEBPACK_IMPORTED_MODULE_8__.BooleanUI(true),
+        relativePosition: new _ui_UIBindings_TypeUIBindings_Vector2UI__WEBPACK_IMPORTED_MODULE_6__.Vector2UI({ x: 0, y: 0 })
+    }
+};
+class TextUI extends _UIComponent__WEBPACK_IMPORTED_MODULE_0__.UIComponent {
+    constructor() {
+        super(...arguments);
+        this.content = "";
+        this.fontSize = 20;
+        this.color = "#000000";
+        this.align = _lib_text__WEBPACK_IMPORTED_MODULE_2__.HorizontalAlign.LEFT;
+        this.screenSpace = true;
+        this.relativePosition = _math_Vector2__WEBPACK_IMPORTED_MODULE_3__.Vector2.zero;
+    }
+    initialize(content, fontSize, color, align, screenSpace = true, relativePosition = _math_Vector2__WEBPACK_IMPORTED_MODULE_3__.Vector2.zero) {
+        this.content = content;
+        this.fontSize = fontSize;
+        this.color = color;
+        this.align = align;
+        this.screenSpace = screenSpace;
+        this.relativePosition = relativePosition;
+    }
+    RenderUI() {
+        (0,_lib_colors__WEBPACK_IMPORTED_MODULE_1__.fill)(this.color);
+        (0,_lib_text__WEBPACK_IMPORTED_MODULE_2__.textAlign)(this.align, _lib_text__WEBPACK_IMPORTED_MODULE_2__.VerticalAlign.CENTER);
+        (0,_lib_text__WEBPACK_IMPORTED_MODULE_2__.textSize)(this.fontSize);
+        const x = this.transform.position.x + this.relativePosition.x;
+        const y = this.transform.position.y + this.relativePosition.y;
+        (0,_lib_text__WEBPACK_IMPORTED_MODULE_2__.text)(this.content, x, y);
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/engine/core/ECS/main/Component.ts"
 /*!***********************************************!*\
   !*** ./src/engine/core/ECS/main/Component.ts ***!
   \***********************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Component: () => (/* binding */ Component)
@@ -255,6 +509,7 @@ class Component extends _EngineObject__WEBPACK_IMPORTED_MODULE_0__.EngineObject 
   \**************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   EngineObject: () => (/* binding */ EngineObject)
@@ -275,6 +530,7 @@ EngineObject._nextId = 1;
   \*****************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Vector2: () => (/* binding */ Vector2)
@@ -346,6 +602,7 @@ class Vector2 {
   \*********************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   CanvasManager: () => (/* binding */ CanvasManager)
@@ -415,6 +672,7 @@ CanvasManager.height = 0;
   \********************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ColorHelpers: () => (/* binding */ ColorHelpers)
@@ -446,6 +704,7 @@ class ColorHelpers {
   \********************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ImageManager: () => (/* binding */ ImageManager)
@@ -530,6 +789,7 @@ ImageManager._instance = null;
   \*******************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   PathHelpers: () => (/* binding */ PathHelpers)
@@ -555,12 +815,66 @@ class PathHelpers {
 
 /***/ },
 
+/***/ "./src/engine/helpers/TimeManager.ts"
+/*!*******************************************!*\
+  !*** ./src/engine/helpers/TimeManager.ts ***!
+  \*******************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Time: () => (/* binding */ Time)
+/* harmony export */ });
+class Time {
+    static update() {
+        this._current = performance.now();
+        // Delta time
+        this.deltaTime = (this._current - this._last) / 1000;
+        this.time += this.deltaTime;
+        this._last = this._current;
+        // FPS counter
+        this._frames++;
+        if (this._current - this._lastFpsUpdate >= 1000) {
+            this.fps = this._frames;
+            this._frames = 0;
+            this._lastFpsUpdate = this._current;
+        }
+    }
+    static getFormattedTime() {
+        const now = new Date();
+        return now.toLocaleTimeString();
+    }
+    static getFormattedDate() {
+        const now = new Date();
+        return now.toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric"
+        }).replace(/\//g, " • ");
+    }
+}
+Time._last = performance.now();
+Time._current = performance.now();
+Time.deltaTime = 0;
+Time.time = 0;
+// --- FPS tracking ---
+Time._frames = 0;
+Time._lastFpsUpdate = performance.now();
+Time.fps = 0;
+Time.fixedDeltaTime = 1 / 50; // 50 Hz like Unity
+Time._fixedAccumulator = 0;
+
+
+/***/ },
+
 /***/ "./src/engine/lib/colors.ts"
 /*!**********************************!*\
   !*** ./src/engine/lib/colors.ts ***!
   \**********************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   background: () => (/* binding */ background),
@@ -578,83 +892,44 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.getCtx();
-function toHex(num) {
-    const chars = "0123456789ABCDEF";
-    return chars[(num - (num % 16)) / 16] + chars[num % 16];
-}
 function color(r, g, b, a = 255) {
-    if (g === undefined && b === undefined && a === undefined) {
-        g = r;
-        b = r;
-        a = 255;
-    }
-    if (b === undefined && a === undefined) {
-        a = g;
+    // If user passed a CSS string, just return it
+    if (typeof r === "string")
+        return r;
+    if (g === undefined && b === undefined) {
         g = r;
         b = r;
     }
-    if (a === undefined) {
-        a = 255;
+    if (b === undefined) {
+        b = r;
     }
-    ctx.globalAlpha = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(a / 255, 0, 1);
-    return "#" + toHex(r) + toHex(g) + toHex(b);
+    r = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(r, 0, 255);
+    g = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(g, 0, 255);
+    b = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(b, 0, 255);
+    a = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(a, 0, 255);
+    return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
 }
-function fill(r, g = 255, b = 255, a = 255) {
-    if (typeof r === "string") {
-        ctx.fillStyle = r;
-    }
-    else {
-        if (g === undefined && b === undefined && a === undefined) {
-            g = r;
-            b = r;
-            a = 255;
-        }
-        if (b === undefined && a === undefined) {
-            a = g;
-            g = r;
-            b = r;
-        }
-        if (a === undefined) {
-            a = 255;
-        }
-        ctx.globalAlpha = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(a / 255, 0, 1);
-        ctx.fillStyle = "#" + toHex(r) + toHex(g) + toHex(b);
-    }
+function fill(r, g, b, a) {
+    ctx.fillStyle = color(r, g, b, a);
 }
 function noFill() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0)";
+    ctx.fillStyle = "rgba(0,0,0,0)";
 }
-function background(r, g, b, a = 255) {
-    fill(r, g, b, a);
-    ctx.fillRect(0, 0, _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.width, _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.height);
+function stroke(r, g, b, a) {
+    ctx.strokeStyle = color(r, g, b, a);
 }
 function noStroke() {
-    ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    ctx.strokeStyle = "rgba(0,0,0,0)";
 }
-function strokeWeight(thickness) {
-    ctx.lineWidth = thickness;
+function strokeWeight(w) {
+    ctx.lineWidth = w;
 }
-function stroke(r, g, b, a = 255) {
-    if (typeof r === "string") {
-        ctx.strokeStyle = r;
-    }
-    else {
-        if (g === undefined && b === undefined && a === undefined) {
-            g = r;
-            b = r;
-            a = 255;
-        }
-        if (b === undefined && a === undefined) {
-            a = g;
-            g = r;
-            b = r;
-        }
-        if (a === undefined) {
-            a = 255;
-        }
-        ctx.globalAlpha = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(a / 255, 0, 1);
-        ctx.strokeStyle = "#" + toHex(r) + toHex(g) + toHex(b);
-    }
+function background(r, g, b, a) {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    fill(r, g, b, a);
+    ctx.fillRect(0, 0, _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.width, _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.height);
+    ctx.restore();
 }
 function lerpColor(color1, color2, amt) {
     function parseColor(color) {
@@ -718,6 +993,7 @@ function gradient(x, y, width, height, color1, color2, direction = "vertical") {
   \********************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   abs: () => (/* binding */ abs),
@@ -907,6 +1183,7 @@ function noise(x, y, z) {
   \***************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   pjsSettings: () => (/* binding */ pjsSettings)
@@ -931,6 +1208,7 @@ const pjsSettings = {
   \**********************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   arc: () => (/* binding */ arc),
@@ -1098,12 +1376,152 @@ function strokeCap(MODE) {
 
 /***/ },
 
+/***/ "./src/engine/lib/text.ts"
+/*!********************************!*\
+  !*** ./src/engine/lib/text.ts ***!
+  \********************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   HorizontalAlign: () => (/* binding */ HorizontalAlign),
+/* harmony export */   VerticalAlign: () => (/* binding */ VerticalAlign),
+/* harmony export */   outlinedText: () => (/* binding */ outlinedText),
+/* harmony export */   text: () => (/* binding */ text),
+/* harmony export */   textAlign: () => (/* binding */ textAlign),
+/* harmony export */   textFont: () => (/* binding */ textFont),
+/* harmony export */   textSize: () => (/* binding */ textSize),
+/* harmony export */   textStyle: () => (/* binding */ textStyle),
+/* harmony export */   textWeight: () => (/* binding */ textWeight)
+/* harmony export */ });
+/* harmony import */ var _pjsSettings__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pjsSettings */ "./src/engine/lib/pjsSettings.ts");
+/* harmony import */ var _colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./colors */ "./src/engine/lib/colors.ts");
+/* harmony import */ var _trigonometry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./trigonometry */ "./src/engine/lib/trigonometry.ts");
+/* harmony import */ var _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../helpers/CanvasManager */ "./src/engine/helpers/CanvasManager.ts");
+
+
+
+
+const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_3__.CanvasManager.getCtx();
+function textFont(font) {
+    _pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalFont = font;
+    updateText();
+}
+function textSize(size) {
+    _pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalSize = size;
+    updateText();
+}
+function textWeight(weight) {
+    if (!["lighter", "normal", "bold", "bolder"].includes(weight)) {
+        console.error("Invalid textWeight:", weight);
+    }
+    _pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalWeight = weight;
+    updateText();
+}
+function textStyle(style) {
+    _pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalStyle = style;
+    updateText();
+}
+function updateText() {
+    ctx.font = `${_pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalStyle} ${_pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalWeight} ${_pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalSize}px ${_pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalFont}`;
+}
+var HorizontalAlign;
+(function (HorizontalAlign) {
+    HorizontalAlign["LEFT"] = "LEFT";
+    HorizontalAlign["CENTER"] = "CENTER";
+    HorizontalAlign["RIGHT"] = "RIGHT";
+})(HorizontalAlign || (HorizontalAlign = {}));
+var VerticalAlign;
+(function (VerticalAlign) {
+    VerticalAlign["BASELINE"] = "BASELINE";
+    VerticalAlign["CENTER"] = "CENTER";
+    VerticalAlign["BOTTOM"] = "BOTTOM";
+})(VerticalAlign || (VerticalAlign = {}));
+function textAlign(ALIGN, YALIGN = VerticalAlign.BASELINE) {
+    const h = ALIGN === "LEFT" ? "start"
+        : ALIGN === "CENTER" ? "center"
+            : "end";
+    const v = YALIGN === "BASELINE" ? "alphabetic"
+        : YALIGN === "CENTER" ? "middle"
+            : "bottom";
+    ctx.textAlign = h;
+    ctx.textBaseline = v;
+}
+function text(message, x, y) {
+    ctx.fillText(message, x, y);
+}
+function outlinedText(message, x, y, weight, main, outline, inc = 10) {
+    (0,_colors__WEBPACK_IMPORTED_MODULE_1__.fill)(outline);
+    for (let i = 0; i < 360; i += inc) {
+        text(message, x + (0,_trigonometry__WEBPACK_IMPORTED_MODULE_2__.sin)(i) * weight, y + (0,_trigonometry__WEBPACK_IMPORTED_MODULE_2__.cos)(i) * weight);
+    }
+    (0,_colors__WEBPACK_IMPORTED_MODULE_1__.fill)(main);
+    text(message, x, y);
+}
+
+
+
+/***/ },
+
+/***/ "./src/engine/lib/trigonometry.ts"
+/*!****************************************!*\
+  !*** ./src/engine/lib/trigonometry.ts ***!
+  \****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   acos: () => (/* binding */ acos),
+/* harmony export */   asin: () => (/* binding */ asin),
+/* harmony export */   atan: () => (/* binding */ atan),
+/* harmony export */   atan2: () => (/* binding */ atan2),
+/* harmony export */   cos: () => (/* binding */ cos),
+/* harmony export */   degrees: () => (/* binding */ degrees),
+/* harmony export */   radians: () => (/* binding */ radians),
+/* harmony export */   sin: () => (/* binding */ sin),
+/* harmony export */   tan: () => (/* binding */ tan)
+/* harmony export */ });
+function radians(angle) {
+    return angle * Math.PI / 180;
+}
+function degrees(angle) {
+    return angle * 180 / Math.PI;
+}
+function sin(degrees) {
+    return Math.sin(radians(degrees));
+}
+function cos(degrees) {
+    return Math.cos(radians(degrees));
+}
+function tan(degrees) {
+    return Math.tan(radians(degrees));
+}
+function asin(value) {
+    return degrees(Math.asin(value));
+}
+function acos(value) {
+    return degrees(Math.acos(value));
+}
+function atan(value) {
+    return degrees(Math.atan(value));
+}
+function atan2(y, x) {
+    return degrees(Math.atan2(y, x));
+}
+
+
+
+/***/ },
+
 /***/ "./src/engine/ui/UIBindings/ParamUI.ts"
 /*!*********************************************!*\
   !*** ./src/engine/ui/UIBindings/ParamUI.ts ***!
   \*********************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ParamUI: () => (/* binding */ ParamUI)
@@ -1120,12 +1538,51 @@ class ParamUI {
 
 /***/ },
 
+/***/ "./src/engine/ui/UIBindings/TypeUIBindings/BooleanUI.ts"
+/*!**************************************************************!*\
+  !*** ./src/engine/ui/UIBindings/TypeUIBindings/BooleanUI.ts ***!
+  \**************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   BooleanUI: () => (/* binding */ BooleanUI)
+/* harmony export */ });
+/* harmony import */ var _ParamUI__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../ParamUI */ "./src/engine/ui/UIBindings/ParamUI.ts");
+
+class BooleanUI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
+    render(onChange) {
+        const container = document.createElement("div");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = this.value;
+        checkbox.classList.add("paramInput");
+        checkbox.onchange = () => {
+            this.value = checkbox.checked;
+            onChange(this.value);
+        };
+        container.appendChild(checkbox);
+        return container;
+    }
+    toCode() {
+        return this.value ? "true" : "false";
+    }
+    clone() {
+        return new BooleanUI(this.value);
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/engine/ui/UIBindings/TypeUIBindings/ColorUI.ts"
 /*!************************************************************!*\
   !*** ./src/engine/ui/UIBindings/TypeUIBindings/ColorUI.ts ***!
   \************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ColorUI: () => (/* binding */ ColorUI)
@@ -1198,12 +1655,68 @@ class ColorUI extends _ParamUI__WEBPACK_IMPORTED_MODULE_1__.ParamUI {
 
 /***/ },
 
+/***/ "./src/engine/ui/UIBindings/TypeUIBindings/EnumUI.ts"
+/*!***********************************************************!*\
+  !*** ./src/engine/ui/UIBindings/TypeUIBindings/EnumUI.ts ***!
+  \***********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   EnumUI: () => (/* binding */ EnumUI)
+/* harmony export */ });
+/* harmony import */ var _ParamUI__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../ParamUI */ "./src/engine/ui/UIBindings/ParamUI.ts");
+
+class EnumUI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
+    constructor(enumObj, defaultValue) {
+        super(defaultValue);
+        this.enumObj = enumObj;
+    }
+    render(onChange) {
+        const container = document.createElement("div");
+        const select = document.createElement("select");
+        select.classList.add("paramInput");
+        // Extract enum keys (filter out reverse numeric mappings)
+        const keys = Object.keys(this.enumObj).filter(k => isNaN(Number(k)) // ignore numeric reverse mappings
+        );
+        keys.forEach(key => {
+            const option = document.createElement("option");
+            option.value = key;
+            option.textContent = key;
+            if (this.enumObj[key] === this.value) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+        select.onchange = () => {
+            const selectedKey = select.value;
+            this.value = this.enumObj[selectedKey];
+            onChange(this.value);
+        };
+        container.appendChild(select);
+        return container;
+    }
+    toCode() {
+        // Produces: MyEnum.SomeValue
+        const key = Object.keys(this.enumObj).find(k => this.enumObj[k] === this.value);
+        return key ? `${this.enumObj.constructor.name}.${key}` : "undefined";
+    }
+    clone() {
+        return new EnumUI(this.enumObj, this.value);
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/engine/ui/UIBindings/TypeUIBindings/NumberUI.ts"
 /*!*************************************************************!*\
   !*** ./src/engine/ui/UIBindings/TypeUIBindings/NumberUI.ts ***!
   \*************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   NumberUI: () => (/* binding */ NumberUI)
@@ -1239,6 +1752,7 @@ class NumberUI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
   \*************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   StringUI: () => (/* binding */ StringUI)
@@ -1274,6 +1788,7 @@ class StringUI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
   \**************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Vector2UI: () => (/* binding */ Vector2UI)
@@ -1315,6 +1830,45 @@ class Vector2UI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
     }
 }
 
+
+/***/ },
+
+/***/ "./src/engine/core/ECS/components sync recursive \\.ts$"
+/*!****************************************************!*\
+  !*** ./src/engine/core/ECS/components/ sync \.ts$ ***!
+  \****************************************************/
+(module, __unused_webpack_exports, __webpack_require__) {
+
+var map = {
+	"./Renderer.ts": "./src/engine/core/ECS/components/Renderer.ts",
+	"./SpriteRenderer.ts": "./src/engine/core/ECS/components/SpriteRenderer.ts",
+	"./Transform.ts": "./src/engine/core/ECS/components/Transform.ts",
+	"./UIComponent.ts": "./src/engine/core/ECS/components/UIComponent.ts",
+	"./physics/Collider2D.ts": "./src/engine/core/ECS/components/physics/Collider2D.ts",
+	"./physics/RigidBody2D.ts": "./src/engine/core/ECS/components/physics/RigidBody2D.ts",
+	"./ui/ProgressBarUI.ts": "./src/engine/core/ECS/components/ui/ProgressBarUI.ts",
+	"./ui/TextUI.ts": "./src/engine/core/ECS/components/ui/TextUI.ts"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./src/engine/core/ECS/components sync recursive \\.ts$";
 
 /***/ }
 
@@ -1381,8 +1935,9 @@ class Vector2UI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
+// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
+"use strict";
 /*!*********************************************!*\
   !*** ./src/engine/tools/PrefabGenerator.ts ***!
   \*********************************************/

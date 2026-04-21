@@ -1137,83 +1137,44 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.getCtx();
-function toHex(num) {
-    const chars = "0123456789ABCDEF";
-    return chars[(num - (num % 16)) / 16] + chars[num % 16];
-}
 function color(r, g, b, a = 255) {
-    if (g === undefined && b === undefined && a === undefined) {
-        g = r;
-        b = r;
-        a = 255;
-    }
-    if (b === undefined && a === undefined) {
-        a = g;
+    // If user passed a CSS string, just return it
+    if (typeof r === "string")
+        return r;
+    if (g === undefined && b === undefined) {
         g = r;
         b = r;
     }
-    if (a === undefined) {
-        a = 255;
+    if (b === undefined) {
+        b = r;
     }
-    ctx.globalAlpha = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(a / 255, 0, 1);
-    return "#" + toHex(r) + toHex(g) + toHex(b);
+    r = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(r, 0, 255);
+    g = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(g, 0, 255);
+    b = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(b, 0, 255);
+    a = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(a, 0, 255);
+    return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
 }
-function fill(r, g = 255, b = 255, a = 255) {
-    if (typeof r === "string") {
-        ctx.fillStyle = r;
-    }
-    else {
-        if (g === undefined && b === undefined && a === undefined) {
-            g = r;
-            b = r;
-            a = 255;
-        }
-        if (b === undefined && a === undefined) {
-            a = g;
-            g = r;
-            b = r;
-        }
-        if (a === undefined) {
-            a = 255;
-        }
-        ctx.globalAlpha = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(a / 255, 0, 1);
-        ctx.fillStyle = "#" + toHex(r) + toHex(g) + toHex(b);
-    }
+function fill(r, g, b, a) {
+    ctx.fillStyle = color(r, g, b, a);
 }
 function noFill() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0)";
+    ctx.fillStyle = "rgba(0,0,0,0)";
 }
-function background(r, g, b, a = 255) {
-    fill(r, g, b, a);
-    ctx.fillRect(0, 0, _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.width, _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.height);
+function stroke(r, g, b, a) {
+    ctx.strokeStyle = color(r, g, b, a);
 }
 function noStroke() {
-    ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    ctx.strokeStyle = "rgba(0,0,0,0)";
 }
-function strokeWeight(thickness) {
-    ctx.lineWidth = thickness;
+function strokeWeight(w) {
+    ctx.lineWidth = w;
 }
-function stroke(r, g, b, a = 255) {
-    if (typeof r === "string") {
-        ctx.strokeStyle = r;
-    }
-    else {
-        if (g === undefined && b === undefined && a === undefined) {
-            g = r;
-            b = r;
-            a = 255;
-        }
-        if (b === undefined && a === undefined) {
-            a = g;
-            g = r;
-            b = r;
-        }
-        if (a === undefined) {
-            a = 255;
-        }
-        ctx.globalAlpha = (0,_math__WEBPACK_IMPORTED_MODULE_1__.constrain)(a / 255, 0, 1);
-        ctx.strokeStyle = "#" + toHex(r) + toHex(g) + toHex(b);
-    }
+function background(r, g, b, a) {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    fill(r, g, b, a);
+    ctx.fillRect(0, 0, _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.width, _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_0__.CanvasManager.height);
+    ctx.restore();
 }
 function lerpColor(color1, color2, amt) {
     function parseColor(color) {

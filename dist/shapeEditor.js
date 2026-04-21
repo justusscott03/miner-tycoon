@@ -799,8 +799,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TransformGizmo: () => (/* binding */ TransformGizmo)
 /* harmony export */ });
 class TransformGizmo {
-    constructor(canvas) {
-        this.canvas = canvas;
+    constructor() {
         this.dragging = false;
         this.dragMode = null;
         this.startMouse = { x: 0, y: 0 };
@@ -813,7 +812,7 @@ class TransformGizmo {
         const y = b.top;
         const width = b.right - b.left;
         const height = b.bottom - b.top;
-        ctx.strokeStyle = "#000000";
+        ctx.strokeStyle = "#4aa3ff";
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
         const handleSize = 10;
@@ -974,7 +973,7 @@ class ShapeEditor {
         this.inspector = new _Shape_Editor_InspectorPanel__WEBPACK_IMPORTED_MODULE_11__.InspectorPanel(document.getElementById(inspectorId));
         this.contextMenu = new _Shape_Editor_ContextMenu__WEBPACK_IMPORTED_MODULE_12__.ContextMenu(document.getElementById(contextMenuId));
         this.exporter = new _Shape_Editor_Exporter__WEBPACK_IMPORTED_MODULE_14__.Exporter(document.getElementById(outputId), document.getElementById(exportBtnId), this.layers);
-        this.gizmo = new _Shape_Editor_TransformGizmo__WEBPACK_IMPORTED_MODULE_15__.TransformGizmo(canvas);
+        this.gizmo = new _Shape_Editor_TransformGizmo__WEBPACK_IMPORTED_MODULE_15__.TransformGizmo();
         this.loop = new _Shape_Editor_RenderLoop__WEBPACK_IMPORTED_MODULE_13__.RenderLoop(ctx, this.layers, this.selection, this.gizmo);
         this.init();
     }
@@ -1369,7 +1368,7 @@ class EllipseUIBindings extends _ShapeUIBindings__WEBPACK_IMPORTED_MODULE_2__.Sh
         const c = _helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_3__.ColorHelpers.hexToRGB(color.value);
         const s = _helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_3__.ColorHelpers.hexToRGB(stroke.value);
         return `fill(${c.r}, ${c.g}, ${c.b}, ${Math.round(color.alpha * 255)});
-stroke(${s.r}, ${s.g}, ${s.b}, ${stroke.alpha});
+stroke(${s.r}, ${s.g}, ${s.b}, ${Math.round(stroke.alpha * 255)});
 ellipse(${x.value}, ${y.value}, ${w.value}, ${h.value});`;
     }
     render(ctx) {
@@ -1455,9 +1454,12 @@ class PathUIBindings extends _ShapeUIBindings__WEBPACK_IMPORTED_MODULE_0__.Shape
         };
     }
     toCode() {
-        const pts = this.params.points.value;
-        let code = "beginShape();\n";
-        for (const p of pts) {
+        const { points, color, stroke } = this.params;
+        console.log(color.value);
+        let code = `fill(${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(color.value).r}, ${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(color.value).g}, ${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(color.value).b}, ${Math.round(color.alpha * 255)});
+stroke(${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(stroke.value).r}, ${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(stroke.value).g}, ${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(stroke.value).b}, ${Math.round(stroke.alpha * 255)});
+beginShape();\n`;
+        for (const p of points.value) {
             code += `   vertex(${p.value.x + this.params.x.value}, ${p.value.y + this.params.y.value});\n`;
         }
         code += "endShape();";
@@ -1600,8 +1602,8 @@ class RectUIBindings extends _ShapeUIBindings__WEBPACK_IMPORTED_MODULE_2__.Shape
         const { x, y, w, h, radius, color, stroke } = this.params;
         const c = _helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_3__.ColorHelpers.hexToRGB(color.value);
         const s = _helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_3__.ColorHelpers.hexToRGB(stroke.value);
-        return `fill(${c.r}, ${c.g}, ${c.b}, ${color.alpha});
-stroke(${s.r}, ${s.g}, ${s.b}, ${stroke.alpha});
+        return `fill(${c.r}, ${c.g}, ${c.b}, ${Math.round(color.alpha * 255)});
+stroke(${s.r}, ${s.g}, ${s.b}, ${Math.round(stroke.alpha * 255)});
 rect(${x.value}, ${y.value}, ${w.value}, ${h.value}, ${radius.value});`;
     }
     render(ctx) {
@@ -1682,8 +1684,8 @@ class TriangleUIBindings extends _ShapeUIBindings__WEBPACK_IMPORTED_MODULE_2__.S
         const { x, y, color, stroke, point1, point2, point3 } = this.params;
         const c = _helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_3__.ColorHelpers.hexToRGB(color.value);
         const s = _helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_3__.ColorHelpers.hexToRGB(stroke.value);
-        return `fill(${c.r}, ${c.g}, ${c.b}, ${color.alpha});
-stroke(${s.r}, ${s.g}, ${s.b}, ${stroke.alpha});
+        return `fill(${c.r}, ${c.g}, ${c.b}, ${Math.round(color.alpha * 255)});
+stroke(${s.r}, ${s.g}, ${s.b}, ${Math.round(stroke.alpha * 255)});
 triangle(${point1.value.x + x.value}, ${point1.value.y + y.value}, ${point2.value.x + x.value}, ${point2.value.y + y.value}, ${point3.value.x + x.value}, ${point3.value.y + y.value});
 `.trim();
     }
