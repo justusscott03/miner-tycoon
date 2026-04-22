@@ -14,7 +14,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _core_ECS_ComponentScanner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/ECS/ComponentScanner */ "./src/engine/core/ECS/ComponentScanner.ts");
 
-const ComponentRegistry = (0,_core_ECS_ComponentScanner__WEBPACK_IMPORTED_MODULE_0__.autoScanComponents)();
+(0,_core_ECS_ComponentScanner__WEBPACK_IMPORTED_MODULE_0__.autoScanComponents)();
+const ComponentRegistry = _core_ECS_ComponentScanner__WEBPACK_IMPORTED_MODULE_0__.ComponentRegistry;
 
 
 /***/ },
@@ -66,24 +67,84 @@ Physics2D.gravity = { x: 0, y: 500 }; // pixels per second squared
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ComponentRegistry: () => (/* binding */ ComponentRegistry),
 /* harmony export */   autoScanComponents: () => (/* binding */ autoScanComponents)
 /* harmony export */ });
+/* harmony import */ var _main_MonoBehavior__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./main/MonoBehavior */ "./src/engine/core/ECS/main/MonoBehavior.ts");
+/* harmony import */ var _config_ImportMap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../config/ImportMap */ "./src/engine/config/ImportMap.ts");
+
+
+const ComponentRegistry = {};
 function autoScanComponents() {
-    const registry = {};
-    // Webpack magic: import all .ts files in components folder
-    const context = __webpack_require__("./src/engine/core/ECS/components sync recursive \\.ts$");
-    context.keys().forEach((key) => {
-        const module = context(key);
-        for (const exportName in module) {
-            const value = module[exportName];
-            // Detect ComponentDefinition objects
-            if (value && typeof value === "object" && "params" in value && "import" in value) {
-                const name = exportName.replace("Def", "");
-                registry[name] = value;
+    const contexts = [
+        __webpack_require__("./src/engine/core/ECS/components sync recursive \\.ts$"),
+        __webpack_require__("./src/game/components sync recursive \\.ts$")
+    ];
+    for (const context of contexts) {
+        context.keys().forEach((key) => {
+            const module = context(key);
+            // Webpack gives us the actual file path here
+            const resolvedPath = context.resolve(key);
+            for (const exportName in module) {
+                const value = module[exportName];
+                // -----------------------------
+                // DATA COMPONENT (ComponentDefinition)
+                // -----------------------------
+                if (value &&
+                    typeof value === "object" &&
+                    "params" in value) {
+                    const name = exportName.replace("Def", "");
+                    // Remove extension from resolvedPath
+                    const cleanedPath = resolvedPath.replace(/\.(ts|js)$/, "");
+                    ComponentRegistry[name] = {
+                        type: "data",
+                        name,
+                        def: value,
+                        importPath: cleanedPath
+                    };
+                    _config_ImportMap__WEBPACK_IMPORTED_MODULE_1__.ImportMap[name] = cleanedPath;
+                    continue;
+                }
+                // -----------------------------
+                // SCRIPT COMPONENT (MonoBehavior)
+                // -----------------------------
+                if (typeof value === "function" &&
+                    value.prototype instanceof _main_MonoBehavior__WEBPACK_IMPORTED_MODULE_0__.MonoBehavior) {
+                    const cleanedPath = resolvedPath.replace(/\.(ts|js)$/, "");
+                    ComponentRegistry[exportName] = {
+                        type: "script",
+                        name: exportName,
+                        ctor: value,
+                        importPath: cleanedPath
+                    };
+                    _config_ImportMap__WEBPACK_IMPORTED_MODULE_1__.ImportMap[exportName] = cleanedPath;
+                }
             }
-        }
-    });
-    return registry;
+        });
+    }
+    return ComponentRegistry;
+}
+
+
+/***/ },
+
+/***/ "./src/engine/core/ECS/Prefab.ts"
+/*!***************************************!*\
+  !*** ./src/engine/core/ECS/Prefab.ts ***!
+  \***************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Prefab: () => (/* binding */ Prefab)
+/* harmony export */ });
+/* harmony import */ var _main_GameObject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./main/GameObject */ "./src/engine/core/ECS/main/GameObject.ts");
+
+class Prefab extends _main_GameObject__WEBPACK_IMPORTED_MODULE_0__.GameObject {
+    static instantiate() {
+        return new this();
+    }
 }
 
 
@@ -363,6 +424,7 @@ const ProgressBarUIDef = {
         backColor: new _ui_UIBindings_TypeUIBindings_ColorUI__WEBPACK_IMPORTED_MODULE_7__.ColorUI("#646464"),
         max: new _ui_UIBindings_TypeUIBindings_NumberUI__WEBPACK_IMPORTED_MODULE_5__.NumberUI(100),
         w: new _ui_UIBindings_TypeUIBindings_NumberUI__WEBPACK_IMPORTED_MODULE_5__.NumberUI(100),
+        h: new _ui_UIBindings_TypeUIBindings_NumberUI__WEBPACK_IMPORTED_MODULE_5__.NumberUI(40),
         relativePosition: new _ui_UIBindings_TypeUIBindings_Vector2UI__WEBPACK_IMPORTED_MODULE_6__.Vector2UI({ x: 0, y: 0 })
     }
 };
@@ -375,14 +437,10 @@ class ProgressBarUI extends _UIComponent__WEBPACK_IMPORTED_MODULE_3__.UIComponen
         this.max = 100;
         this.w = 100;
         this.h = 40;
+        this.relativePosition = _math_Vector2__WEBPACK_IMPORTED_MODULE_4__.Vector2.zero;
     }
-    initialize(fillColor, backColor, max, w = 100, h = 40, relativePosition = _math_Vector2__WEBPACK_IMPORTED_MODULE_4__.Vector2.zero) {
-        this.fillColor = fillColor;
-        this.backColor = backColor;
-        this.max = max;
-        this.w = w;
-        this.h = h;
-        this.relativePosition = relativePosition;
+    initialize(values) {
+        Object.assign(this, values);
     }
     RenderUI() {
         let x = this.transform.position.x + this.relativePosition.x;
@@ -436,7 +494,7 @@ const TextUIDef = {
         content: new _ui_UIBindings_TypeUIBindings_StringUI__WEBPACK_IMPORTED_MODULE_7__.StringUI(""),
         fontSize: new _ui_UIBindings_TypeUIBindings_NumberUI__WEBPACK_IMPORTED_MODULE_5__.NumberUI(20),
         color: new _ui_UIBindings_TypeUIBindings_ColorUI__WEBPACK_IMPORTED_MODULE_4__.ColorUI("#000000"),
-        align: new _ui_UIBindings_TypeUIBindings_EnumUI__WEBPACK_IMPORTED_MODULE_9__.EnumUI(_lib_text__WEBPACK_IMPORTED_MODULE_2__.HorizontalAlign, _lib_text__WEBPACK_IMPORTED_MODULE_2__.HorizontalAlign.LEFT),
+        align: new _ui_UIBindings_TypeUIBindings_EnumUI__WEBPACK_IMPORTED_MODULE_9__.EnumUI(["LEFT", "CENTER", "RIGHT"], "LEFT"),
         screenSpace: new _ui_UIBindings_TypeUIBindings_BooleanUI__WEBPACK_IMPORTED_MODULE_8__.BooleanUI(true),
         relativePosition: new _ui_UIBindings_TypeUIBindings_Vector2UI__WEBPACK_IMPORTED_MODULE_6__.Vector2UI({ x: 0, y: 0 })
     }
@@ -447,25 +505,43 @@ class TextUI extends _UIComponent__WEBPACK_IMPORTED_MODULE_0__.UIComponent {
         this.content = "";
         this.fontSize = 20;
         this.color = "#000000";
-        this.align = _lib_text__WEBPACK_IMPORTED_MODULE_2__.HorizontalAlign.LEFT;
+        this.align = "LEFT";
         this.screenSpace = true;
         this.relativePosition = _math_Vector2__WEBPACK_IMPORTED_MODULE_3__.Vector2.zero;
     }
-    initialize(content, fontSize, color, align, screenSpace = true, relativePosition = _math_Vector2__WEBPACK_IMPORTED_MODULE_3__.Vector2.zero) {
-        this.content = content;
-        this.fontSize = fontSize;
-        this.color = color;
-        this.align = align;
-        this.screenSpace = screenSpace;
-        this.relativePosition = relativePosition;
+    initialize(values) {
+        Object.assign(this, values);
     }
     RenderUI() {
         (0,_lib_colors__WEBPACK_IMPORTED_MODULE_1__.fill)(this.color);
-        (0,_lib_text__WEBPACK_IMPORTED_MODULE_2__.textAlign)(this.align, _lib_text__WEBPACK_IMPORTED_MODULE_2__.VerticalAlign.CENTER);
+        (0,_lib_text__WEBPACK_IMPORTED_MODULE_2__.textAlign)(this.align, "CENTER");
         (0,_lib_text__WEBPACK_IMPORTED_MODULE_2__.textSize)(this.fontSize);
         const x = this.transform.position.x + this.relativePosition.x;
         const y = this.transform.position.y + this.relativePosition.y;
         (0,_lib_text__WEBPACK_IMPORTED_MODULE_2__.text)(this.content, x, y);
+    }
+}
+
+
+/***/ },
+
+/***/ "./src/engine/core/ECS/main/Behavior.ts"
+/*!**********************************************!*\
+  !*** ./src/engine/core/ECS/main/Behavior.ts ***!
+  \**********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Behavior: () => (/* binding */ Behavior)
+/* harmony export */ });
+/* harmony import */ var _Component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Component */ "./src/engine/core/ECS/main/Component.ts");
+
+class Behavior extends _Component__WEBPACK_IMPORTED_MODULE_0__.Component {
+    constructor() {
+        super(...arguments);
+        this.enabled = true;
     }
 }
 
@@ -520,6 +596,111 @@ class EngineObject {
     }
 }
 EngineObject._nextId = 1;
+
+
+/***/ },
+
+/***/ "./src/engine/core/ECS/main/GameObject.ts"
+/*!************************************************!*\
+  !*** ./src/engine/core/ECS/main/GameObject.ts ***!
+  \************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   GameObject: () => (/* binding */ GameObject)
+/* harmony export */ });
+/* harmony import */ var _Component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Component */ "./src/engine/core/ECS/main/Component.ts");
+/* harmony import */ var _components_Transform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Transform */ "./src/engine/core/ECS/components/Transform.ts");
+/* harmony import */ var _EngineObject__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EngineObject */ "./src/engine/core/ECS/main/EngineObject.ts");
+
+
+
+class GameObject extends _EngineObject__WEBPACK_IMPORTED_MODULE_2__.EngineObject {
+    constructor() {
+        super();
+        this.components = [];
+        this.children = [];
+        this.transform = new _components_Transform__WEBPACK_IMPORTED_MODULE_1__.Transform();
+        this.transform = this.AddComponent(_components_Transform__WEBPACK_IMPORTED_MODULE_1__.Transform);
+    }
+    // -------------------------
+    // AddComponent<T>
+    // -------------------------
+    AddComponent(type) {
+        const comp = new type();
+        comp.gameObject = this;
+        this.components.push(comp);
+        return comp;
+    }
+    GetComponent(type) {
+        if (typeof type === "string") {
+            return (this.components.find(c => c.constructor.name === type) || null);
+        }
+        const comp = this.components.find(c => c instanceof type);
+        return comp ? comp : null;
+    }
+    // -------------------------
+    // RemoveComponent
+    // -------------------------
+    RemoveComponent(type) {
+        // Remove by instance
+        if (type instanceof _Component__WEBPACK_IMPORTED_MODULE_0__.Component) {
+            const index = this.components.indexOf(type);
+            if (index !== -1) {
+                this.components.splice(index, 1);
+                return true;
+            }
+            return false;
+        }
+        // Remove by string name
+        if (typeof type === "string") {
+            const index = this.components.findIndex(c => c.constructor.name === type);
+            if (index !== -1) {
+                this.components.splice(index, 1);
+                return true;
+            }
+            return false;
+        }
+        // Remove by constructor
+        const index = this.components.findIndex(c => c instanceof type);
+        if (index !== -1) {
+            this.components.splice(index, 1);
+            return true;
+        }
+        return false;
+    }
+    addChild(child) {
+        child.transform.parent = this.transform;
+        this.children.push(child);
+    }
+}
+
+
+/***/ },
+
+/***/ "./src/engine/core/ECS/main/MonoBehavior.ts"
+/*!**************************************************!*\
+  !*** ./src/engine/core/ECS/main/MonoBehavior.ts ***!
+  \**************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   MonoBehavior: () => (/* binding */ MonoBehavior)
+/* harmony export */ });
+/* harmony import */ var _Behavior__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Behavior */ "./src/engine/core/ECS/main/Behavior.ts");
+
+class MonoBehavior extends _Behavior__WEBPACK_IMPORTED_MODULE_0__.Behavior {
+    Awake() { }
+    Start() { }
+    FixedUpdate() { }
+    Update() { }
+    LateUpdate() { }
+    OnDestroy() { }
+}
 
 
 /***/ },
@@ -1385,8 +1566,6 @@ function strokeCap(MODE) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   HorizontalAlign: () => (/* binding */ HorizontalAlign),
-/* harmony export */   VerticalAlign: () => (/* binding */ VerticalAlign),
 /* harmony export */   outlinedText: () => (/* binding */ outlinedText),
 /* harmony export */   text: () => (/* binding */ text),
 /* harmony export */   textAlign: () => (/* binding */ textAlign),
@@ -1426,19 +1605,7 @@ function textStyle(style) {
 function updateText() {
     ctx.font = `${_pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalStyle} ${_pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalWeight} ${_pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalSize}px ${_pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalFont}`;
 }
-var HorizontalAlign;
-(function (HorizontalAlign) {
-    HorizontalAlign["LEFT"] = "LEFT";
-    HorizontalAlign["CENTER"] = "CENTER";
-    HorizontalAlign["RIGHT"] = "RIGHT";
-})(HorizontalAlign || (HorizontalAlign = {}));
-var VerticalAlign;
-(function (VerticalAlign) {
-    VerticalAlign["BASELINE"] = "BASELINE";
-    VerticalAlign["CENTER"] = "CENTER";
-    VerticalAlign["BOTTOM"] = "BOTTOM";
-})(VerticalAlign || (VerticalAlign = {}));
-function textAlign(ALIGN, YALIGN = VerticalAlign.BASELINE) {
+function textAlign(ALIGN, YALIGN = "BASELINE") {
     const h = ALIGN === "LEFT" ? "start"
         : ALIGN === "CENTER" ? "center"
             : "end";
@@ -1669,41 +1836,36 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ParamUI__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../ParamUI */ "./src/engine/ui/UIBindings/ParamUI.ts");
 
 class EnumUI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
-    constructor(enumObj, defaultValue) {
+    constructor(options, defaultValue) {
         super(defaultValue);
-        this.enumObj = enumObj;
+        this.options = options;
     }
     render(onChange) {
         const container = document.createElement("div");
         const select = document.createElement("select");
         select.classList.add("paramInput");
-        // Extract enum keys (filter out reverse numeric mappings)
-        const keys = Object.keys(this.enumObj).filter(k => isNaN(Number(k)) // ignore numeric reverse mappings
-        );
-        keys.forEach(key => {
+        this.options.forEach(opt => {
             const option = document.createElement("option");
-            option.value = key;
-            option.textContent = key;
-            if (this.enumObj[key] === this.value) {
+            option.value = String(opt);
+            option.textContent = String(opt);
+            if (opt === this.value) {
                 option.selected = true;
             }
             select.appendChild(option);
         });
         select.onchange = () => {
-            const selectedKey = select.value;
-            this.value = this.enumObj[selectedKey];
-            onChange(this.value);
+            const selected = select.value;
+            this.value = selected;
+            onChange(selected);
         };
         container.appendChild(select);
         return container;
     }
     toCode() {
-        // Produces: MyEnum.SomeValue
-        const key = Object.keys(this.enumObj).find(k => this.enumObj[k] === this.value);
-        return key ? `${this.enumObj.constructor.name}.${key}` : "undefined";
+        return JSON.stringify(this.value);
     }
     clone() {
-        return new EnumUI(this.enumObj, this.value);
+        return new EnumUI(this.options, this.value);
     }
 }
 
@@ -1833,6 +1995,334 @@ class Vector2UI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
 
 /***/ },
 
+/***/ "./src/game/components/entities/CrateBehavior.ts"
+/*!*******************************************************!*\
+  !*** ./src/game/components/entities/CrateBehavior.ts ***!
+  \*******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CrateBehavior: () => (/* binding */ CrateBehavior)
+/* harmony export */ });
+/* harmony import */ var _engine_core_ECS_components_ui_TextUI__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../engine/core/ECS/components/ui/TextUI */ "./src/engine/core/ECS/components/ui/TextUI.ts");
+/* harmony import */ var _engine_core_ECS_main_MonoBehavior__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../engine/core/ECS/main/MonoBehavior */ "./src/engine/core/ECS/main/MonoBehavior.ts");
+/* harmony import */ var _engine_helpers_TimeManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../engine/helpers/TimeManager */ "./src/engine/helpers/TimeManager.ts");
+/* harmony import */ var _helpers_MoneyFormatter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../helpers/MoneyFormatter */ "./src/game/helpers/MoneyFormatter.ts");
+/* harmony import */ var _prefabs_CratePrefab__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../prefabs/CratePrefab */ "./src/game/prefabs/CratePrefab.ts");
+
+
+
+
+
+class CrateBehavior extends _engine_core_ECS_main_MonoBehavior__WEBPACK_IMPORTED_MODULE_1__.MonoBehavior {
+    constructor() {
+        super(...arguments);
+        this.money = 0;
+        this.lvl = 1;
+        this.hasUnloaded = false;
+    }
+    Awake() {
+        this.moneyText = this.GetComponent(_engine_core_ECS_components_ui_TextUI__WEBPACK_IMPORTED_MODULE_0__.TextUI);
+    }
+    Update() {
+        this.money += _engine_helpers_TimeManager__WEBPACK_IMPORTED_MODULE_2__.Time.deltaTime;
+        this.moneyText.content = _helpers_MoneyFormatter__WEBPACK_IMPORTED_MODULE_3__.MoneyFormatter.abbreviate(Math.round(this.money));
+    }
+    add(amount) {
+        if (amount > 0) {
+            this.money += amount;
+        }
+    }
+    toJSON() {
+        return {
+            lvl: this.lvl,
+            money: this.money,
+            hasUnloaded: this.hasUnloaded
+        };
+    }
+    static fromJSON(data) {
+        const crateGO = _prefabs_CratePrefab__WEBPACK_IMPORTED_MODULE_4__.CratePrefab.instantiate();
+        const crateBehavior = crateGO.GetComponent(CrateBehavior);
+        crateBehavior.lvl = data.lvl;
+        crateBehavior.money = data.money;
+        crateBehavior.hasUnloaded = data.hasUnloaded;
+        return crateGO;
+    }
+}
+
+
+/***/ },
+
+/***/ "./src/game/components/entities/MinerBehavior.ts"
+/*!*******************************************************!*\
+  !*** ./src/game/components/entities/MinerBehavior.ts ***!
+  \*******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   MinerBehavior: () => (/* binding */ MinerBehavior)
+/* harmony export */ });
+/* harmony import */ var _engine_core_ECS_components_ui_ProgressBarUI__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../engine/core/ECS/components/ui/ProgressBarUI */ "./src/engine/core/ECS/components/ui/ProgressBarUI.ts");
+/* harmony import */ var _engine_core_ECS_main_MonoBehavior__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../engine/core/ECS/main/MonoBehavior */ "./src/engine/core/ECS/main/MonoBehavior.ts");
+/* harmony import */ var _engine_helpers_TimeManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../engine/helpers/TimeManager */ "./src/engine/helpers/TimeManager.ts");
+/* harmony import */ var _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../config/MinerStates */ "./src/game/config/MinerStates.ts");
+/* harmony import */ var _prefabs_MinerPrefab__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../prefabs/MinerPrefab */ "./src/game/prefabs/MinerPrefab.ts");
+
+
+
+
+
+class MinerBehavior extends _engine_core_ECS_main_MonoBehavior__WEBPACK_IMPORTED_MODULE_1__.MonoBehavior {
+    constructor() {
+        super(...arguments);
+        this.maxLoad = 100;
+        this.currentLoad = 0;
+        this.loadSpeed = 50;
+        this.moveSpeed = 60;
+        this.direction = 1;
+        this.action = _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__.MinerStates.ToDigging;
+    }
+    Awake() {
+        this.progressBar = this.GetComponent(_engine_core_ECS_components_ui_ProgressBarUI__WEBPACK_IMPORTED_MODULE_0__.ProgressBarUI);
+    }
+    Update() {
+        this.progressBar.hidden = this.action != _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__.MinerStates.Digging;
+        this.progressBar.max = this.maxLoad;
+        this.progressBar.current = this.currentLoad;
+        this.transform.scale.x = this.direction;
+        let x = this.transform.position.x;
+        switch (this.action) {
+            case _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__.MinerStates.ToDigging:
+                this.direction = 1;
+                if (x < 500) {
+                    this.transform.position.x += this.moveSpeed * _engine_helpers_TimeManager__WEBPACK_IMPORTED_MODULE_2__.Time.deltaTime;
+                }
+                else {
+                    this.action = _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__.MinerStates.Digging;
+                }
+                break;
+            case _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__.MinerStates.Digging:
+                this.direction = 1;
+                this.currentLoad += this.loadSpeed * _engine_helpers_TimeManager__WEBPACK_IMPORTED_MODULE_2__.Time.deltaTime;
+                if (this.currentLoad >= this.maxLoad) {
+                    this.currentLoad = this.maxLoad;
+                    this.action = _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__.MinerStates.ToCrate;
+                }
+                break;
+            case _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__.MinerStates.ToCrate:
+                this.direction = -1;
+                if (x > 300) {
+                    this.transform.position.x -= this.moveSpeed * _engine_helpers_TimeManager__WEBPACK_IMPORTED_MODULE_2__.Time.deltaTime;
+                }
+                else {
+                    this.crate.add(this.currentLoad);
+                    this.currentLoad = 0;
+                    this.action = _config_MinerStates__WEBPACK_IMPORTED_MODULE_3__.MinerStates.ToDigging;
+                }
+                break;
+        }
+    }
+    toJSON() {
+        return {
+            maxLoad: this.maxLoad,
+            currentLoad: this.currentLoad,
+            loadSpeed: this.loadSpeed,
+            moveSpeed: this.moveSpeed
+        };
+    }
+    static fromJSON(data) {
+        const minerGO = _prefabs_MinerPrefab__WEBPACK_IMPORTED_MODULE_4__.MinerPrefab.instantiate();
+        const minerBehavior = minerGO.GetComponent(MinerBehavior);
+        minerBehavior.maxLoad = data.maxLoad;
+        minerBehavior.currentLoad = data.currentLoad;
+        minerBehavior.loadSpeed = data.loadSpeed;
+        minerBehavior.moveSpeed = data.moveSpeed;
+        return minerGO;
+    }
+}
+
+
+/***/ },
+
+/***/ "./src/game/components/entities/ShaftBehavior.ts"
+/*!*******************************************************!*\
+  !*** ./src/game/components/entities/ShaftBehavior.ts ***!
+  \*******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ShaftBehavior: () => (/* binding */ ShaftBehavior)
+/* harmony export */ });
+/* harmony import */ var _engine_core_ECS_main_MonoBehavior__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../engine/core/ECS/main/MonoBehavior */ "./src/engine/core/ECS/main/MonoBehavior.ts");
+
+class ShaftBehavior extends _engine_core_ECS_main_MonoBehavior__WEBPACK_IMPORTED_MODULE_0__.MonoBehavior {
+}
+
+
+/***/ },
+
+/***/ "./src/game/config/MinerStates.ts"
+/*!****************************************!*\
+  !*** ./src/game/config/MinerStates.ts ***!
+  \****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   MinerStates: () => (/* binding */ MinerStates)
+/* harmony export */ });
+var MinerStates;
+(function (MinerStates) {
+    MinerStates["ToDigging"] = "toDigging";
+    MinerStates["Digging"] = "digging";
+    MinerStates["ToCrate"] = "toCrate";
+})(MinerStates || (MinerStates = {}));
+
+
+/***/ },
+
+/***/ "./src/game/helpers/MoneyFormatter.ts"
+/*!********************************************!*\
+  !*** ./src/game/helpers/MoneyFormatter.ts ***!
+  \********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   MoneyFormatter: () => (/* binding */ MoneyFormatter)
+/* harmony export */ });
+class MoneyFormatter {
+    static tenthRoot(num) {
+        const numStr = num.toString();
+        if (numStr[1] === ".") {
+            return parseInt(numStr.substring(numStr.indexOf("e") + 2));
+        }
+        else if (numStr[1] === "e") {
+            return parseInt(numStr.substring(3));
+        }
+        else {
+            return numStr.length - 1;
+        }
+    }
+    static abbreviate(num, forceZeroes = false) {
+        if (num < 1000) {
+            return num.toString();
+        }
+        let numStr = num.toString();
+        let numArr = numStr.split("");
+        let numPow = numStr.length - 1;
+        if (numArr[1] === ".") {
+            numPow = parseInt(numStr.substring(numArr.indexOf("e") + 2));
+            numArr.splice(1, 1);
+        }
+        if (numArr[1] === "e") {
+            numPow = parseInt(numStr.substring(3));
+            numArr = [numArr[0], "0", "0", "0"];
+        }
+        numStr = numArr.join("");
+        let newNumStr = numStr.slice(0, numPow % 3 + 1) +
+            "." +
+            numStr.slice(numPow % 3 + 1);
+        if (!forceZeroes) {
+            let trimmed = newNumStr.substr(0, 5).split("");
+            for (let i = trimmed.length - 1; i >= 0; i--) {
+                if (trimmed[i] !== "0")
+                    break;
+                trimmed.splice(i, 1);
+            }
+            if (trimmed[trimmed.length - 1] === ".") {
+                trimmed.pop();
+            }
+            newNumStr = trimmed.join("");
+        }
+        const suffixIndex = Math.floor(numPow / 3) - 1;
+        return newNumStr.substr(0, 5) + MoneyFormatter.numberLetters[suffixIndex];
+    }
+}
+MoneyFormatter.numberLetters = [
+    "K", "B", "M", "T",
+    "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak"
+];
+
+
+/***/ },
+
+/***/ "./src/game/prefabs/CratePrefab.ts"
+/*!*****************************************!*\
+  !*** ./src/game/prefabs/CratePrefab.ts ***!
+  \*****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CratePrefab: () => (/* binding */ CratePrefab)
+/* harmony export */ });
+/* harmony import */ var _engine_core_ECS_components_SpriteRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../engine/core/ECS/components/SpriteRenderer */ "./src/engine/core/ECS/components/SpriteRenderer.ts");
+/* harmony import */ var _engine_core_ECS_components_ui_TextUI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../engine/core/ECS/components/ui/TextUI */ "./src/engine/core/ECS/components/ui/TextUI.ts");
+/* harmony import */ var _components_entities_CrateBehavior__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/entities/CrateBehavior */ "./src/game/components/entities/CrateBehavior.ts");
+/* harmony import */ var _engine_core_ECS_Prefab__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../engine/core/ECS/Prefab */ "./src/engine/core/ECS/Prefab.ts");
+
+
+
+
+class CratePrefab extends _engine_core_ECS_Prefab__WEBPACK_IMPORTED_MODULE_3__.Prefab {
+    constructor() {
+        super();
+        const spriteRenderer = this.AddComponent(_engine_core_ECS_components_SpriteRenderer__WEBPACK_IMPORTED_MODULE_0__.SpriteRenderer);
+        spriteRenderer.initialize("crate", 70, 40);
+        const moneyText = this.AddComponent(_engine_core_ECS_components_ui_TextUI__WEBPACK_IMPORTED_MODULE_1__.TextUI);
+        //moneyText.initialize("0", 30, color(0, 0, 0), "CENTER", false, new Vector2(35, -10));
+        this.AddComponent(_components_entities_CrateBehavior__WEBPACK_IMPORTED_MODULE_2__.CrateBehavior);
+    }
+}
+
+
+/***/ },
+
+/***/ "./src/game/prefabs/MinerPrefab.ts"
+/*!*****************************************!*\
+  !*** ./src/game/prefabs/MinerPrefab.ts ***!
+  \*****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   MinerPrefab: () => (/* binding */ MinerPrefab)
+/* harmony export */ });
+/* harmony import */ var _engine_core_ECS_components_SpriteRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../engine/core/ECS/components/SpriteRenderer */ "./src/engine/core/ECS/components/SpriteRenderer.ts");
+/* harmony import */ var _engine_core_ECS_components_ui_ProgressBarUI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../engine/core/ECS/components/ui/ProgressBarUI */ "./src/engine/core/ECS/components/ui/ProgressBarUI.ts");
+/* harmony import */ var _engine_core_math_Vector2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../engine/core/math/Vector2 */ "./src/engine/core/math/Vector2.ts");
+/* harmony import */ var _engine_core_ECS_Prefab__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../engine/core/ECS/Prefab */ "./src/engine/core/ECS/Prefab.ts");
+/* harmony import */ var _components_entities_MinerBehavior__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/entities/MinerBehavior */ "./src/game/components/entities/MinerBehavior.ts");
+
+
+
+
+
+class MinerPrefab extends _engine_core_ECS_Prefab__WEBPACK_IMPORTED_MODULE_3__.Prefab {
+    constructor() {
+        super();
+        const spriteRenderer = this.AddComponent(_engine_core_ECS_components_SpriteRenderer__WEBPACK_IMPORTED_MODULE_0__.SpriteRenderer);
+        spriteRenderer.initialize("miner", 50, 75, new _engine_core_math_Vector2__WEBPACK_IMPORTED_MODULE_2__.Vector2(0, 0));
+        const progressBar = this.AddComponent(_engine_core_ECS_components_ui_ProgressBarUI__WEBPACK_IMPORTED_MODULE_1__.ProgressBarUI);
+        //progressBar.initialize(color(255, 214, 89), color(255), 0, 200 / 3, 15 / 2, new Vector2(-25 / 3, -25 / 2));
+        this.AddComponent(_components_entities_MinerBehavior__WEBPACK_IMPORTED_MODULE_4__.MinerBehavior);
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/engine/core/ECS/components sync recursive \\.ts$"
 /*!****************************************************!*\
   !*** ./src/engine/core/ECS/components/ sync \.ts$ ***!
@@ -1869,6 +2359,40 @@ webpackContext.keys = function webpackContextKeys() {
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
 webpackContext.id = "./src/engine/core/ECS/components sync recursive \\.ts$";
+
+/***/ },
+
+/***/ "./src/game/components sync recursive \\.ts$"
+/*!*****************************************!*\
+  !*** ./src/game/components/ sync \.ts$ ***!
+  \*****************************************/
+(module, __unused_webpack_exports, __webpack_require__) {
+
+var map = {
+	"./entities/CrateBehavior.ts": "./src/game/components/entities/CrateBehavior.ts",
+	"./entities/MinerBehavior.ts": "./src/game/components/entities/MinerBehavior.ts",
+	"./entities/ShaftBehavior.ts": "./src/game/components/entities/ShaftBehavior.ts"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./src/game/components sync recursive \\.ts$";
 
 /***/ }
 
@@ -1969,64 +2493,76 @@ class PrefabGenerator {
         var _a;
         this.state = { className: "", components: [] };
         this.outputDirHandle = null;
-        // DOM elements
         this.container = document.getElementById(containerId);
         this.select = document.getElementById(selectId);
-        if (!this.select)
-            throw new Error("componentSelect element missing!");
         this.classNameInput = document.getElementById(classNameId);
         const generateBtn = document.getElementById(generateBtnId);
         const downloadBtn = document.getElementById(downloadBtnId);
         const componentList = document.getElementById(componentListId);
         const output = document.getElementById(outputId);
-        // Initialize class name input
+        // Class name input
         this.classNameInput.oninput = (e) => {
             this.state.className = e.target.value;
         };
-        // Populate component select
+        // Populate dropdown
         Object.keys(_config_ComponentRegistry__WEBPACK_IMPORTED_MODULE_0__.ComponentRegistry).forEach((name) => {
             const option = document.createElement("option");
             option.value = name;
             option.textContent = name;
             this.select.appendChild(option);
         });
-        // Add component button
+        // Add component
         (_a = document.getElementById("addComponentButton")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => this.addComponent(componentList));
-        // Generate code button
+        // Generate code
         generateBtn.addEventListener("click", () => {
             const code = this.generatePrefabCode();
             output.textContent = code;
         });
-        // Download prefab file
+        // Download file
         downloadBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             const code = this.generatePrefabCode();
             const filename = `${this.state.className || "Prefab"}.ts`;
             yield this.saveToDirectory(filename, code);
         }));
+        // Choose output directory
         const chooseDirBtn = document.getElementById("chooseOutputDir");
         chooseDirBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             try {
                 this.outputDirHandle = yield window.showDirectoryPicker();
-                console.log("Directory selected:", this.outputDirHandle);
             }
-            catch (err) {
-                console.warn("Directory selection cancelled.");
-            }
+            catch (_a) { }
         }));
     }
+    // ----------------------------
+    // ADD COMPONENT
+    // ----------------------------
     addComponent(container) {
         const type = this.select.value;
-        const definition = _config_ComponentRegistry__WEBPACK_IMPORTED_MODULE_0__.ComponentRegistry[type];
-        if (!definition)
+        const entry = _config_ComponentRegistry__WEBPACK_IMPORTED_MODULE_0__.ComponentRegistry[type];
+        if (!entry)
             return;
-        // Initialize values from UI defaults
+        // SCRIPT COMPONENT (MonoBehavior)
+        if (entry.type === "script") {
+            this.state.components.push({
+                type,
+                definition: null,
+                values: {}
+            });
+            this.renderComponents(container);
+            return;
+        }
+        // DATA COMPONENT
+        const definition = entry.def;
         const values = {};
-        for (const [key, ui] of Object.entries(definition.params)) {
-            values[key] = ui.clone(); // 🔥 THIS FIXES EVERYTHING
+        for (const key of Object.keys(definition.params)) {
+            values[key] = definition.params[key].clone();
         }
         this.state.components.push({ type, definition, values });
         this.renderComponents(container);
     }
+    // ----------------------------
+    // RENDER COMPONENT UI
+    // ----------------------------
     renderComponents(container) {
         container.innerHTML = "";
         this.state.components.forEach((comp, index) => {
@@ -2037,16 +2573,24 @@ class PrefabGenerator {
             const title = document.createElement("h4");
             title.textContent = comp.type;
             div.appendChild(title);
-            // Render each param UI
-            for (const [paramName, uiInstance] of Object.entries(comp.values)) {
-                const label = document.createElement("label");
-                label.textContent = paramName;
-                const element = uiInstance.render((val) => {
-                    uiInstance.value = val;
-                });
-                div.appendChild(label);
-                div.appendChild(element);
-                div.appendChild(document.createElement("br"));
+            // SCRIPT COMPONENT
+            if (!comp.definition) {
+                const note = document.createElement("p");
+                note.textContent = "(Script component — no parameters)";
+                div.appendChild(note);
+            }
+            // DATA COMPONENT
+            else {
+                for (const [paramName, uiInstance] of Object.entries(comp.values)) {
+                    const label = document.createElement("label");
+                    label.textContent = paramName;
+                    const element = uiInstance.render((val) => {
+                        uiInstance.value = val;
+                    });
+                    div.appendChild(label);
+                    div.appendChild(element);
+                    div.appendChild(document.createElement("br"));
+                }
             }
             const removeBtn = document.createElement("button");
             removeBtn.textContent = "Remove";
@@ -2058,27 +2602,42 @@ class PrefabGenerator {
             container.appendChild(div);
         });
     }
+    // ----------------------------
+    // GENERATE PREFAB CODE
+    // ----------------------------
     generatePrefabCode() {
         const imports = new Set();
         imports.add(this.buildImport("Prefab"));
         let body = "";
-        // First pass: collect imports
+        // Collect imports
         this.state.components.forEach((comp) => {
-            imports.add(this.buildImport(comp.type, comp.definition.import));
-            Object.values(comp.values).forEach(ui => {
-                ui.getImports().forEach(symbol => {
+            // Script component
+            if (!comp.definition) {
+                imports.add(this.buildImport(comp.type));
+                return;
+            }
+            // Data component
+            imports.add(this.buildImport(comp.type));
+            Object.values(comp.values).forEach((ui) => {
+                ui.getImports().forEach((symbol) => {
                     imports.add(this.buildImport(symbol));
                 });
             });
         });
-        // Second pass: build body
+        // Build body
         this.state.components.forEach((comp, i) => {
             const varName = comp.type.toLowerCase() + i;
+            // SCRIPT COMPONENT
+            if (!comp.definition) {
+                body += `        this.AddComponent(${comp.type});\n\n`;
+                return;
+            }
+            // DATA COMPONENT
             body += `        const ${varName} = this.AddComponent(${comp.type});\n`;
-            const paramValues = Object.keys(comp.definition.params)
-                .map(key => comp.values[key].toCode())
-                .join(", ");
-            body += `        ${varName}.initialize(${paramValues});\n\n`;
+            const paramObject = Object.entries(comp.definition.params)
+                .map(([key]) => `            ${key}: ${comp.values[key].toCode()}`)
+                .join(",\n");
+            body += `        ${varName}.initialize({\n${paramObject}\n        });\n\n`;
         });
         return `${[...imports].join("\n")}
 
@@ -2091,24 +2650,27 @@ ${body}
 }
 `;
     }
+    // ----------------------------
+    // SAVE FILE
+    // ----------------------------
     saveToDirectory(filename, content) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.outputDirHandle) {
                 alert("Please choose an output directory first.");
                 return;
             }
-            // Create or overwrite the file
             const fileHandle = yield this.outputDirHandle.getFileHandle(filename, { create: true });
             const writable = yield fileHandle.createWritable();
             yield writable.write(content);
             yield writable.close();
-            console.log("Saved:", filename);
         });
     }
+    // ----------------------------
+    // IMPORT BUILDER
+    // ----------------------------
     buildImport(symbol, overridePath) {
         const absolutePath = overridePath !== null && overridePath !== void 0 ? overridePath : _config_ImportMap__WEBPACK_IMPORTED_MODULE_1__.ImportMap[symbol];
         if (!absolutePath) {
-            console.error("ImportMap:", _config_ImportMap__WEBPACK_IMPORTED_MODULE_1__.ImportMap);
             throw new Error(`No import path found for symbol: ${symbol}`);
         }
         const finalPath = _helpers_PathHelpers__WEBPACK_IMPORTED_MODULE_2__.PathHelpers.isExternalPath(absolutePath)

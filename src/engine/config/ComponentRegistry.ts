@@ -1,3 +1,5 @@
-import { autoScanComponents } from "../core/ECS/ComponentScanner";
+import { autoScanComponents, ComponentRegistry as InternalRegistry } from "../core/ECS/ComponentScanner";
 
-export const ComponentRegistry = autoScanComponents();
+autoScanComponents();
+
+export const ComponentRegistry = InternalRegistry;

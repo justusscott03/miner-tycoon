@@ -1,32 +1,81 @@
 declare const require: any;
 
 import { ComponentDefinition } from "./main/Component";
+import { MonoBehavior } from "./main/MonoBehavior";
+import { ImportMap } from "../../config/ImportMap";
 
-type AnyComponentDefinition = ComponentDefinition<any>;
+export interface ComponentRegistryEntry {
+    type: "data" | "script";
+    name: string;
+    def?: ComponentDefinition<any>;
+    ctor?: any;
+    importPath: string;
+}
 
-export function autoScanComponents(): Record<string, AnyComponentDefinition> {
-    const registry: Record<string, AnyComponentDefinition> = {};
+export const ComponentRegistry: Record<string, ComponentRegistryEntry> = {};
 
-    // Webpack magic: import all .ts files in components folder
-    const context = require.context(
-        "./components",
-        true,
-        /\.ts$/
-    );
+export function autoScanComponents() {
+    const contexts = [
+        require.context("../../core/ECS/components", true, /\.ts$/),
+        require.context("../../../game/components", true, /\.ts$/)
+    ];
 
-    context.keys().forEach((key: string) => {
-        const module = context(key);
+    for (const context of contexts) {
+        context.keys().forEach((key: string) => {
+            const module = context(key);
 
-        for (const exportName in module) {
-            const value = module[exportName];
+            // Webpack gives us the actual file path here
+            const resolvedPath = context.resolve(key);
 
-            // Detect ComponentDefinition objects
-            if (value && typeof value === "object" && "params" in value && "import" in value) {
-                const name = exportName.replace("Def", "");
-                registry[name] = value;
+            for (const exportName in module) {
+                const value = module[exportName];
+
+                // -----------------------------
+                // DATA COMPONENT (ComponentDefinition)
+                // -----------------------------
+                if (
+                    value &&
+                    typeof value === "object" &&
+                    "params" in value
+                ) {
+                    const name = exportName.replace("Def", "");
+
+                    // Remove extension from resolvedPath
+                    const cleanedPath = resolvedPath.replace(/\.(ts|js)$/, "");
+
+                    ComponentRegistry[name] = {
+                        type: "data",
+                        name,
+                        def: value,
+                        importPath: cleanedPath
+                    };
+
+                    ImportMap[name] = cleanedPath;
+
+                    continue;
+                }
+
+                // -----------------------------
+                // SCRIPT COMPONENT (MonoBehavior)
+                // -----------------------------
+                if (
+                    typeof value === "function" &&
+                    value.prototype instanceof MonoBehavior
+                ) {
+                    const cleanedPath = resolvedPath.replace(/\.(ts|js)$/, "");
+
+                    ComponentRegistry[exportName] = {
+                        type: "script",
+                        name: exportName,
+                        ctor: value,
+                        importPath: cleanedPath
+                    };
+
+                    ImportMap[exportName] = cleanedPath;
+                }
             }
-        }
-    });
+        });
+    }
 
-    return registry;
+    return ComponentRegistry;
 }

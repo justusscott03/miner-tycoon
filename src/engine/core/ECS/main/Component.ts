@@ -4,7 +4,6 @@ import { EngineObject } from "./EngineObject";
 import { GameObject } from "./GameObject";
 
 export type ComponentDefinition<TParams extends Record<string, ParamUI<any>>> = {
-    import: string;
     params: TParams;
 };
 

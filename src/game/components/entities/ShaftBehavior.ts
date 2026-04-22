@@ -1,4 +1,4 @@
-import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior";
+import { MonoBehavior } from "../../../engine/core/ECS/main/MonoBehavior";
 
 export interface ShaftSaveData {
     x: number;

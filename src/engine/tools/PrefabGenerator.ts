@@ -12,7 +12,7 @@ const prefabOutputPath = "src/game/prefabs/";
 
 type ComponentInstance = {
     type: string;
-    definition: ComponentDefinition<any>;
+    definition: ComponentDefinition<any> | null; // null = script component
     values: Record<string, ParamUI<any>>;
 };
 
@@ -42,10 +42,8 @@ export class PrefabGenerator {
         componentListId: string,
         outputId: string
     ) {
-        // DOM elements
         this.container = document.getElementById(containerId)!;
         this.select = document.getElementById(selectId) as HTMLSelectElement;
-        if (!this.select) throw new Error("componentSelect element missing!");
         this.classNameInput = document.getElementById(classNameId) as HTMLInputElement;
 
         const generateBtn = document.getElementById(generateBtnId)!;
@@ -53,12 +51,12 @@ export class PrefabGenerator {
         const componentList = document.getElementById(componentListId)!;
         const output = document.getElementById(outputId) as HTMLPreElement;
 
-        // Initialize class name input
+        // Class name input
         this.classNameInput.oninput = (e) => {
             this.state.className = (e.target as HTMLInputElement).value;
         };
 
-        // Populate component select
+        // Populate dropdown
         Object.keys(ComponentRegistry).forEach((name) => {
             const option = document.createElement("option");
             option.value = name;
@@ -66,53 +64,68 @@ export class PrefabGenerator {
             this.select.appendChild(option);
         });
 
-        // Add component button
-        document.getElementById("addComponentButton")?.addEventListener("click", () => this.addComponent(componentList));
+        // Add component
+        document.getElementById("addComponentButton")?.addEventListener("click", () =>
+            this.addComponent(componentList)
+        );
 
-        // Generate code button
+        // Generate code
         generateBtn.addEventListener("click", () => {
             const code = this.generatePrefabCode();
             output.textContent = code;
         });
 
-        // Download prefab file
+        // Download file
         downloadBtn.addEventListener("click", async () => {
             const code = this.generatePrefabCode();
             const filename = `${this.state.className || "Prefab"}.ts`;
             await this.saveToDirectory(filename, code);
         });
 
+        // Choose output directory
         const chooseDirBtn = document.getElementById("chooseOutputDir")!;
         chooseDirBtn.addEventListener("click", async () => {
             try {
                 this.outputDirHandle = await (window as any).showDirectoryPicker();
-                console.log("Directory selected:", this.outputDirHandle);
-            } catch (err) {
-                console.warn("Directory selection cancelled.");
-            }
+            } catch {}
         });
-
     }
+
+    // ----------------------------
+    // ADD COMPONENT
+    // ----------------------------
 
     addComponent(container: HTMLElement) {
         const type = this.select.value;
-        const definition = ComponentRegistry[type];
-        if (!definition) return;
+        const entry = ComponentRegistry[type];
+        if (!entry) return;
 
-        // Initialize values from UI defaults
-        const values = {} as Record<
-            keyof typeof definition.params,
-            ParamUI<any>
-        >;
+        // SCRIPT COMPONENT (MonoBehavior)
+        if (entry.type === "script") {
+            this.state.components.push({
+                type,
+                definition: null,
+                values: {}
+            });
+            this.renderComponents(container);
+            return;
+        }
 
-        for (const key of Object.keys(definition.params) as Array<keyof typeof definition.params>) {
-            const ui = definition.params[key];
-            values[key] = ui.clone();
+        // DATA COMPONENT
+        const definition = entry.def!;
+        const values: Record<string, ParamUI<any>> = {};
+
+        for (const key of Object.keys(definition.params)) {
+            values[key] = definition.params[key].clone();
         }
 
         this.state.components.push({ type, definition, values });
         this.renderComponents(container);
     }
+
+    // ----------------------------
+    // RENDER COMPONENT UI
+    // ----------------------------
 
     renderComponents(container: HTMLElement) {
         container.innerHTML = "";
@@ -127,18 +140,27 @@ export class PrefabGenerator {
             title.textContent = comp.type;
             div.appendChild(title);
 
-            // Render each param UI
-            for (const [paramName, uiInstance] of Object.entries(comp.values)) {
-                const label = document.createElement("label");
-                label.textContent = paramName;
-                
-                const element = uiInstance.render((val: any) => {
-                    uiInstance.value = val;
-                });
+            // SCRIPT COMPONENT
+            if (!comp.definition) {
+                const note = document.createElement("p");
+                note.textContent = "(Script component — no parameters)";
+                div.appendChild(note);
+            }
 
-                div.appendChild(label);
-                div.appendChild(element);
-                div.appendChild(document.createElement("br"));
+            // DATA COMPONENT
+            else {
+                for (const [paramName, uiInstance] of Object.entries(comp.values)) {
+                    const label = document.createElement("label");
+                    label.textContent = paramName;
+
+                    const element = uiInstance.render((val: any) => {
+                        uiInstance.value = val;
+                    });
+
+                    div.appendChild(label);
+                    div.appendChild(element);
+                    div.appendChild(document.createElement("br"));
+                }
             }
 
             const removeBtn = document.createElement("button");
@@ -153,27 +175,45 @@ export class PrefabGenerator {
         });
     }
 
+    // ----------------------------
+    // GENERATE PREFAB CODE
+    // ----------------------------
+
     generatePrefabCode(): string {
         const imports = new Set<string>();
         imports.add(this.buildImport("Prefab"));
 
         let body = "";
 
-        // First pass: collect imports
+        // Collect imports
         this.state.components.forEach((comp) => {
-            imports.add(this.buildImport(comp.type, comp.definition.import));
+            // Script component
+            if (!comp.definition) {
+                imports.add(this.buildImport(comp.type));
+                return;
+            }
 
-            Object.values(comp.values).forEach(ui => {
-                ui.getImports().forEach(symbol => {
+            // Data component
+            imports.add(this.buildImport(comp.type));
+
+            Object.values(comp.values).forEach((ui) => {
+                ui.getImports().forEach((symbol) => {
                     imports.add(this.buildImport(symbol));
                 });
             });
         });
 
-        // Second pass: build body
+        // Build body
         this.state.components.forEach((comp, i) => {
             const varName = comp.type.toLowerCase() + i;
 
+            // SCRIPT COMPONENT
+            if (!comp.definition) {
+                body += `        this.AddComponent(${comp.type});\n\n`;
+                return;
+            }
+
+            // DATA COMPONENT
             body += `        const ${varName} = this.AddComponent(${comp.type});\n`;
 
             const paramObject = Object.entries(comp.definition.params)
@@ -195,26 +235,30 @@ ${body}
 `;
     }
 
+    // ----------------------------
+    // SAVE FILE
+    // ----------------------------
+
     async saveToDirectory(filename: string, content: string) {
         if (!this.outputDirHandle) {
             alert("Please choose an output directory first.");
             return;
         }
 
-        // Create or overwrite the file
         const fileHandle = await this.outputDirHandle.getFileHandle(filename, { create: true });
         const writable = await fileHandle.createWritable();
         await writable.write(content);
         await writable.close();
-
-        console.log("Saved:", filename);
     }
+
+    // ----------------------------
+    // IMPORT BUILDER
+    // ----------------------------
 
     private buildImport(symbol: string, overridePath?: string): string {
         const absolutePath = overridePath ?? ImportMap[symbol];
 
         if (!absolutePath) {
-            console.error("ImportMap:", ImportMap);
             throw new Error(`No import path found for symbol: ${symbol}`);
         }
 

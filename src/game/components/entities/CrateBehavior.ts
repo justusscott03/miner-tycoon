@@ -1,8 +1,8 @@
-import { TextUI } from "../../engine/core/ECS/components/ui/TextUI";
-import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior";
-import { Time } from "../../engine/helpers/TimeManager";
-import { MoneyFormatter } from "../helpers/MoneyFormatter";
-import { CratePrefab } from "../prefabs/CratePrefab";
+import { TextUI } from "../../../engine/core/ECS/components/ui/TextUI";
+import { MonoBehavior } from "../../../engine/core/ECS/main/MonoBehavior";
+import { Time } from "../../../engine/helpers/TimeManager";
+import { MoneyFormatter } from "../../helpers/MoneyFormatter";
+import { CratePrefab } from "../../prefabs/CratePrefab";
 
 export interface CrateSaveData {
     lvl: number;

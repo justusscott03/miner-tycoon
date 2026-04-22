@@ -1,8 +1,8 @@
-import { ProgressBarUI } from "../../engine/core/ECS/components/ui/ProgressBarUI";
-import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior";
-import { Time } from "../../engine/helpers/TimeManager";
-import { MinerStates } from "../config/MinerStates";
-import { MinerPrefab } from "../prefabs/MinerPrefab";
+import { ProgressBarUI } from "../../../engine/core/ECS/components/ui/ProgressBarUI";
+import { MonoBehavior } from "../../../engine/core/ECS/main/MonoBehavior";
+import { Time } from "../../../engine/helpers/TimeManager";
+import { MinerStates } from "../../config/MinerStates";
+import { MinerPrefab } from "../../prefabs/MinerPrefab";
 import { CrateBehavior } from "./CrateBehavior";
 
 export interface MinerSaveData {
