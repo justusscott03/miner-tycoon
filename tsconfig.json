@@ -3,16 +3,12 @@
     "target": "ES6",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "rootDir": "./src",
-
     "strict": true,
     "esModuleInterop": true,
     "allowJs": false,
-    "noEmit": true,
-
+    "noEmit": false,        // ⭐ IMPORTANT: Webpack needs JS output
     "lib": ["es2017", "dom"],
-    "typeRoots": ["./types", "./node_modules/@types"],
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "types/**/*"]
+  "include": ["src/**/*"]
 }

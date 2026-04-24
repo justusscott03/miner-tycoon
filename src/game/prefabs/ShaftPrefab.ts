@@ -2,8 +2,8 @@ import { MonoBehavior } from "../../engine/core/ECS/main/MonoBehavior";
 import { MinerPrefab } from "../prefabs/MinerPrefab";
 import { CratePrefab } from "../prefabs/CratePrefab";
 import { TextUI } from "../../engine/core/ECS/components/ui/TextUI";
-import { MinerBehavior } from "../entities/MinerBehavior";
-import { CrateBehavior } from "../entities/CrateBehavior";
+import { MinerBehavior } from "../components/entities/MinerBehavior";
+import { CrateBehavior } from "../components/entities/CrateBehavior";
 import { Prefab } from "../../engine/core/ECS/Prefab";
 import { SpriteRenderer } from "../../engine/core/ECS/components/SpriteRenderer";
 

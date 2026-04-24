@@ -1,4 +1,4 @@
-import { ShapeRegistry, ShapeTypes } from "../ShapeEditor";
+import { ShapeRegistry, ShapeTypes } from "../../windows/ShapeEditorWindow";
 import { Layer } from "./Layers/Layer";
 
 export class ShapeFactory {

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle Miner Tycoon: Money Games</title>
+
+    <!-- Editor styles -->
+    <link rel="stylesheet" href="./styles/theme.css">
+    <link rel="stylesheet" href="./styles/editor-windows.css">
+    <link rel="stylesheet" href="./styles/editor-layout.css">
+    <link rel="stylesheet" href="./styles/legacy.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka&family=Lilita+One&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./images/favicon.png">
+</head>
+<body>
+
+    <!-- Top bar (can evolve into menus later) -->
+    <nav id="topNav">
+        <div id="appTitle">Idle Miner Editor</div>
+        <div id="topNavRight">
+            <!-- Placeholder for future menus -->
+        </div>
+    </nav>
+
+    <div id="editorRoot">
+        <!-- CENTER WINDOW: Game / Shape Editor / Prefab Builder -->
+        <div class="editor-window" data-window-id="center-main" style="left: 220px; top: 70px; width: 900px; height: 600px;">
+            <div class="window-tabs" data-tab-bar>
+                <button class="window-tab active" data-tab-target="tab-game">Game</button>
+                <button class="window-tab" data-tab-target="tab-shape-editor">Shape Editor</button>
+                <button class="window-tab" data-tab-target="tab-prefab-builder">Prefab Builder</button>
+            </div>
+            <div class="window-titlebar" data-drag-handle>
+                <span class="window-title">Main View</span>
+                <button class="window-close" data-close-window>×</button>
+            </div>
+            <div class="window-content">
+                <!-- GAME TAB -->
+                <div class="window-tab-content active" data-tab-id="tab-game">
+                    <div id="gameTab" class="game-tab-container">
+                        <!-- Game canvas will be injected here -->
+                    </div>
+                </div>
+
+                <!-- SHAPE EDITOR TAB -->
+                <div class="window-tab-content" data-tab-id="tab-shape-editor">
+                    <div id="shapeEditor">
+                        <div id="canvasContainer">
+                            <canvas id="shapeEditorCanvas"></canvas>
+
+                            <div id="layerContextMenu" class="contextMenu">
+                                <div data-action="rename">Rename</div>
+                                <div data-action="delete">Delete</div>
+                                <div data-action="group">Group</div>
+                            </div>
+                        </div>
+
+                        <div class="slidecontainer">
+                            <input type="range" id="gridSizeSlider" min="0" max="100" value="50">
+                            <p>Grid size: <span id="valueDisplay">50</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PREFAB BUILDER TAB -->
+                <div class="window-tab-content" data-tab-id="tab-prefab-builder">
+                    <div id="prefabGenerator" class="menuSideBar">
+                        <h2>Prefab Generator</h2>
+                        <input id="className" class="menuSideBarItem" placeholder="Class Name (e.g. MinerPrefab)" />
+                        <br><br>
+                        <select id="componentSelect" class="menuSideBarItem"></select>
+                        <button id="addComponentButton" class="menuSideBarItem">Add Component</button>
+                        <div id="componentList"></div>
+                        <br>
+                        <button id="generateButton" class="menuSideBarItem">Generate Code</button>
+                        <button id="downloadButton" class="menuSideBarItem">Download File</button>
+                        <button id="chooseOutputDir" class="menuSideBarItem">Choose Output Directory</button>
+                        <pre id="output"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="window-resize-handle" data-resize-handle></div>
+        </div>
+
+        <!-- RIGHT WINDOW: Hierarchy / Inspector / Export -->
+        <div class="editor-window" data-window-id="right-inspector" style="left: 1150px; top: 70px; width: 320px; height: 600px;">
+            <div class="window-tabs" data-tab-bar>
+                <button class="window-tab active" data-tab-target="tab-hierarchy">Hierarchy</button>
+                <button class="window-tab" data-tab-target="tab-inspector">Inspector</button>
+                <button class="window-tab" data-tab-target="tab-export">Export</button>
+                <button class="window-tab" data-tab-target="tab-shape-types">Shape Types</button>
+            </div>
+            <div class="window-titlebar" data-drag-handle>
+                <span class="window-title">Hierarchy / Inspector</span>
+                <button class="window-close" data-close-window>×</button>
+            </div>
+            <div class="window-content">
+                <!-- HIERARCHY TAB -->
+                <div class="window-tab-content active" data-tab-id="tab-hierarchy">
+                    <div id="shapeHierarchyPanel" class="menuSideBar">
+                        <h2>Layers</h2>
+                        <!-- ShapeEditor.js will populate this -->
+                    </div>
+                </div>
+
+                <!-- INSPECTOR TAB -->
+                <div class="window-tab-content" data-tab-id="tab-inspector">
+                    <div id="shapeInspector" class="menuSideBar">
+                        <h2>Shape Inspector</h2>
+                        <!-- ShapeEditor.js will populate this -->
+                    </div>
+                </div>
+
+                `<!-- SHAPE TYPES TAB -->
+                <div class="window-tab-content" data-tab-id="tab-shape-types">
+                    <div id="shapeTypeContainer" class="menuSideBar">
+                        <h2>Shape Types</h2>
+                        <!-- ShapeEditor.js will populate this -->
+                    </div>
+                </div>
+
+                <!-- EXPORT TAB -->
+                <div class="window-tab-content" data-tab-id="tab-export">
+                    <div id="exportPanel" class="menuSideBar">
+                        <h2>Export</h2>
+                        <button id="exportButton" class="menuSideBarItem">Export Shapes</button>
+                        <pre id="shapeEditorExportOutput"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="window-resize-handle" data-resize-handle></div>
+        </div>
+
+        <!-- BOTTOM WINDOW: Console / Project (placeholders for now) -->
+        <div class="editor-window" data-window-id="bottom-console" style="left: 220px; top: 690px; width: 900px; height: 220px;">
+            <div class="window-tabs" data-tab-bar>
+                <button class="window-tab active" data-tab-target="tab-console">Console</button>
+                <button class="window-tab" data-tab-target="tab-project">Project</button>
+            </div>
+            <div class="window-titlebar" data-drag-handle>
+                <span class="window-title">Console / Project</span>
+                <button class="window-close" data-close-window>×</button>
+            </div>
+            <div class="window-content">
+                <div class="window-tab-content active" data-tab-id="tab-console">
+                    <div id="consolePanel" class="menuSideBar">
+                        <h2>Console</h2>
+                        <p>(Coming soon)</p>
+                    </div>
+                </div>
+                <div class="window-tab-content" data-tab-id="tab-project">
+                    <div id="projectPanel" class="menuSideBar">
+                        <h2>Project</h2>
+                        <div id="projectTree"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="window-resize-handle" data-resize-handle></div>
+        </div>
+    </div>
+
+    <!-- Saves page (unchanged) -->
+    <div id="savePage" class="fredoka">
+        <h1>Saves</h1>
+        <button id="returnToGame" type="button">Return to game</button>
+    </div>
+
+    <!-- Game canvas injection -->
+    <script>
+        (function () {
+            const canvas = document.createElement("canvas");
+            canvas.id = "canvas";
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const gameTab = document.getElementById("gameTab");
+            if (gameTab) {
+                gameTab.appendChild(canvas);
+            } else {
+                document.body.appendChild(canvas);
+            }
+        })();
+    </script>
+
+    <script src="/engine.js"></script>
+</body>
+</html>

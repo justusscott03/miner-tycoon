@@ -1,0 +1,38 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: sans-serif;
+    background: #1e1e1e;
+    color: #ddd;
+}
+
+.fredoka {
+    font-family: "Fredoka", sans-serif;
+}
+
+#topNav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 32px;
+    background: #252526;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 2000;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+#appTitle {
+    color: #ccc;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+#topNavRight {
+    color: #aaa;
+    font-size: 12px;
+}

@@ -1,4 +1,4 @@
-import { ShapeTypes } from "../ShapeEditor";
+import { ShapeTypes } from "../../windows/ShapeEditorWindow";
 
 export type ToolType = "select" | ShapeTypes;
 

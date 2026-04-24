@@ -1,10 +1,13 @@
+import { EditorBootstrapper } from "./engine/EditorBootstrapper";
 import { SceneManager } from "./engine/core/scene/SceneManager";
-//import { Engine } from "./engine/Engine";
 import { TestScene } from "./game/TestScene";
 
 window.addEventListener("load", () => {
-    console.log("Game initialized!");
-    // Engine.start();
-    //SceneManager.loadScene(new TestScene());
-});
+    console.log("Game + Editor initialized!");
 
+    const editor = new EditorBootstrapper();
+    editor.start();
+
+    // Optional: load a scene
+    // SceneManager.loadScene(new TestScene());
+});
