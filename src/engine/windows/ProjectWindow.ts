@@ -10,6 +10,20 @@ export class ProjectWindow {
     private container: HTMLElement;
     private selected: HTMLElement | null = null;
 
+    // -----------------------------
+    // ICON MAP
+    // -----------------------------
+    private iconMap: Record<string, string> = {
+        folder: "/engine/icons/folder.png",
+        file: "/engine/icons/file.png",
+
+        ts: "/engine/icons/script.png",
+        jpg: "/engine/icons/image.png",
+        png: "/engine/icons/image.png",
+
+        prefab: "/engine/icons/prefab.png"
+    };
+
     constructor(containerId: string) {
         const el = document.getElementById(containerId);
         if (!el) throw new Error("ProjectWindow container not found");
@@ -21,7 +35,6 @@ export class ProjectWindow {
     async load() {
         const res = await fetch("/project-tree");
         const data = await res.json();
-        console.log(data);
         this.render(data);
     }
 
@@ -46,10 +59,12 @@ export class ProjectWindow {
         const label = document.createElement("div");
         label.classList.add("project-label");
 
-        // Icon + name
-        const icon = document.createElement("span");
+        // Icon
+        const icon = document.createElement("img");
         icon.classList.add("icon");
+        icon.src = this.getIconForNode(node);
 
+        // Text
         const text = document.createElement("span");
         text.textContent = node.baseName ?? node.name;
 
@@ -59,17 +74,14 @@ export class ProjectWindow {
         // Folder
         if (node.type === "folder") {
             wrapper.classList.add("folder");
-            icon.textContent = "📁";
 
             const childrenContainer = document.createElement("div");
             childrenContainer.classList.add("project-children", "collapsed");
 
-            // Recursively add children
             node.children?.forEach(child => {
                 childrenContainer.appendChild(this.createNode(child));
             });
 
-            // Expand/collapse
             label.addEventListener("click", (e) => {
                 e.stopPropagation();
                 childrenContainer.classList.toggle("collapsed");
@@ -82,7 +94,6 @@ export class ProjectWindow {
         // File
         if (node.type === "file") {
             wrapper.classList.add("file");
-            icon.textContent = this.getFileIcon(node.extension);
 
             label.addEventListener("click", (e) => {
                 e.stopPropagation();
@@ -104,16 +115,27 @@ export class ProjectWindow {
         el.classList.add("selected");
     }
 
-    private getFileIcon(ext?: string): string {
-        switch (ext) {
-            case "json": return "📝";
-            case "png":
-            case "jpg":
-            case "jpeg": return "🖼️";
-            case "ts":
-            case "js": return "📄";
-            default: return "📄";
+    // -----------------------------
+    // ICON LOGIC
+    // -----------------------------
+    private getIconForNode(node: ProjectNode): string {
+        // Folder
+        if (node.type === "folder") {
+            return this.iconMap.folder;
         }
+
+        // Prefab special case: *.prefab.ts
+        if (node.extension === "ts" && node.baseName?.endsWith(".prefab")) {
+            return this.iconMap.prefab;
+        }
+
+        // Normal extension-based icons
+        if (node.extension && this.iconMap[node.extension]) {
+            return this.iconMap[node.extension];
+        }
+
+        // Fallback
+        return this.iconMap.file;
     }
 
     public refresh() {

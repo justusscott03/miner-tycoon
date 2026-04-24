@@ -269,19 +269,3 @@ ${body}
         return `import { ${symbol} } from "${finalPath}";`;
     }
 }
-
-// ----------------------------
-// USAGE
-// ----------------------------
-
-// document.addEventListener("DOMContentLoaded", () => {
-//     new PrefabGeneratorWindow(
-//         "prefabContainer",
-//         "componentSelect",
-//         "className",
-//         "generateButton",
-//         "downloadButton",
-//         "componentList",
-//         "output"
-//     );
-// });

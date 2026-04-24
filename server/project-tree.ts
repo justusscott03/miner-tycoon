@@ -1,6 +1,7 @@
 import { Router } from "express";
 import fs from "fs";
 import path from "path";
+console.log(">>> PROJECT TREE ROUTE LOADED <<<");
 
 const router = Router();
 

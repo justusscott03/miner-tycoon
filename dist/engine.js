@@ -3670,20 +3670,6 @@ ${body}
         return `import { ${symbol} } from "${finalPath}";`;
     }
 }
-// ----------------------------
-// USAGE
-// ----------------------------
-// document.addEventListener("DOMContentLoaded", () => {
-//     new PrefabGeneratorWindow(
-//         "prefabContainer",
-//         "componentSelect",
-//         "className",
-//         "generateButton",
-//         "downloadButton",
-//         "componentList",
-//         "output"
-//     );
-// });
 
 
 /***/ },
@@ -3711,6 +3697,17 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 class ProjectWindow {
     constructor(containerId) {
         this.selected = null;
+        // -----------------------------
+        // ICON MAP
+        // -----------------------------
+        this.iconMap = {
+            folder: "/engine/icons/folder.png",
+            file: "/engine/icons/file.png",
+            ts: "/engine/icons/script.png",
+            jpg: "/engine/icons/image.png",
+            png: "/engine/icons/image.png",
+            prefab: "/engine/icons/prefab.png"
+        };
         const el = document.getElementById(containerId);
         if (!el)
             throw new Error("ProjectWindow container not found");
@@ -3721,7 +3718,6 @@ class ProjectWindow {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield fetch("/project-tree");
             const data = yield res.json();
-            console.log(data);
             this.render(data);
         });
     }
@@ -3742,9 +3738,11 @@ class ProjectWindow {
         // Label row
         const label = document.createElement("div");
         label.classList.add("project-label");
-        // Icon + name
-        const icon = document.createElement("span");
+        // Icon
+        const icon = document.createElement("img");
         icon.classList.add("icon");
+        icon.src = this.getIconForNode(node);
+        // Text
         const text = document.createElement("span");
         text.textContent = (_a = node.baseName) !== null && _a !== void 0 ? _a : node.name;
         label.appendChild(icon);
@@ -3752,14 +3750,11 @@ class ProjectWindow {
         // Folder
         if (node.type === "folder") {
             wrapper.classList.add("folder");
-            icon.textContent = "📁";
             const childrenContainer = document.createElement("div");
             childrenContainer.classList.add("project-children", "collapsed");
-            // Recursively add children
             (_b = node.children) === null || _b === void 0 ? void 0 : _b.forEach(child => {
                 childrenContainer.appendChild(this.createNode(child));
             });
-            // Expand/collapse
             label.addEventListener("click", (e) => {
                 e.stopPropagation();
                 childrenContainer.classList.toggle("collapsed");
@@ -3770,7 +3765,6 @@ class ProjectWindow {
         // File
         if (node.type === "file") {
             wrapper.classList.add("file");
-            icon.textContent = this.getFileIcon(node.extension);
             label.addEventListener("click", (e) => {
                 e.stopPropagation();
                 this.select(label);
@@ -3787,16 +3781,25 @@ class ProjectWindow {
         this.selected = el;
         el.classList.add("selected");
     }
-    getFileIcon(ext) {
-        switch (ext) {
-            case "json": return "📝";
-            case "png":
-            case "jpg":
-            case "jpeg": return "🖼️";
-            case "ts":
-            case "js": return "📄";
-            default: return "📄";
+    // -----------------------------
+    // ICON LOGIC
+    // -----------------------------
+    getIconForNode(node) {
+        var _a;
+        // Folder
+        if (node.type === "folder") {
+            return this.iconMap.folder;
         }
+        // Prefab special case: *.prefab.ts
+        if (node.extension === "ts" && ((_a = node.baseName) === null || _a === void 0 ? void 0 : _a.endsWith(".prefab"))) {
+            return this.iconMap.prefab;
+        }
+        // Normal extension-based icons
+        if (node.extension && this.iconMap[node.extension]) {
+            return this.iconMap[node.extension];
+        }
+        // Fallback
+        return this.iconMap.file;
     }
     refresh() {
         this.load();
