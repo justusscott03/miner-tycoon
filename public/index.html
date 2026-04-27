@@ -26,7 +26,7 @@
 
     <div id="editorRoot">
         <!-- CENTER WINDOW: Game / Shape Editor / Prefab Builder -->
-        <div class="editor-window" data-window-id="center-main" style="left: 220px; top: 70px; width: 900px; height: 600px;">
+        <div class="editor-window" data-window-id="center-main" style="left: 20px; top: 20px; width: 1460px; height: 650px;">
             <div class="window-tabs" data-tab-bar>
                 <button class="window-tab active" data-tab-target="tab-game">Game</button>
                 <button class="window-tab" data-tab-target="tab-shape-editor">Shape Editor</button>
@@ -85,7 +85,7 @@
         </div>
 
         <!-- RIGHT WINDOW: Hierarchy / Inspector / Export -->
-        <div class="editor-window" data-window-id="right-inspector" style="left: 1150px; top: 70px; width: 320px; height: 600px;">
+        <div class="editor-window" data-window-id="right-inspector" style="left: 1500px; top: 20px; width: 400px; height: 890px;">
             <div class="window-tabs" data-tab-bar>
                 <button class="window-tab active" data-tab-target="tab-hierarchy">Hierarchy</button>
                 <button class="window-tab" data-tab-target="tab-inspector">Inspector</button>
@@ -134,7 +134,7 @@
         </div>
 
         <!-- BOTTOM WINDOW: Console / Project (placeholders for now) -->
-        <div class="editor-window" data-window-id="bottom-console" style="left: 220px; top: 690px; width: 900px; height: 220px;">
+        <div class="editor-window" data-window-id="bottom-console" style="left: 20px; top: 690px; width: 1460px; height: 220px;">
             <div class="window-tabs" data-tab-bar>
                 <button class="window-tab active" data-tab-target="tab-console">Console</button>
                 <button class="window-tab" data-tab-target="tab-project">Project</button>
@@ -147,7 +147,7 @@
                 <div class="window-tab-content active" data-tab-id="tab-console">
                     <div id="consolePanel" class="menuSideBar">
                         <h2>Console</h2>
-                        <p>(Coming soon)</p>
+                        <div id="consoleOutput" style="height: calc(100% - 40px); overflow-y: auto;"></div>
                     </div>
                 </div>
                 <div class="window-tab-content" data-tab-id="tab-project">

@@ -50,7 +50,7 @@ export class CanvasManager {
         this.width = canvas.width;
         this.height = canvas.height;
 
-        console.log(`Canvas initialized: ${canvasId} (${this.width}x${this.height})`);
+        //console.log(`Canvas initialized: ${canvasId} (${this.width}x${this.height})`);
     }
 
     // Resize logic

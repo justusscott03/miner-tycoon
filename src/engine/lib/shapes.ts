@@ -1,5 +1,6 @@
 import { EllipseMode, pjsSettings, RectMode } from "./pjsSettings";
 import { CanvasManager } from "../helpers/CanvasManager";
+import { Debug } from "../diagnostics/Debug";
 
 const ctx = CanvasManager.ctx;
 
@@ -132,7 +133,7 @@ function image (image: HTMLCanvasElement, x: number, y: number, w: number = imag
     ctx.drawImage(image, x, y, w, h);
 
     if (arguments.length !== 3 && arguments.length !== 5) {
-        console.error(`image() requires 3 or 5 parameters, not ${arguments.length}`)
+        Debug.error(`image() requires 3 or 5 parameters, not ${arguments.length}`)
     }
 }
 

@@ -2,22 +2,17 @@ import express from "express";
 import path from "path";
 import projectTreeRoute from "./project-tree";
 
-console.log(">>> AFTER IMPORTS <<<");
-
-console.log(">>> SERVER STARTED <<<");
-console.log("CWD:", process.cwd());
-
 const app = express();
 const PORT = 8080;
 
-app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.url}`);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`[${req.method}] ${req.url}`);
+//   next();
+// });
 
 // Serve static files
 app.use("/engine/icons", (req, res, next) => {
-  console.log(">>> ICONS ROUTE HIT:", req.path);
+  res.set("Cache-Control", "no-store");
   next();
 }, express.static(path.join(process.cwd(), "src/engine/icons")));
 
@@ -29,11 +24,11 @@ app.use(projectTreeRoute);
 
 // Catch-all route
 app.get(/.*/, (req, res) => {
-  console.log(">>> CATCH-ALL ROUTE HIT:", req.path);
+  //console.log(">>> CATCH-ALL ROUTE HIT:", req.path);
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
 app.listen(PORT, "127.0.0.1", () => {
-  console.log(`Editor running at http://127.0.0.1:${PORT}`);
+  //console.log(`Editor running at http://127.0.0.1:${PORT}`);
 });
 

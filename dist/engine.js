@@ -16,6 +16,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _windows_ShapeEditorWindow__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./windows/ShapeEditorWindow */ "./src/engine/windows/ShapeEditorWindow.ts");
 /* harmony import */ var _windows_PrefabGeneratorWindow__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./windows/PrefabGeneratorWindow */ "./src/engine/windows/PrefabGeneratorWindow.ts");
 /* harmony import */ var _windows_ProjectWindow__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./windows/ProjectWindow */ "./src/engine/windows/ProjectWindow.ts");
+/* harmony import */ var _windows_ConsoleWindow__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./windows/ConsoleWindow */ "./src/engine/windows/ConsoleWindow.ts");
+/* harmony import */ var _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./diagnostics/Debug */ "./src/engine/diagnostics/Debug.ts");
+
+
 
 
 
@@ -28,7 +32,8 @@ class EditorBootstrapper {
         new _windows_ShapeEditorWindow__WEBPACK_IMPORTED_MODULE_1__.ShapeEditorWindow("shapeEditorCanvas", "shapeTypeContainer", "shapeInspector", "shapeHierarchyPanel", "shapeEditorExportOutput", "exportButton", "layerContextMenu");
         new _windows_PrefabGeneratorWindow__WEBPACK_IMPORTED_MODULE_2__.PrefabGeneratorWindow("prefabContainer", "componentSelect", "className", "generateButton", "downloadButton", "componentList", "output");
         new _windows_ProjectWindow__WEBPACK_IMPORTED_MODULE_3__.ProjectWindow("projectTree");
-        console.log("Editor initialized");
+        new _windows_ConsoleWindow__WEBPACK_IMPORTED_MODULE_4__.ConsoleWindow("consoleOutput");
+        _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_5__.Debug.log("Editor initialized");
     }
 }
 
@@ -810,6 +815,53 @@ class Vector2 {
 
 /***/ },
 
+/***/ "./src/engine/diagnostics/Debug.ts"
+/*!*****************************************!*\
+  !*** ./src/engine/diagnostics/Debug.ts ***!
+  \*****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Debug: () => (/* binding */ Debug)
+/* harmony export */ });
+class Debug {
+    static onMessage(listener) {
+        this.listeners.push(listener);
+    }
+    static emit(type, text) {
+        const msg = {
+            type,
+            text,
+            timestamp: new Date()
+        };
+        for (const listener of this.listeners) {
+            listener(msg);
+        }
+        // Optional: still log to browser console
+        if (type === "log")
+            console.log(text);
+        if (type === "warn")
+            console.warn(text);
+        if (type === "error")
+            console.error(text);
+    }
+    static log(text) {
+        this.emit("log", text);
+    }
+    static warn(text) {
+        this.emit("warn", text);
+    }
+    static error(text) {
+        this.emit("error", text);
+    }
+}
+Debug.listeners = [];
+
+
+/***/ },
+
 /***/ "./src/engine/helpers/CanvasManager.ts"
 /*!*********************************************!*\
   !*** ./src/engine/helpers/CanvasManager.ts ***!
@@ -861,7 +913,7 @@ class CanvasManager {
         this.ctx = ctx;
         this.width = canvas.width;
         this.height = canvas.height;
-        console.log(`Canvas initialized: ${canvasId} (${this.width}x${this.height})`);
+        //console.log(`Canvas initialized: ${canvasId} (${this.width}x${this.height})`);
     }
     // Resize logic
     static resize(originalWidth, originalHeight, newWidth, newHeight) {
@@ -1441,6 +1493,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _pjsSettings__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pjsSettings */ "./src/engine/lib/pjsSettings.ts");
 /* harmony import */ var _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helpers/CanvasManager */ "./src/engine/helpers/CanvasManager.ts");
+/* harmony import */ var _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../diagnostics/Debug */ "./src/engine/diagnostics/Debug.ts");
+
 
 
 const ctx = _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_1__.CanvasManager.ctx;
@@ -1556,7 +1610,7 @@ function quad(x1, y1, x2, y2, x3, y3, x4, y4) {
 function image(image, x, y, w = image.width, h = image.height) {
     ctx.drawImage(image, x, y, w, h);
     if (arguments.length !== 3 && arguments.length !== 5) {
-        console.error(`image() requires 3 or 5 parameters, not ${arguments.length}`);
+        _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_2__.Debug.error(`image() requires 3 or 5 parameters, not ${arguments.length}`);
     }
 }
 function line(x1, y1, x2, y2) {
@@ -1611,6 +1665,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./colors */ "./src/engine/lib/colors.ts");
 /* harmony import */ var _trigonometry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./trigonometry */ "./src/engine/lib/trigonometry.ts");
 /* harmony import */ var _helpers_CanvasManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../helpers/CanvasManager */ "./src/engine/helpers/CanvasManager.ts");
+/* harmony import */ var _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../diagnostics/Debug */ "./src/engine/diagnostics/Debug.ts");
+
 
 
 
@@ -1626,7 +1682,7 @@ function textSize(size) {
 }
 function textWeight(weight) {
     if (!["lighter", "normal", "bold", "bolder"].includes(weight)) {
-        console.error("Invalid textWeight:", weight);
+        _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_4__.Debug.error(`Invalid textWeight: ${weight}`);
     }
     _pjsSettings__WEBPACK_IMPORTED_MODULE_0__.pjsSettings.globalWeight = weight;
     updateText();
@@ -2849,7 +2905,6 @@ class PathUIBindings extends _ShapeUIBindings__WEBPACK_IMPORTED_MODULE_0__.Shape
     }
     toCode() {
         const { points, color, stroke } = this.params;
-        console.log(color.value);
         let code = `fill(${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(color.value).r}, ${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(color.value).g}, ${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(color.value).b}, ${Math.round(color.alpha * 255)});
 stroke(${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(stroke.value).r}, ${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(stroke.value).g}, ${_helpers_ColorHelpers__WEBPACK_IMPORTED_MODULE_5__.ColorHelpers.hexToRGB(stroke.value).b}, ${Math.round(stroke.alpha * 255)});
 beginShape();\n`;
@@ -3218,7 +3273,6 @@ class ColorUI extends _ParamUI__WEBPACK_IMPORTED_MODULE_1__.ParamUI {
         super(defaultColor);
         this.alpha = 1;
         this.id = colorUICounter++;
-        //console.log("Created ColorUI with id:", this.id);
     }
     render(onChange) {
         const container = document.createElement("div");
@@ -3443,6 +3497,44 @@ class Vector2UI extends _ParamUI__WEBPACK_IMPORTED_MODULE_0__.ParamUI {
     }
     getImports() {
         return ["Vector2"];
+    }
+}
+
+
+/***/ },
+
+/***/ "./src/engine/windows/ConsoleWindow.ts"
+/*!*********************************************!*\
+  !*** ./src/engine/windows/ConsoleWindow.ts ***!
+  \*********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ConsoleWindow: () => (/* binding */ ConsoleWindow)
+/* harmony export */ });
+/* harmony import */ var _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../diagnostics/Debug */ "./src/engine/diagnostics/Debug.ts");
+
+class ConsoleWindow {
+    constructor(containerId) {
+        const el = document.getElementById(containerId);
+        if (!el)
+            throw new Error("ConsoleWindow container not found");
+        this.container = el;
+        _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_0__.Debug.onMessage(msg => this.addMessage(msg));
+    }
+    addMessage(msg) {
+        const row = document.createElement("div");
+        row.classList.add("console-row", msg.type);
+        const time = msg.timestamp.toLocaleTimeString();
+        row.innerHTML = `<span class="time">[${time}]</span> ${msg.text}`;
+        this.container.appendChild(row);
+        // Auto-scroll
+        this.container.scrollTop = this.container.scrollHeight;
+    }
+    clear() {
+        this.container.innerHTML = "";
     }
 }
 
@@ -3685,6 +3777,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ProjectWindow: () => (/* binding */ ProjectWindow)
 /* harmony export */ });
+/* harmony import */ var _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../diagnostics/Debug */ "./src/engine/diagnostics/Debug.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -3694,6 +3787,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 class ProjectWindow {
     constructor(containerId) {
         this.selected = null;
@@ -3703,7 +3797,7 @@ class ProjectWindow {
         this.iconMap = {
             folder: "/engine/icons/folder.png",
             file: "/engine/icons/file.png",
-            ts: "/engine/icons/script.png",
+            ts: "/engine/icons/Icon_TypeScript_File.png",
             jpg: "/engine/icons/image.png",
             png: "/engine/icons/image.png",
             prefab: "/engine/icons/prefab.png"
@@ -3768,7 +3862,7 @@ class ProjectWindow {
             label.addEventListener("click", (e) => {
                 e.stopPropagation();
                 this.select(label);
-                console.log("Selected file:", node.name);
+                _diagnostics_Debug__WEBPACK_IMPORTED_MODULE_0__.Debug.log(`Selected file: ${node.name}`);
             });
             wrapper.appendChild(label);
         }
@@ -4737,11 +4831,16 @@ var __webpack_exports__ = {};
   \**********************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _engine_EditorBootstrapper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./engine/EditorBootstrapper */ "./src/engine/EditorBootstrapper.ts");
+/* harmony import */ var _engine_diagnostics_Debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./engine/diagnostics/Debug */ "./src/engine/diagnostics/Debug.ts");
+
 
 window.addEventListener("load", () => {
-    console.log("Game + Editor initialized!");
     const editor = new _engine_EditorBootstrapper__WEBPACK_IMPORTED_MODULE_0__.EditorBootstrapper();
     editor.start();
+    _engine_diagnostics_Debug__WEBPACK_IMPORTED_MODULE_1__.Debug.log("Game + Editor initialized!");
+    _engine_diagnostics_Debug__WEBPACK_IMPORTED_MODULE_1__.Debug.error("Test error");
+    _engine_diagnostics_Debug__WEBPACK_IMPORTED_MODULE_1__.Debug.warn("Test warning");
+    _engine_diagnostics_Debug__WEBPACK_IMPORTED_MODULE_1__.Debug.log("Test log");
     // Optional: load a scene
     // SceneManager.loadScene(new TestScene());
 });

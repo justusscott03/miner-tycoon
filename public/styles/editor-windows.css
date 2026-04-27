@@ -167,4 +167,28 @@
     display: inline-block; /* add this if needed */
 }
 
+/* ===========================
+    CONSOLE WINDOW
+    =========================== */
+.console-row {
+    font-family: monospace;
+    padding: 2px 6px;
+    white-space: pre-wrap;
+}
 
+.console-row.log {
+    color: #ccc;
+}
+
+.console-row.warn {
+    color: #e6d35a;
+}
+
+.console-row.error {
+    color: #ff6b6b;
+}
+
+.console-row .time {
+    opacity: 0.5;
+    margin-right: 6px;
+}

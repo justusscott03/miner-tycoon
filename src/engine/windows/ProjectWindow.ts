@@ -1,3 +1,5 @@
+import { Debug } from "../diagnostics/Debug";
+
 export interface ProjectNode {
     type: "folder" | "file";
     name: string;
@@ -17,7 +19,7 @@ export class ProjectWindow {
         folder: "/engine/icons/folder.png",
         file: "/engine/icons/file.png",
 
-        ts: "/engine/icons/script.png",
+        ts: "/engine/icons/Icon_TypeScript_File.png",
         jpg: "/engine/icons/image.png",
         png: "/engine/icons/image.png",
 
@@ -98,7 +100,7 @@ export class ProjectWindow {
             label.addEventListener("click", (e) => {
                 e.stopPropagation();
                 this.select(label);
-                console.log("Selected file:", node.name);
+                Debug.log(`Selected file: ${node.name}`);
             });
 
             wrapper.appendChild(label);

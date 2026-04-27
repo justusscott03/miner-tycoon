@@ -30,7 +30,6 @@ export class PathUIBindings extends ShapeUIBindings<PathParams> {
 
     toCode(): string {
         const { points, color, stroke} = this.params;
-        console.log(color.value);
 
         let code = `fill(${ColorHelpers.hexToRGB(color.value).r}, ${ColorHelpers.hexToRGB(color.value).g}, ${ColorHelpers.hexToRGB(color.value).b}, ${Math.round(color.alpha * 255)});
 stroke(${ColorHelpers.hexToRGB(stroke.value).r}, ${ColorHelpers.hexToRGB(stroke.value).g}, ${ColorHelpers.hexToRGB(stroke.value).b}, ${Math.round(stroke.alpha * 255)});

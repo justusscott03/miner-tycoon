@@ -1,5 +1,6 @@
 import { pjsSettings } from "./pjsSettings";
 import { CanvasManager } from "../helpers/CanvasManager";
+import { Debug } from "../diagnostics/Debug";
 
 const ctx: CanvasRenderingContext2D = CanvasManager.getCtx();
 
@@ -35,7 +36,7 @@ function bezierVertex (cx1: number, cy1: number, cx2: number, cy2: number, x: nu
 
 function strokeJoin (MODE: CanvasLineJoin) {
     if (!["MITER", "BEVEL", "ROUND"].includes(MODE)) {
-        console.error("Invalid strokeJoin MODE:", MODE);
+        Debug.error(`Invalid strokeJoin MODE: ${MODE}`);
     }
 
     ctx.lineJoin = MODE;

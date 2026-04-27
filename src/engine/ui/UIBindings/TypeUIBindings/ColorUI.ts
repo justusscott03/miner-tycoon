@@ -12,7 +12,6 @@ export class ColorUI extends ParamUI<string> {
         super(defaultColor);
         this.alpha = 1;
         this.id = colorUICounter++;
-        //console.log("Created ColorUI with id:", this.id);
     }
 
     render(onChange: (value: string) => void): HTMLElement {

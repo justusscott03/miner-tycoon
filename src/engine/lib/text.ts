@@ -2,6 +2,7 @@ import { pjsSettings } from "./pjsSettings";
 import { fill } from "./colors";
 import { sin, cos } from "./trigonometry";
 import { CanvasManager } from "../helpers/CanvasManager";
+import { Debug } from "../diagnostics/Debug";
 
 const ctx = CanvasManager.getCtx();
 
@@ -17,7 +18,7 @@ function textSize (size: number) {
 
 function textWeight(weight: string) {
     if (!["lighter", "normal", "bold", "bolder"].includes(weight)) {
-        console.error("Invalid textWeight:", weight);
+        Debug.error(`Invalid textWeight: ${weight}`);
     }   
 
     pjsSettings.globalWeight = weight;

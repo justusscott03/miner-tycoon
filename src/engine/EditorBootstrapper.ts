@@ -2,6 +2,8 @@ import { WindowManager } from "./windows/WindowManager";
 import { ShapeEditorWindow } from "./windows/ShapeEditorWindow";
 import { PrefabGeneratorWindow } from "./windows/PrefabGeneratorWindow";
 import { ProjectWindow } from "./windows/ProjectWindow";
+import { ConsoleWindow } from "./windows/ConsoleWindow";
+import { Debug } from "./diagnostics/Debug";
 
 export class EditorBootstrapper {
     private windowManager!: WindowManager;
@@ -31,7 +33,8 @@ export class EditorBootstrapper {
             "output"
         );
         new ProjectWindow("projectTree");
+        new ConsoleWindow("consoleOutput");
 
-        console.log("Editor initialized");
+        Debug.log("Editor initialized");
     }
 }
