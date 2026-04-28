@@ -12,18 +12,23 @@ export class ProjectWindow {
     private container: HTMLElement;
     private selected: HTMLElement | null = null;
 
+    private engineIconsDirectory: string = "/engine/icons"
+
     // -----------------------------
     // ICON MAP
     // -----------------------------
     private iconMap: Record<string, string> = {
-        folder: "/engine/icons/folder.png",
-        file: "/engine/icons/file.png",
+        folder: `${this.engineIconsDirectory}/folder.png`,
+        file: `${this.engineIconsDirectory}/file.png`,
 
-        ts: "/engine/icons/Icon_TypeScript_File.png",
-        jpg: "/engine/icons/image.png",
-        png: "/engine/icons/image.png",
+        ts: `${this.engineIconsDirectory}/Icon_TypeScript_File.png`,
+        jpg: `${this.engineIconsDirectory}/image.png`,
+        png: `${this.engineIconsDirectory}/image.png`,
 
-        prefab: "/engine/icons/prefab.png"
+        wav: `${this.engineIconsDirectory}/Icon_AudioWAV_File.png`,
+        mp3: `${this.engineIconsDirectory}/Icon_AudioMP3_File.png`,
+
+        prefab: `${this.engineIconsDirectory}/prefab.png`
     };
 
     constructor(containerId: string) {

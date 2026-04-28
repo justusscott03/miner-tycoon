@@ -3791,16 +3791,19 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 class ProjectWindow {
     constructor(containerId) {
         this.selected = null;
+        this.engineIconsDirectory = "/engine/icons";
         // -----------------------------
         // ICON MAP
         // -----------------------------
         this.iconMap = {
-            folder: "/engine/icons/folder.png",
-            file: "/engine/icons/file.png",
-            ts: "/engine/icons/Icon_TypeScript_File.png",
-            jpg: "/engine/icons/image.png",
-            png: "/engine/icons/image.png",
-            prefab: "/engine/icons/prefab.png"
+            folder: `${this.engineIconsDirectory}/folder.png`,
+            file: `${this.engineIconsDirectory}/file.png`,
+            ts: `${this.engineIconsDirectory}/Icon_TypeScript_File.png`,
+            jpg: `${this.engineIconsDirectory}/image.png`,
+            png: `${this.engineIconsDirectory}/image.png`,
+            wav: `${this.engineIconsDirectory}/Icon_AudioWAV_File.png`,
+            mp3: `${this.engineIconsDirectory}/Icon_AudioMP3_File.png`,
+            prefab: `${this.engineIconsDirectory}/prefab.png`
         };
         const el = document.getElementById(containerId);
         if (!el)
